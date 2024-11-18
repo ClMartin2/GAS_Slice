@@ -45,6 +45,16 @@ void AGAS_SliceCharacter::PostInitializeComponents()
 	if (!Knife)
 	{
 		Knife = FindComponentByClass<UKnife>();
-		FString nameKnife = Knife->GetName();
+		ParentKnife = Knife->GetAttachParent();
 	}
+}
+
+void AGAS_SliceCharacter::ResetKnife_Implementation()
+{
+	Knife->SetupAttachment(ParentKnife, NameSocketKnife);
+}
+
+void AGAS_SliceCharacter::ThrowKnife_Implementation()
+{
+	Knife->DetachFromParent(true);
 }

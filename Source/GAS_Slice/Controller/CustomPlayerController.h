@@ -49,29 +49,31 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
 	UKnife* Knife;
 
-	UPROPERTY(EditAnywhere, Category = "Settings|Physics", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Settings|Knife", meta = (AllowPrivateAccess = "true"))
 	float ForceThrowKnife;
 
-private:
+	FVector ForwardThrowKnife;
+
+protected:
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void ThrowKnife();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void ResetKnife();
 
-protected: 
+	UFUNCTION(BlueprintCallable, Category = "Knife")
+	void MoveKnife();
+
+	virtual void ResetKnife_Implementation();
+	virtual void ThrowKnife_Implementation();
 	virtual void BeginPlay() override;
-
-	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
-
-	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
-
 	void Jump();
-
 	void StopJumping();
-
 	void SetupPlayerInputComponent(UInputComponent* InputComponent);
 	
 public:

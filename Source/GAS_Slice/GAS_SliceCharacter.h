@@ -29,8 +29,14 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
 	UKnife* Knife;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
+	USceneComponent* ParentKnife;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Knife", meta = (AllowPrivateAccess = "true"))
+	FName NameSocketKnife;
 
 public:
 	/** Returns Mesh1P subobject **/
@@ -45,5 +51,15 @@ protected:
 
 public:
 	AGAS_SliceCharacter();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
+	void ThrowKnife();
+
+	virtual void ThrowKnife_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
+	void ResetKnife();
+
+	virtual void ResetKnife_Implementation();
 };
 

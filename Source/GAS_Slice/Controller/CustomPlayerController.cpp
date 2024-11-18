@@ -9,6 +9,7 @@
 #include "InputActionValue.h"
 #include "../Weapon/Knife.h"
 #include "../GAS_SliceCharacter.h"
+#include <Kismet/KismetMathLibrary.h>
 
 
 ACustomPlayerController::ACustomPlayerController()
@@ -87,18 +88,33 @@ void ACustomPlayerController::SetupPlayerInputComponent(UInputComponent* PlayerI
 	}
 }
 
-void ACustomPlayerController::ThrowKnife()
+void ACustomPlayerController::ThrowKnife_Implementation()
 {
-	FVector forward = PlayerCharacter->GetActorForwardVector();
-	Knife->SetSimulatePhysics(true);
-	Knife->AddImpulse(forward * ForceThrowKnife, NAME_None, true);
+	PlayerCharacter->ThrowKnife();
+
+	FRotator CameraRotation = PlayerCameraManager->GetCameraRotation();
+	ForwardThrowKnife = CameraRotation.Vector();
+
+	FRotator RotationToForward = UKismetMathLibrary::FindLookAtRotation(FVector::ZeroVector, ForwardThrowKnife);
+	Knife->SetWorldRotation(RotationToForward);
+
+	FHitResult Hit(ForceInit);
+	FVector start = Knife->GetComponentLocation();
+	FVector End = start + ForwardThrowKnife * 700.f;
+	FCollisionQueryParams CollisionParams;
+	DrawDebugLine(GetWorld(), start, End, FColor::Green, true, -1.0f, 0, 5.f);
+} 
+
+void ACustomPlayerController::MoveKnife()
+{
+	FVector NewLocation = Knife->GetComponentLocation() + ForwardThrowKnife * (ForceThrowKnife * GetWorld()->GetDeltaSeconds());
+	Knife->SetWorldLocation(NewLocation,true);
 }
 
-void ACustomPlayerController::ResetKnife()
+void ACustomPlayerController::ResetKnife_Implementation()
 {
-	Knife->SetSimulatePhysics(false);
-	//Knife->SetPhysicsLinearVelocity(FVector::ZeroVector);
-	Knife->SetRelativeLocation(FVector::ZeroVector,false,nullptr,ETeleportType::ResetPhysics);
+	PlayerCharacter->ResetKnife();
+	Knife->SetRelativeLocation(FVector::ZeroVector);
 }
 
 

@@ -12,7 +12,7 @@ class USkeletalMeshComponent;
 class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
-class UKnife;
+class AKnife;
 struct FInputActionValue;
 
 UCLASS(config=Game)
@@ -30,7 +30,10 @@ private:
 	UCameraComponent* FirstPersonCameraComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
-	UKnife* Knife;
+	AKnife* Knife;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
+	USceneComponent* KnifeChildActor;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* ParentKnife;
@@ -38,12 +41,14 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Knife", meta = (AllowPrivateAccess = "true"))
 	FName NameSocketKnife;
 
+	FVector KnifeStartLocation;
+
 public:
 	/** Returns Mesh1P subobject **/
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
-	UKnife* GetKnife() const { return Knife; }
+	AKnife* GetKnife() const { return Knife; }
 
 protected:
 	virtual void BeginPlay() override;

@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Knife.generated.h"
-#include "Components/BoxComponent.h"
+
+class UProjectileMovementComponent;
+class UBoxComponent;
 
 /**
  * 
@@ -28,6 +30,11 @@ public:
 
 	virtual void StopMove_Implementation();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
+	void Reset();
+
+	virtual void Reset_Implementation();
+
 
 private:
 	UFUNCTION(BlueprintCallable, Category = "Knife")
@@ -40,4 +47,9 @@ private:
 	float SpeedKnife;
 
 	UBoxComponent* BoxCollision = nullptr;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	UProjectileMovementComponent* ProjectileMovement;
+
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 };

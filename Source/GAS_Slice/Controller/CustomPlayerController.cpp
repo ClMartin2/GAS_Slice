@@ -113,7 +113,7 @@ void ACustomPlayerController::ThrowKnife_Implementation()
 void ACustomPlayerController::ResetKnife_Implementation()
 {
 	PlayerCharacter->ResetKnife();
-	KnifeChildActor->SetRelativeLocation(FVector::ZeroVector);
+	Knife->Reset_Implementation();
 	WasTheKnifeThrown = false;
 }
 

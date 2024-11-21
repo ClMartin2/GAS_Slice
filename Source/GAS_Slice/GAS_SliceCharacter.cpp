@@ -11,6 +11,7 @@
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
 #include "Weapon/Knife.h"
+#include <Kismet/KismetStringLibrary.h>
 
 
 AGAS_SliceCharacter::AGAS_SliceCharacter()
@@ -44,17 +45,33 @@ void AGAS_SliceCharacter::PostInitializeComponents()
 
 	if (!Knife)
 	{
-		Knife = FindComponentByClass<UKnife>();
-		ParentKnife = Knife->GetAttachParent();
+		TArray<AActor*> ChildActors;
+		GetAllChildActors(ChildActors, true);
+		
+		for (AActor* Actor : ChildActors)
+		{			
+			if (Actor->IsA(AKnife::StaticClass()))
+			{
+				Knife = Cast<AKnife>(Actor);
+			}
+		}
+		
+		if (Knife != nullptr) {
+			KnifeChildActor = Knife->GetParentComponent();
+			ParentKnife = KnifeChildActor->GetAttachParent();
+			KnifeStartLocation = KnifeChildActor->GetRelativeLocation();
+		}
 	}
 }
 
 void AGAS_SliceCharacter::ResetKnife_Implementation()
 {
-	Knife->SetupAttachment(ParentKnife, NameSocketKnife);
+	KnifeChildActor->DetachFromParent();
+	bool SuccesAttachement = KnifeChildActor->AttachToComponent(ParentKnife, FAttachmentTransformRules::KeepWorldTransform,NameSocketKnife);
+	KnifeChildActor->SetRelativeTransform(FTransform(FRotator::ZeroRotator, KnifeStartLocation),false, nullptr,ETeleportType::ResetPhysics);
 }
 
 void AGAS_SliceCharacter::ThrowKnife_Implementation()
 {
-	Knife->DetachFromParent(true);
+	KnifeChildActor->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
 }

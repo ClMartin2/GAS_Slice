@@ -10,7 +10,7 @@
 class UInputComponent;
 class UInputAction;
 class UInputMappingContext;
-class UKnife;
+class AKnife;
 class AGAS_SliceCharacter;
 
 struct FInputActionValue;
@@ -45,17 +45,21 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ResetKnifeAction;
 	
-	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	class UInputAction* LookAction;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
-	UKnife* Knife;
+	AKnife* Knife;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
+	USceneComponent* KnifeChildActor;
 
 	UPROPERTY(EditAnywhere, Category = "Settings|Knife", meta = (AllowPrivateAccess = "true"))
 	float ForceThrowKnife;
 
 	FVector ForwardThrowKnife;
+
+	bool WasTheKnifeThrown = false;
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
@@ -63,9 +67,6 @@ protected:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void ResetKnife();
-
-	UFUNCTION(BlueprintCallable, Category = "Knife")
-	void MoveKnife();
 
 	virtual void ResetKnife_Implementation();
 	virtual void ThrowKnife_Implementation();

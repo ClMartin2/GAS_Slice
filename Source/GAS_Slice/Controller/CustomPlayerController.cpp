@@ -30,6 +30,9 @@ void ACustomPlayerController::BeginPlay()
 	if (PlayerCharacter != nullptr) {
 		SetupPlayerInputComponent(PlayerCharacter->InputComponent);
 		Knife = PlayerCharacter->GetKnife();
+
+		if (Knife != nullptr)
+			KnifeChildActor = Knife->GetParentComponent();
 	}
 }
 
@@ -90,31 +93,30 @@ void ACustomPlayerController::SetupPlayerInputComponent(UInputComponent* PlayerI
 
 void ACustomPlayerController::ThrowKnife_Implementation()
 {
-	PlayerCharacter->ThrowKnife();
+	if (WasTheKnifeThrown)
+		return;
 
 	FRotator CameraRotation = PlayerCameraManager->GetCameraRotation();
 	ForwardThrowKnife = CameraRotation.Vector();
 
-	FRotator RotationToForward = UKismetMathLibrary::FindLookAtRotation(FVector::ZeroVector, ForwardThrowKnife);
-	Knife->SetWorldRotation(RotationToForward);
-
-	FHitResult Hit(ForceInit);
-	FVector start = Knife->GetComponentLocation();
+	FVector start = KnifeChildActor->GetComponentLocation();
 	FVector End = start + ForwardThrowKnife * 700.f;
-	FCollisionQueryParams CollisionParams;
-	DrawDebugLine(GetWorld(), start, End, FColor::Green, true, -1.0f, 0, 5.f);
-} 
 
-void ACustomPlayerController::MoveKnife()
-{
-	FVector NewLocation = Knife->GetComponentLocation() + ForwardThrowKnife * (ForceThrowKnife * GetWorld()->GetDeltaSeconds());
-	Knife->SetWorldLocation(NewLocation,true);
-}
+	FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(start, End);
+	KnifeChildActor->SetWorldRotation(TargetRotation);
+
+	PlayerCharacter->ThrowKnife();
+	Knife->StartMove(ForwardThrowKnife);
+	WasTheKnifeThrown = true;
+} 
 
 void ACustomPlayerController::ResetKnife_Implementation()
 {
 	PlayerCharacter->ResetKnife();
-	Knife->SetRelativeLocation(FVector::ZeroVector);
+	Knife->Reset_Implementation();
+	WasTheKnifeThrown = false;
+
+	GEngine->AddOnScreenDebugMessage(-1, 100, FColor::Black, "Passe par la");
 }
 
 

@@ -40,16 +40,21 @@ private:
 	UFUNCTION(BlueprintCallable, Category = "Knife")
 	void Move(float Acceleration);
 
+	UFUNCTION()
+	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
 private:
 	FVector Direction;
 
 	UPROPERTY(EditAnywhere, Category = "Settings|Speed")
-	float SpeedKnife;
+	float Speed;
 
+	UPROPERTY(EditAnywhere, Category = "Settings|Speed")
+	float MaxSpeed;
+
+	UPROPERTY(EditAnywhere, Category = Collision, meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* BoxCollision = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
-
-	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 };

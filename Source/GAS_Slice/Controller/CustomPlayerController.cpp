@@ -115,6 +115,8 @@ void ACustomPlayerController::ResetKnife_Implementation()
 	PlayerCharacter->ResetKnife();
 	Knife->Reset_Implementation();
 	WasTheKnifeThrown = false;
+
+	GEngine->AddOnScreenDebugMessage(-1, 100, FColor::Black, "Passe par la");
 }
 
 

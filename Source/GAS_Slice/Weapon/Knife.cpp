@@ -11,30 +11,37 @@ AKnife::AKnife()
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxCollision"));
 	BoxCollision->OnComponentHit.AddDynamic(this, &AKnife::OnHit);
 
-	SetRootComponent(BoxCollision);
+	RootComponent = BoxCollision;
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 	ProjectileMovement->UpdatedComponent = BoxCollision;
 	ProjectileMovement->bRotationFollowsVelocity = true;
+
+	ProjectileMovement->MaxSpeed = MaxSpeed;
 }
 
 void AKnife::StartMove_Implementation(FVector DirectionThrowKnife)
 {
 	Direction = DirectionThrowKnife;
+	ProjectileMovement->InitialSpeed = Speed;
+	ProjectileMovement->Velocity = Direction * Speed;
+
+	GEngine->AddOnScreenDebugMessage(-1, 500, FColor::Blue, "Velocity: " + ProjectileMovement->Velocity.ToString());
 }
 
 void AKnife::StopMove_Implementation()
 {
-
+	ProjectileMovement->Velocity = FVector::ZeroVector;
+	ProjectileMovement->InitialSpeed = 0;
 }
 
 void AKnife::Reset_Implementation()
 {
-	
+	StopMove_Implementation();
 }
 
 void AKnife::Move(float Acceleration) {
-	FVector NewLocation = GetActorLocation() + Direction * (SpeedKnife * Acceleration * GetWorld()->GetDeltaSeconds());
+	FVector NewLocation = GetActorLocation() + Direction * (Speed * Acceleration * GetWorld()->GetDeltaSeconds());
 	SetActorLocation(NewLocation, true);
 }
 

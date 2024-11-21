@@ -9,7 +9,6 @@
 #include "InputActionValue.h"
 #include "../Weapon/Knife.h"
 #include "../GAS_SliceCharacter.h"
-#include <Kismet/KismetMathLibrary.h>
 
 
 ACustomPlayerController::ACustomPlayerController()
@@ -99,12 +98,6 @@ void ACustomPlayerController::ThrowKnife_Implementation()
 	FRotator CameraRotation = PlayerCameraManager->GetCameraRotation();
 	ForwardThrowKnife = CameraRotation.Vector();
 
-	FVector start = KnifeChildActor->GetComponentLocation();
-	FVector End = start + ForwardThrowKnife * 700.f;
-
-	FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(start, End);
-	KnifeChildActor->SetWorldRotation(TargetRotation);
-
 	PlayerCharacter->ThrowKnife();
 	Knife->StartMove(ForwardThrowKnife);
 	WasTheKnifeThrown = true;
@@ -112,11 +105,12 @@ void ACustomPlayerController::ThrowKnife_Implementation()
 
 void ACustomPlayerController::ResetKnife_Implementation()
 {
+	if (!WasTheKnifeThrown)
+		return;
+
 	PlayerCharacter->ResetKnife();
 	Knife->Reset_Implementation();
 	WasTheKnifeThrown = false;
-
-	GEngine->AddOnScreenDebugMessage(-1, 100, FColor::Black, "Passe par la");
 }
 
 

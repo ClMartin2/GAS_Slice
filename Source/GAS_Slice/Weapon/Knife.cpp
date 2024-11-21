@@ -22,11 +22,9 @@ AKnife::AKnife()
 
 void AKnife::StartMove_Implementation(FVector DirectionThrowKnife)
 {
-	Direction = DirectionThrowKnife;
+	ProjectileMovement->SetUpdatedComponent(GetRootComponent());
 	ProjectileMovement->InitialSpeed = Speed;
-	ProjectileMovement->Velocity = Direction * Speed;
-
-	GEngine->AddOnScreenDebugMessage(-1, 500, FColor::Blue, "Velocity: " + ProjectileMovement->Velocity.ToString());
+	ProjectileMovement->Velocity = DirectionThrowKnife * Speed;
 }
 
 void AKnife::StopMove_Implementation()
@@ -40,13 +38,13 @@ void AKnife::Reset_Implementation()
 	StopMove_Implementation();
 }
 
-void AKnife::Move(float Acceleration) {
-	FVector NewLocation = GetActorLocation() + Direction * (Speed * Acceleration * GetWorld()->GetDeltaSeconds());
-	SetActorLocation(NewLocation, true);
-}
-
 void AKnife::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	Hit_Implementation(OtherActor);
+}
+
+void AKnife::Hit_Implementation(AActor* HitActor)
+{
 	StopMove_Implementation();
-	AttachToActor(OtherActor, FAttachmentTransformRules::KeepWorldTransform);
+	AttachToActor(HitActor, FAttachmentTransformRules::KeepWorldTransform);
 }

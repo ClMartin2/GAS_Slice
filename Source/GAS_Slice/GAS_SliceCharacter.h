@@ -33,13 +33,7 @@ private:
 	AKnife* Knife;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
-	USceneComponent* KnifeChildActor;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* ParentKnife;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Knife", meta = (AllowPrivateAccess = "true"))
-	FName NameSocketKnife;
 
 	FVector KnifeStartLocation;
 

@@ -57,7 +57,7 @@ void AGAS_SliceCharacter::PostInitializeComponents()
 		}
 		
 		if (Knife != nullptr) {
-			KnifeChildActor = Knife->GetParentComponent();
+			UChildActorComponent* KnifeChildActor = Knife->GetParentComponent();
 			ParentKnife = KnifeChildActor->GetAttachParent();
 			KnifeStartLocation = KnifeChildActor->GetRelativeLocation();
 		}
@@ -66,12 +66,12 @@ void AGAS_SliceCharacter::PostInitializeComponents()
 
 void AGAS_SliceCharacter::ResetKnife_Implementation()
 {
-	KnifeChildActor->DetachFromParent();
-	bool SuccesAttachement = KnifeChildActor->AttachToComponent(ParentKnife, FAttachmentTransformRules::KeepWorldTransform,NameSocketKnife);
-	KnifeChildActor->SetRelativeTransform(FTransform(FRotator::ZeroRotator, KnifeStartLocation),false, nullptr,ETeleportType::ResetPhysics);
+	Knife->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	bool SuccesAttachement = Knife->AttachToComponent(ParentKnife, FAttachmentTransformRules::KeepWorldTransform);
+	Knife->SetActorRelativeLocation(KnifeStartLocation);
 }
 
 void AGAS_SliceCharacter::ThrowKnife_Implementation()
 {
-	KnifeChildActor->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	Knife->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 }

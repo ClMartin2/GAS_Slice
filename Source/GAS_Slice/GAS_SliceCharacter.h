@@ -37,6 +37,8 @@ private:
 
 	FVector KnifeStartLocation;
 
+	FRotator KnifeStartRotation;
+
 public:
 	/** Returns Mesh1P subobject **/
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }

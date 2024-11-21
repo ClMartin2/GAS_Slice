@@ -4,6 +4,7 @@
 #include "Knife.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Components/StaticMeshComponent.h"
 
 
 AKnife::AKnife()
@@ -18,6 +19,9 @@ AKnife::AKnife()
 	ProjectileMovement->bRotationFollowsVelocity = true;
 
 	ProjectileMovement->MaxSpeed = MaxSpeed;
+
+	StaticMeshKnife = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshKnife"));
+	StaticMeshKnife->SetupAttachment(BoxCollision);
 }
 
 void AKnife::StartMove_Implementation(FVector DirectionThrowKnife)
@@ -35,16 +39,22 @@ void AKnife::StopMove_Implementation()
 
 void AKnife::Reset_Implementation()
 {
-	StopMove_Implementation();
+	StopMove();
 }
 
 void AKnife::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	Hit_Implementation(OtherActor);
+	HitKnife(OtherActor);
 }
 
-void AKnife::Hit_Implementation(AActor* HitActor)
+void AKnife::RotateThrow()
 {
-	StopMove_Implementation();
+	FRotator NewRotation = GetActorRotation() - FRotator(RotationSpeed * GetWorld()->GetDeltaSeconds(),0, 0);
+	SetActorRotation(NewRotation);
+}
+
+void AKnife::HitKnife_Implementation(AActor* HitActor)
+{
+	StopMove();
 	AttachToActor(HitActor, FAttachmentTransformRules::KeepWorldTransform);
 }

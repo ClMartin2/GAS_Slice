@@ -95,11 +95,29 @@ void ACustomPlayerController::ThrowKnife_Implementation()
 	if (WasTheKnifeThrown)
 		return;
 
-	FRotator CameraRotation = PlayerCameraManager->GetCameraRotation();
-	ForwardThrowKnife = CameraRotation.Vector();
+	FVector ForwardThrowKnife = PlayerCameraManager->GetCameraRotation().Vector();
+	
+	FHitResult HitResult(ForceInit);
+	FVector CameraLocation = PlayerCameraManager->GetCameraLocation();
+	FVector KnifeLocation = Knife->GetActorLocation();
+
+	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
+	RV_TraceParams.bTraceComplex = true;
+	RV_TraceParams.bReturnPhysicalMaterial = false;
+
+	GetWorld()->LineTraceSingleByChannel(HitResult, CameraLocation, CameraLocation + ForwardThrowKnife * 99999999999999999,ECollisionChannel::ECC_Visibility, RV_TraceParams);
+	
+	FVector DirectionKnife = FVector::ZeroVector;
+
+	if (HitResult.GetActor() != nullptr)
+		DirectionKnife = HitResult.ImpactPoint - KnifeLocation;
+	else
+		DirectionKnife = (CameraLocation + ForwardThrowKnife * 10000) - KnifeLocation;
+
+	DirectionKnife = DirectionKnife.GetSafeNormal();
 
 	PlayerCharacter->ThrowKnife();
-	Knife->StartMove(ForwardThrowKnife);
+	Knife->StartMove(DirectionKnife);
 	WasTheKnifeThrown = true;
 } 
 
@@ -109,7 +127,7 @@ void ACustomPlayerController::ResetKnife_Implementation()
 		return;
 
 	PlayerCharacter->ResetKnife();
-	Knife->Reset_Implementation();
+	Knife->Reset();
 	WasTheKnifeThrown = false;
 }
 

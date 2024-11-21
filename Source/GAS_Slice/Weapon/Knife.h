@@ -8,6 +8,7 @@
 
 class UProjectileMovementComponent;
 class UBoxComponent;
+class UStaticMeshComponent;
 
 /**
  * 
@@ -24,12 +25,17 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Settings|Speed")
 	float MaxSpeed;
 
-	UPROPERTY(EditAnywhere, Category = Collision, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Settings|Speed")
+	float RotationSpeed;
+
+	UPROPERTY(VisibleAnywhere, Category = Collision, meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* BoxCollision = nullptr;
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* StaticMeshKnife = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
-
 
 public:
 	AKnife();	
@@ -52,11 +58,15 @@ protected:
 	virtual void StopMove_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
-	void Hit(AActor* HitActor);
+	void HitKnife(AActor* HitActor);
 
-	virtual void Hit_Implementation(AActor* HitActor);
+	virtual void HitKnife_Implementation(AActor* HitActor);
+
 
 private:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
+	UFUNCTION(BlueprintCallable, Category = "Knife")
+	void RotateThrow();
 };

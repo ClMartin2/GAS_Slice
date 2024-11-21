@@ -57,8 +57,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Settings|Knife", meta = (AllowPrivateAccess = "true"))
 	float ForceThrowKnife;
 
-	FVector ForwardThrowKnife;
-
 	bool WasTheKnifeThrown = false;
 
 protected:

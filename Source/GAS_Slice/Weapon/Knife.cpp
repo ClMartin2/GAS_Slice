@@ -5,6 +5,8 @@
 #include "Components/BoxComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Kismet/KismetStringLibrary.h"
+#include "../Library/ConvertLibrary.h"
 
 
 AKnife::AKnife()
@@ -44,7 +46,7 @@ void AKnife::Reset_Implementation()
 
 void AKnife::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	HitKnife(OtherActor);
+	HitKnife(OtherActor, Hit);
 }
 
 void AKnife::RotateThrow()
@@ -53,8 +55,18 @@ void AKnife::RotateThrow()
 	SetActorRotation(NewRotation);
 }
 
-void AKnife::HitKnife_Implementation(AActor* HitActor)
+void AKnife::HitKnife_Implementation(AActor* HitActor, FHitResult Hit)
 {
+	FVector Forward = GetActorForwardVector();
+	bool IsOnTheRightSide = !ConvertLibrary::ConvertFloatToBoolNegativePositiveRange(FVector::DotProduct(Forward, Hit.ImpactNormal));
+
+	if (!IsOnTheRightSide) {
+		FRotator ActorRotation = GetActorRotation();
+		FRotator NewRotation = FRotator(ActorRotation.Pitch, ActorRotation.Yaw + 180.0f, ActorRotation.Roll);
+		SetActorRotation(NewRotation);
+		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Black, "Inverse");
+	}
+
 	StopMove();
 	AttachToActor(HitActor, FAttachmentTransformRules::KeepWorldTransform);
 }

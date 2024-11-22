@@ -58,9 +58,9 @@ protected:
 	virtual void StopMove_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
-	void HitKnife(AActor* HitActor);
+	void HitKnife(AActor* HitActor, FHitResult Hit);
 
-	virtual void HitKnife_Implementation(AActor* HitActor);
+	virtual void HitKnife_Implementation(AActor* HitActor, FHitResult Hit);
 
 
 private:

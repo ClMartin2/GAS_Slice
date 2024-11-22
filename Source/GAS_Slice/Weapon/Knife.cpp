@@ -7,6 +7,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "../Library/ConvertLibrary.h"
+#include "CableComponent.h"
 
 
 AKnife::AKnife()
@@ -22,8 +23,8 @@ AKnife::AKnife()
 
 	ProjectileMovement->MaxSpeed = MaxSpeed;
 
-	StaticMeshKnife = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshKnife"));
-	StaticMeshKnife->SetupAttachment(BoxCollision);
+	StaticMeshKnife_ = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Static Mesh Knife"));
+	StaticMeshKnife_->SetupAttachment(BoxCollision);
 }
 
 void AKnife::StartMove_Implementation(FVector DirectionThrowKnife)
@@ -64,7 +65,6 @@ void AKnife::HitKnife_Implementation(AActor* HitActor, FHitResult Hit)
 		FRotator ActorRotation = GetActorRotation();
 		FRotator NewRotation = FRotator(ActorRotation.Pitch, ActorRotation.Yaw + 180.0f, ActorRotation.Roll);
 		SetActorRotation(NewRotation);
-		GEngine->AddOnScreenDebugMessage(-1, 10, FColor::Black, "Inverse");
 	}
 
 	StopMove();

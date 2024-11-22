@@ -9,6 +9,7 @@
 class UProjectileMovementComponent;
 class UBoxComponent;
 class UStaticMeshComponent;
+class UCableComponent;
 
 /**
  * 
@@ -29,10 +30,10 @@ private:
 	float RotationSpeed;
 
 	UPROPERTY(VisibleAnywhere, Category = Collision, meta = (AllowPrivateAccess = "true"))
-	UBoxComponent* BoxCollision = nullptr;
+	UBoxComponent* BoxCollision;
 
-	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* StaticMeshKnife = nullptr;
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Visual", meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* StaticMeshKnife_;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;

@@ -11,8 +11,9 @@
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
 #include "Weapon/Knife.h"
-#include <Kismet/KismetStringLibrary.h>
-
+#include "Kismet/KismetStringLibrary.h"
+#include "CableComponent.h"
+#include "Components/ChildActorComponent.h"
 
 AGAS_SliceCharacter::AGAS_SliceCharacter()
 {
@@ -32,6 +33,12 @@ AGAS_SliceCharacter::AGAS_SliceCharacter()
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+
+	/*HandStart = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HandStart"));
+	HandStart->SetupAttachment(FirstPersonCameraComponent);
+
+	Cable = CreateDefaultSubobject<UCableComponent>(TEXT("Cable"));
+	Cable->SetupAttachment(HandStart);*/
 }
 
 void AGAS_SliceCharacter::BeginPlay()

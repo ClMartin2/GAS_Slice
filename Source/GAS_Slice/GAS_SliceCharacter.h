@@ -13,6 +13,9 @@ class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
 class AKnife;
+class UCableComponent;
+class UChildActorComponent;
+
 struct FInputActionValue;
 
 UCLASS(config=Game)
@@ -34,6 +37,12 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* ParentKnife;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* HandStart;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Cable", meta = (AllowPrivateAccess = "true"))
+	UCableComponent* Cable;
 
 	FVector KnifeStartLocation;
 

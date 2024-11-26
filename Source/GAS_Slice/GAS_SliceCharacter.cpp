@@ -44,6 +44,8 @@ AGAS_SliceCharacter::AGAS_SliceCharacter()
 void AGAS_SliceCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	Knife->DelegateHitKnife.AddDynamic(this, &AGAS_SliceCharacter::OnHitKnife);
 }
 
 void AGAS_SliceCharacter::PostInitializeComponents()
@@ -78,6 +80,26 @@ void AGAS_SliceCharacter::ResetKnife_Implementation()
 	Knife->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	Knife->AttachToComponent(ParentKnife, FAttachmentTransformRules::KeepWorldTransform);
 	Knife->SetActorRelativeTransform(FTransform(KnifeStartRotation, KnifeStartLocation));
+}
+
+bool AGAS_SliceCharacter::CheckDistanceKnife_Implementation()
+{
+	float Distance = FVector::Distance(HandStart->GetComponentLocation(),Knife->GetActorLocation());
+	bool Toofar = Distance > MaxDistance;
+
+	if (Toofar)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
+			"Go to far distance : " +  UKismetStringLibrary::Conv_FloatToString(Distance));
+		Knife->Retain();
+	}
+	
+	return Toofar;
+}
+
+void AGAS_SliceCharacter::OnHitKnife_Implementation()
+{
+	
 }
 
 void AGAS_SliceCharacter::ThrowKnife_Implementation()

@@ -128,7 +128,7 @@ void ACustomPlayerController::ResetKnife_Implementation()
 		return;
 
 	PlayerCharacter->ResetKnife();
-	Knife->Reset();
+	Knife->ResetKnife();
 	WasTheKnifeThrown = false;
 }
 

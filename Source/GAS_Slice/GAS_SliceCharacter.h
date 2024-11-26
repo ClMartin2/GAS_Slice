@@ -45,8 +45,8 @@ private:
 	UCableComponent* Cable;
 
 	FVector KnifeStartLocation;
-
 	FRotator KnifeStartRotation;
+	UChildActorComponent* KnifeChildActorComponent;
 
 public:
 	/** Returns Mesh1P subobject **/

@@ -19,7 +19,7 @@ AGAS_SliceCharacter::AGAS_SliceCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
-		
+
 	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
@@ -34,11 +34,11 @@ AGAS_SliceCharacter::AGAS_SliceCharacter()
 	Mesh1P->CastShadow = false;
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
-	/*HandStart = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HandStart"));
-	HandStart->SetupAttachment(FirstPersonCameraComponent);
+	HandStart = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HandStart"));
+	HandStart->SetupAttachment(FirstPersonCameraComponent);	
 
 	Cable = CreateDefaultSubobject<UCableComponent>(TEXT("Cable"));
-	Cable->SetupAttachment(HandStart);*/
+	Cable->SetupAttachment(HandStart);
 }
 
 void AGAS_SliceCharacter::BeginPlay()
@@ -54,20 +54,21 @@ void AGAS_SliceCharacter::PostInitializeComponents()
 	{
 		TArray<AActor*> ChildActors;
 		GetAllChildActors(ChildActors, true);
-		
+
 		for (AActor* Actor : ChildActors)
-		{			
+		{
 			if (Actor->IsA(AKnife::StaticClass()))
 			{
 				Knife = Cast<AKnife>(Actor);
 			}
 		}
-		
-		if (Knife != nullptr) {
-			UChildActorComponent* KnifeChildActor = Knife->GetParentComponent();
-			ParentKnife = KnifeChildActor->GetAttachParent();
-			KnifeStartLocation = KnifeChildActor->GetRelativeLocation();
-			KnifeStartRotation = KnifeChildActor->GetRelativeRotation();
+
+		if (Knife != nullptr)
+		{
+			KnifeChildActorComponent = Knife->GetParentComponent();
+			ParentKnife = KnifeChildActorComponent->GetAttachParent();
+			KnifeStartLocation = KnifeChildActorComponent->GetRelativeLocation();
+			KnifeStartRotation = KnifeChildActorComponent->GetRelativeRotation();
 		}
 	}
 }
@@ -75,11 +76,12 @@ void AGAS_SliceCharacter::PostInitializeComponents()
 void AGAS_SliceCharacter::ResetKnife_Implementation()
 {
 	Knife->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	bool SuccesAttachement = Knife->AttachToComponent(ParentKnife, FAttachmentTransformRules::KeepWorldTransform);
+	Knife->AttachToComponent(ParentKnife, FAttachmentTransformRules::KeepWorldTransform);
 	Knife->SetActorRelativeTransform(FTransform(KnifeStartRotation, KnifeStartLocation));
 }
 
 void AGAS_SliceCharacter::ThrowKnife_Implementation()
 {
 	Knife->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	Cable->SetAttachEndToComponent(Knife->GetRootComponent());
 }

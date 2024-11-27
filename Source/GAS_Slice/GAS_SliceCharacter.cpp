@@ -11,14 +11,15 @@
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
 #include "Weapon/Knife.h"
-#include <Kismet/KismetStringLibrary.h>
-
+#include "Kismet/KismetStringLibrary.h"
+#include "CableComponent.h"
+#include "Components/ChildActorComponent.h"
 
 AGAS_SliceCharacter::AGAS_SliceCharacter()
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
-		
+
 	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
@@ -32,11 +33,19 @@ AGAS_SliceCharacter::AGAS_SliceCharacter()
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+
+	HandStart = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HandStart"));
+	HandStart->SetupAttachment(FirstPersonCameraComponent);	
+
+	Cable = CreateDefaultSubobject<UCableComponent>(TEXT("Cable"));
+	Cable->SetupAttachment(HandStart);
 }
 
 void AGAS_SliceCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	Knife->DelegateHitKnife.AddDynamic(this, &AGAS_SliceCharacter::OnHitKnife);
 }
 
 void AGAS_SliceCharacter::PostInitializeComponents()
@@ -47,31 +56,54 @@ void AGAS_SliceCharacter::PostInitializeComponents()
 	{
 		TArray<AActor*> ChildActors;
 		GetAllChildActors(ChildActors, true);
-		
+
 		for (AActor* Actor : ChildActors)
-		{			
+		{
 			if (Actor->IsA(AKnife::StaticClass()))
 			{
 				Knife = Cast<AKnife>(Actor);
 			}
 		}
-		
-		if (Knife != nullptr) {
-			KnifeChildActor = Knife->GetParentComponent();
-			ParentKnife = KnifeChildActor->GetAttachParent();
-			KnifeStartLocation = KnifeChildActor->GetRelativeLocation();
+
+		if (Knife != nullptr)
+		{
+			KnifeChildActorComponent = Knife->GetParentComponent();
+			ParentKnife = KnifeChildActorComponent->GetAttachParent();
+			KnifeStartLocation = KnifeChildActorComponent->GetRelativeLocation();
+			KnifeStartRotation = KnifeChildActorComponent->GetRelativeRotation();
 		}
 	}
 }
 
 void AGAS_SliceCharacter::ResetKnife_Implementation()
 {
-	KnifeChildActor->DetachFromParent();
-	bool SuccesAttachement = KnifeChildActor->AttachToComponent(ParentKnife, FAttachmentTransformRules::KeepWorldTransform,NameSocketKnife);
-	KnifeChildActor->SetRelativeTransform(FTransform(FRotator::ZeroRotator, KnifeStartLocation),false, nullptr,ETeleportType::ResetPhysics);
+	Knife->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	Knife->AttachToComponent(ParentKnife, FAttachmentTransformRules::KeepWorldTransform);
+	Knife->SetActorRelativeTransform(FTransform(KnifeStartRotation, KnifeStartLocation));
+}
+
+bool AGAS_SliceCharacter::CheckDistanceKnife_Implementation()
+{
+	float Distance = FVector::Distance(HandStart->GetComponentLocation(),Knife->GetActorLocation());
+	bool Toofar = Distance > MaxDistance;
+
+	if (Toofar)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
+			"Go to far distance : " +  UKismetStringLibrary::Conv_FloatToString(Distance));
+		Knife->Retain();
+	}
+	
+	return Toofar;
+}
+
+void AGAS_SliceCharacter::OnHitKnife_Implementation()
+{
+	
 }
 
 void AGAS_SliceCharacter::ThrowKnife_Implementation()
 {
-	KnifeChildActor->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+	Knife->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+	Cable->SetAttachEndToComponent(Knife->GetRootComponent());
 }

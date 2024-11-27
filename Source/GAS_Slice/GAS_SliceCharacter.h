@@ -13,6 +13,9 @@ class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
 class AKnife;
+class UCableComponent;
+class UChildActorComponent;
+
 struct FInputActionValue;
 
 UCLASS(config=Game)
@@ -33,15 +36,20 @@ private:
 	AKnife* Knife;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
-	USceneComponent* KnifeChildActor;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* ParentKnife;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Knife", meta = (AllowPrivateAccess = "true"))
-	FName NameSocketKnife;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
+	UStaticMeshComponent* HandStart;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Cable", meta = (AllowPrivateAccess = "true"))
+	UCableComponent* Cable;
+
+	UPROPERTY(EditAnywhere, Category = "Settings|Movement", meta = (AllowPrivateAccess = "true"))
+	float MaxDistance;
+	
 	FVector KnifeStartLocation;
+	FRotator KnifeStartRotation;
+	UChildActorComponent* KnifeChildActorComponent;
 
 public:
 	/** Returns Mesh1P subobject **/
@@ -49,10 +57,6 @@ public:
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 	AKnife* GetKnife() const { return Knife; }
-
-protected:
-	virtual void BeginPlay() override;
-	virtual void PostInitializeComponents() override;
 
 public:
 	AGAS_SliceCharacter();
@@ -66,5 +70,16 @@ public:
 	void ResetKnife();
 
 	virtual void ResetKnife_Implementation();
+	
+protected:
+	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
+	bool CheckDistanceKnife();
+	virtual bool CheckDistanceKnife_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
+	void OnHitKnife();
+	void OnHitKnife_Implementation();
 };
 

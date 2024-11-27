@@ -9,7 +9,6 @@
 #include "InputActionValue.h"
 #include "../Weapon/Knife.h"
 #include "../GAS_SliceCharacter.h"
-#include <Kismet/KismetMathLibrary.h>
 
 
 ACustomPlayerController::ACustomPlayerController()
@@ -96,27 +95,41 @@ void ACustomPlayerController::ThrowKnife_Implementation()
 	if (WasTheKnifeThrown)
 		return;
 
-	FRotator CameraRotation = PlayerCameraManager->GetCameraRotation();
-	ForwardThrowKnife = CameraRotation.Vector();
+	FVector ForwardThrowKnife = PlayerCameraManager->GetCameraRotation().Vector();
+	
+	FHitResult HitResult(ForceInit);
+	FVector CameraLocation = PlayerCameraManager->GetCameraLocation();
+	FVector KnifeLocation = Knife->GetActorLocation();
 
-	FVector start = KnifeChildActor->GetComponentLocation();
-	FVector End = start + ForwardThrowKnife * 700.f;
+	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
+	RV_TraceParams.bTraceComplex = true;
+	RV_TraceParams.bReturnPhysicalMaterial = false;
 
-	FRotator TargetRotation = UKismetMathLibrary::FindLookAtRotation(start, End);
-	KnifeChildActor->SetWorldRotation(TargetRotation);
+	GetWorld()->LineTraceSingleByChannel(HitResult, CameraLocation, CameraLocation + ForwardThrowKnife * 99999999999999999,ECollisionChannel::ECC_Visibility, RV_TraceParams);
+	
+	FVector DirectionKnife = FVector::ZeroVector;
+
+	if (HitResult.GetActor() != nullptr)
+		DirectionKnife = HitResult.ImpactPoint - KnifeLocation;
+	else
+		//Activer la gravite ici pour qu'il tombe 
+		DirectionKnife = (CameraLocation + ForwardThrowKnife * 10000) - KnifeLocation;
+
+	DirectionKnife = DirectionKnife.GetSafeNormal();
 
 	PlayerCharacter->ThrowKnife();
-	Knife->StartMove(ForwardThrowKnife);
+	Knife->StartMove(DirectionKnife);
 	WasTheKnifeThrown = true;
 } 
 
 void ACustomPlayerController::ResetKnife_Implementation()
 {
-	PlayerCharacter->ResetKnife();
-	Knife->Reset_Implementation();
-	WasTheKnifeThrown = false;
+	if (!WasTheKnifeThrown)
+		return;
 
-	GEngine->AddOnScreenDebugMessage(-1, 100, FColor::Black, "Passe par la");
+	PlayerCharacter->ResetKnife();
+	Knife->ResetKnife();
+	WasTheKnifeThrown = false;
 }
 
 

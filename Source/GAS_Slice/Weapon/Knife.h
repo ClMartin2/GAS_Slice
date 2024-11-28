@@ -49,6 +49,8 @@ private:
 	
 	FVector ThrowDirection;
 	FVector CameraForward;
+	
+	bool IsRetain = false;
 
 public:
 	AKnife();	
@@ -85,10 +87,13 @@ private:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	UFUNCTION(BlueprintCallable, Category = "Knife")
+	UFUNCTION(BlueprintCallable, Category = "Knife",meta=(AllowPrivateAccess="true"))
 	void RotateThrow();
 
 	void HitRotate(const FHitResult& Hit);
 	void ReplaceHitKnife(const FHitResult& Hit);
+
+	UFUNCTION(BlueprintCallable,Category=Collision,meta=(AllowPrivateAccess="true"))
+	void CheckCollide();
 
 };

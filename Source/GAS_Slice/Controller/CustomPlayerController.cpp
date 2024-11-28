@@ -9,6 +9,7 @@
 #include "InputActionValue.h"
 #include "../Weapon/Knife.h"
 #include "../GAS_SliceCharacter.h"
+#include "DrawDebugHelpers.h"
 
 
 ACustomPlayerController::ACustomPlayerController()
@@ -115,9 +116,10 @@ void ACustomPlayerController::ThrowKnife_Implementation()
 		DirectionKnife = (CameraLocation + ForwardThrowKnife * 10000) - KnifeLocation;
 
 	DirectionKnife = DirectionKnife.GetSafeNormal();
-
+	
 	PlayerCharacter->ThrowKnife();
 	Knife->Throw(DirectionKnife,ForwardThrowKnife);
+	
 	WasTheKnifeThrown = true;
 } 
 

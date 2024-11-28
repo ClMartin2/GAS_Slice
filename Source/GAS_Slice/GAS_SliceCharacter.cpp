@@ -84,6 +84,7 @@ void AGAS_SliceCharacter::ResetKnife_Implementation()
 
 bool AGAS_SliceCharacter::CheckDistanceKnife_Implementation()
 {
+	//mettre dans le controlleur 
 	float Distance = FVector::Distance(HandStart->GetComponentLocation(),Knife->GetActorLocation());
 	bool Toofar = Distance > MaxDistance;
 

@@ -112,13 +112,12 @@ void ACustomPlayerController::ThrowKnife_Implementation()
 	if (HitResult.GetActor() != nullptr)
 		DirectionKnife = HitResult.ImpactPoint - KnifeLocation;
 	else
-		//Activer la gravite ici pour qu'il tombe 
 		DirectionKnife = (CameraLocation + ForwardThrowKnife * 10000) - KnifeLocation;
 
 	DirectionKnife = DirectionKnife.GetSafeNormal();
 
 	PlayerCharacter->ThrowKnife();
-	Knife->StartMove(DirectionKnife);
+	Knife->Throw(DirectionKnife,ForwardThrowKnife);
 	WasTheKnifeThrown = true;
 } 
 

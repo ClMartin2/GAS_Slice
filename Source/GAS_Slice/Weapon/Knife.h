@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -50,14 +48,15 @@ private:
 	float RetainForce;
 	
 	FVector ThrowDirection;
+	FVector CameraForward;
 
 public:
 	AKnife();	
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
-	void StartMove(FVector DirectionThrowKnife);
+	void Throw(FVector DirectionThrowKnife, FVector NewCameraForward);
 
-	virtual void StartMove_Implementation(FVector DirectionThrowKnife);
+	virtual void Throw_Implementation(FVector DirectionThrowKnife, FVector NewCameraForward);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void ResetKnife();
@@ -77,11 +76,6 @@ protected:
 	virtual void StopMove_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
-	void HitKnife(AActor* HitActor, FHitResult Hit);
-
-	virtual void HitKnife_Implementation(AActor* HitActor, FHitResult Hit);
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void UpdateMove();
 
 	virtual void UpdateMove_Implementation();
@@ -93,4 +87,8 @@ private:
 
 	UFUNCTION(BlueprintCallable, Category = "Knife")
 	void RotateThrow();
+
+	void HitRotate(const FHitResult& Hit);
+	void ReplaceHitKnife(const FHitResult& Hit);
+
 };

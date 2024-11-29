@@ -22,18 +22,9 @@ class GAS_SLICE_API AKnife : public AActor
 private:
 	UPROPERTY(EditAnywhere, Category = "Settings|Speed")
 	float Speed;
-	
-	UPROPERTY(EditAnywhere, Category = "Settings|Speed")
-	float SpeedFall;
-
-	UPROPERTY(EditAnywhere, Category = "Settings|Speed")
-	float SpeedImpulseRetainKnife;
 
 	UPROPERTY(EditAnywhere, Category = "Settings|Speed")
 	float MaxSpeed;
-
-	UPROPERTY(EditAnywhere, Category = "Settings|Speed")
-	float RotationSpeed;
 
 	UPROPERTY(VisibleAnywhere, Category = Collision, meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* BoxCollision;
@@ -43,9 +34,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
-
-	UPROPERTY(EditAnywhere, Category = "Settings|Force")
-	float RetainForce;
 	
 	FVector ThrowDirection;
 	FVector CameraForward;
@@ -64,8 +52,6 @@ public:
 
 	virtual void ResetKnife_Implementation();
 
-	void Retain();
-
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FDelegateHitKnife DelegateHitKnife;
 
@@ -78,19 +64,10 @@ protected:
 
 	virtual void StopMove_Implementation();
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
-	void UpdateMove();
-
-	virtual void UpdateMove_Implementation();
-
 private:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	UFUNCTION(BlueprintCallable, Category = "Knife",meta=(AllowPrivateAccess="true"))
-	void RotateThrow();
-
 	void HitRotate(const FHitResult& Hit);
 	void ReplaceHitKnife(const FHitResult& Hit);
-
 };

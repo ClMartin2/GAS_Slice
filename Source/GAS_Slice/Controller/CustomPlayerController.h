@@ -55,13 +55,19 @@ private:
 	USceneComponent* KnifeChildActor;
 
 	UPROPERTY(EditAnywhere, Category = "Settings|Knife", meta = (AllowPrivateAccess = "true"))
-	float ForceThrowKnife;
-
-	UPROPERTY(EditAnywhere, Category = "Settings|Movement", meta = (AllowPrivateAccess = "true"))
 	float MaxDistance;
 
-	UPROPERTY(EditAnywhere, Category = "Settings|Movement", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
 	float PushForce;
+	
+	UPROPERTY(EditAnywhere, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
+	float MaxZPushForce;
+
+	UPROPERTY(EditAnywhere, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
+	float MinZPushForce;
+	
+	UPROPERTY(EditAnywhere, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
+	float MaxAngle = 90;
 	
 	bool WasTheKnifeThrown = false;
 public:
@@ -70,12 +76,16 @@ public:
 protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void ThrowKnife();
-
+	virtual void ThrowKnife_Implementation();
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void ResetKnife();
-
 	virtual void ResetKnife_Implementation();
-	virtual void ThrowKnife_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
+	void PullKnife();
+	virtual void PullKnife_Implementation();
+
 	virtual void BeginPlay() override;
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -88,5 +98,6 @@ protected:
 	virtual void CheckDistanceKnife_Implementation();
 
 private:
+	UFUNCTION()
 	void PushToKnife() const;
 };

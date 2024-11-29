@@ -10,14 +10,16 @@
 #include "../Weapon/Knife.h"
 #include "../GAS_SliceCharacter.h"
 #include "DrawDebugHelpers.h"
+#include "MathUtil.h"
+#include "../Library/ConvertLibrary.h"
 #include "PointWeightMap.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetStringLibrary.h"
 
 
 ACustomPlayerController::ACustomPlayerController()
 {
-
 }
 
 void ACustomPlayerController::BeginPlay()
@@ -90,7 +92,7 @@ void ACustomPlayerController::SetupPlayerInputComponent(UInputComponent* PlayerI
 		EnhancedInputComponent->BindAction(ThrowKnifeAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::ThrowKnife);
 
 		//Reset knife
-		EnhancedInputComponent->BindAction(ResetKnifeAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::ResetKnife);
+		EnhancedInputComponent->BindAction(ResetKnifeAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::PullKnife);
 	}
 }
 
@@ -131,7 +133,6 @@ void ACustomPlayerController::ResetKnife_Implementation()
 	if (!WasTheKnifeThrown)
 		return;
 
-	PushToKnife();
 	PlayerCharacter->ResetKnife();
 	Knife->ResetKnife();
 	
@@ -153,13 +154,42 @@ void ACustomPlayerController::PushToKnife() const
 	if (Knife->GetIsAttached())
 	{
 		FVector LocalDirection = (Knife->GetActorLocation() - PlayerCameraManager->GetCameraLocation()).GetSafeNormal();
-		PlayerCharacter->GetCharacterMovement()->AddImpulse(LocalDirection * PushForce,true);
-
-		FVector Start = PlayerCameraManager->GetCameraLocation();
-		FVector End = Start + LocalDirection * PushForce;
+		float Angle = FMath::RadiansToDegrees(FMath::Acos(
+			FVector::DotProduct(LocalDirection, PlayerCharacter->GetActorForwardVector())));
+		float CoeffAngle = FVector::DotProduct(LocalDirection, -PlayerCharacter->GetActorUpVector());
+		bool AddBaseZVelocity = ConvertLibrary::ConvertFloatToBoolNegativePositiveRange(-CoeffAngle);
 		
-		DrawDebugDirectionalArrow(GetWorld(),Start,End,10,FColor::Red,true);
+		FVector LocalNewVelocity = LocalDirection * PushForce;
+		// float CoeffZpushForce = CoeffAngle > 0? Angle/MaxAngle + LocalNewVelocity.Z: Angle/MaxAngle;
+		float LocalCoeffZpushForce = 1 - Angle/MaxAngle;
+		
+		float LocalZPushForce = FMathf::Clamp(MaxZPushForce * LocalCoeffZpushForce,MinZPushForce,MaxZPushForce);
+		LocalNewVelocity.Z = LocalZPushForce + LocalNewVelocity.Z * AddBaseZVelocity;
+		
+		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Emerald,
+			"Plus velocity " + FString::SanitizeFloat(LocalNewVelocity.Z * AddBaseZVelocity));
+
+		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Emerald,
+			"Angle " + FString::SanitizeFloat(Angle));
+
+		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Red,
+		"NewZVelocity: " + FString::SanitizeFloat(LocalNewVelocity.Z));
+
+		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Red,
+		"NewZVelocity: " + FString::SanitizeFloat(LocalNewVelocity.Z));
+		
+		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,LocalNewVelocity.ToString());
+		
+		PlayerCharacter->GetCharacterMovement()->AddImpulse(LocalNewVelocity, true);
+
+		PlayerCharacter->LaunchCharacter()
 	}
+}
+
+void ACustomPlayerController::PullKnife_Implementation()
+{
+	PushToKnife();
+	ResetKnife();
 }
 
 

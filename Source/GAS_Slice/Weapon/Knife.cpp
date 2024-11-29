@@ -26,7 +26,7 @@ AKnife::AKnife()
 
 void AKnife::Throw_Implementation(FVector DirectionThrowKnife, FVector NewCameraForward)
 {
-	IsRetain = false;
+	IsAttached = false;
 	ProjectileMovement->SetUpdatedComponent(GetRootComponent());
 	ProjectileMovement->InitialSpeed = Speed;
 	ProjectileMovement->Velocity = DirectionThrowKnife * Speed;
@@ -36,32 +36,24 @@ void AKnife::Throw_Implementation(FVector DirectionThrowKnife, FVector NewCamera
 
 void AKnife::StopMove_Implementation()
 {
-	BoxCollision->SetSimulatePhysics(false);
 	ProjectileMovement->Velocity = FVector::ZeroVector;
 	ProjectileMovement->InitialSpeed = 0;
 }
 
 void AKnife::ResetKnife_Implementation()
 {
-	ProjectileMovement->Activate();
-	BoxCollision->SetSimulatePhysics(false);
 	StopMove();
+	IsAttached = false;
 }
 
 void AKnife::Retain()
 {
-	IsRetain = true;
-	StopMove();
-	ProjectileMovement->Deactivate();
-	BoxCollision->SetSimulatePhysics(true);
-	BoxCollision->SetPhysicsLinearVelocity(FVector::ZeroVector);
 	
-	FVector ImpulseVector = ThrowDirection * RetainForce * -1;
-	BoxCollision->AddImpulse(ImpulseVector);
 }
 
 void AKnife::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	IsAttached = true;
 	StopMove();
 	HitRotate(Hit);
 	ReplaceHitKnife(Hit);
@@ -85,9 +77,6 @@ void AKnife::HitRotate(const FHitResult& Hit)
 
 	FRotator NewRotation = FRotator(CameraForward.Rotation().Pitch,CameraForward.Rotation().Yaw,HitNormalRotation.Roll);
 
-	if (IsRetain)
-		NewRotation.Pitch = HitNormalRotation.Pitch;
-
 	SetActorRotation(NewRotation);
 }
 
@@ -107,37 +96,11 @@ void AKnife::ReplaceHitKnife(const FHitResult& Hit)
 	FVector ImpactLocation = HitResult.ImpactPoint;
 	float DistanceBetweenMeshAndRootLocation = FVector::Distance(GetActorLocation(), StaticMeshKnife_->GetComponentLocation());
 	
-	DrawDebugDirectionalArrow(GetWorld(),Start, End,10,FColor::Yellow,true);
-	
-	DrawDebugDirectionalArrow(GetWorld(),ImpactLocation, ImpactLocation +
-		GetActorForwardVector() * DistanceBetweenMeshAndRootLocation,10,FColor::Red,true);
-	
 	FVector NewLocation = ImpactLocation - GetActorForwardVector() * DistanceBetweenMeshAndRootLocation;
 	SetActorLocation(NewLocation);
 }
 
-void AKnife::CheckCollide()
-{
-	FHitResult HitResult(ForceInit);
-	
-	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
-	RV_TraceParams.bTraceComplex = true;
-
-	FVector Direction = GetVelocity().GetSafeNormal();
-	float LengthBoxCollision = BoxCollision->GetScaledBoxExtent().X;
-	float WidthBoxCollision = BoxCollision->GetScaledBoxExtent().Y;
-	FVector Start = GetActorLocation();
-	FVector End = Start + Direction * (LengthBoxCollision + 100);
-	
-	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End,ECollisionChannel::ECC_Visibility, RV_TraceParams);
-	
-	DrawDebugDirectionalArrow(GetWorld(),Start, End,10,FColor::Yellow,true);
-	
-	GEngine->AddOnScreenDebugMessage(-1,5,FColor::Yellow,"velocity: " + GetVelocity().ToString());
-
-}
-
 void AKnife::UpdateMove_Implementation()
 {
-	RotateThrow();
+	// RotateThrow();
 }

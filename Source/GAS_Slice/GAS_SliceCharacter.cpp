@@ -82,22 +82,6 @@ void AGAS_SliceCharacter::ResetKnife_Implementation()
 	Knife->SetActorRelativeTransform(FTransform(KnifeStartRotation, KnifeStartLocation));
 }
 
-bool AGAS_SliceCharacter::CheckDistanceKnife_Implementation()
-{
-	//mettre dans le controlleur 
-	float Distance = FVector::Distance(HandStart->GetComponentLocation(),Knife->GetActorLocation());
-	bool Toofar = Distance > MaxDistance;
-
-	if (Toofar)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,
-			"Go to far distance : " +  UKismetStringLibrary::Conv_FloatToString(Distance));
-		Knife->Retain();
-	}
-	
-	return Toofar;
-}
-
 void AGAS_SliceCharacter::OnHitKnife_Implementation()
 {
 	

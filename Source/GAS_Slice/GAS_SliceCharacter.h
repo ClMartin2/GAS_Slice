@@ -43,9 +43,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Cable", meta = (AllowPrivateAccess = "true"))
 	UCableComponent* Cable;
-
-	UPROPERTY(EditAnywhere, Category = "Settings|Movement", meta = (AllowPrivateAccess = "true"))
-	float MaxDistance;
 	
 	FVector KnifeStartLocation;
 	FRotator KnifeStartRotation;
@@ -57,6 +54,7 @@ public:
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 	AKnife* GetKnife() const { return Knife; }
+	UStaticMeshComponent* GetHandStart() const {return HandStart;}
 
 public:
 	AGAS_SliceCharacter();
@@ -74,9 +72,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void PostInitializeComponents() override;
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
-	bool CheckDistanceKnife();
-	virtual bool CheckDistanceKnife_Implementation();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void OnHitKnife();

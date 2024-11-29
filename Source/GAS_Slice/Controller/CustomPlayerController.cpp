@@ -10,6 +10,9 @@
 #include "../Weapon/Knife.h"
 #include "../GAS_SliceCharacter.h"
 #include "DrawDebugHelpers.h"
+#include "PointWeightMap.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 ACustomPlayerController::ACustomPlayerController()
@@ -128,9 +131,35 @@ void ACustomPlayerController::ResetKnife_Implementation()
 	if (!WasTheKnifeThrown)
 		return;
 
+	PushToKnife();
 	PlayerCharacter->ResetKnife();
 	Knife->ResetKnife();
+	
 	WasTheKnifeThrown = false;
+}
+
+void ACustomPlayerController::CheckDistanceKnife_Implementation()
+{
+	float Distance = FVector::Distance(PlayerCharacter->GetHandStart()->GetComponentLocation(),Knife->GetActorLocation());
+
+	if (Distance > MaxDistance)
+	{
+		ResetKnife();
+	}
+}
+
+void ACustomPlayerController::PushToKnife() const
+{
+	if (Knife->GetIsAttached())
+	{
+		FVector LocalDirection = (Knife->GetActorLocation() - PlayerCameraManager->GetCameraLocation()).GetSafeNormal();
+		PlayerCharacter->GetCharacterMovement()->AddImpulse(LocalDirection * PushForce,true);
+
+		FVector Start = PlayerCameraManager->GetCameraLocation();
+		FVector End = Start + LocalDirection * PushForce;
+		
+		DrawDebugDirectionalArrow(GetWorld(),Start,End,10,FColor::Red,true);
+	}
 }
 
 

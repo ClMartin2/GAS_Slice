@@ -49,6 +49,7 @@ private:
 	
 	FVector ThrowDirection;
 	FVector CameraForward;
+	bool IsAttached;
 
 public:
 	AKnife();	
@@ -68,6 +69,8 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FDelegateHitKnife DelegateHitKnife;
 
+	bool GetIsAttached() const {return IsAttached;}
+
 protected:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
@@ -80,12 +83,11 @@ protected:
 
 	virtual void UpdateMove_Implementation();
 
-
 private:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	UFUNCTION(BlueprintCallable, Category = "Knife")
+	UFUNCTION(BlueprintCallable, Category = "Knife",meta=(AllowPrivateAccess="true"))
 	void RotateThrow();
 
 	void HitRotate(const FHitResult& Hit);

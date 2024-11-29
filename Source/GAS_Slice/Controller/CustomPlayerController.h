@@ -57,8 +57,16 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Settings|Knife", meta = (AllowPrivateAccess = "true"))
 	float ForceThrowKnife;
 
-	bool WasTheKnifeThrown = false;
+	UPROPERTY(EditAnywhere, Category = "Settings|Movement", meta = (AllowPrivateAccess = "true"))
+	float MaxDistance;
 
+	UPROPERTY(EditAnywhere, Category = "Settings|Movement", meta = (AllowPrivateAccess = "true"))
+	float PushForce;
+	
+	bool WasTheKnifeThrown = false;
+public:
+	ACustomPlayerController();
+	
 protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void ThrowKnife();
@@ -74,7 +82,11 @@ protected:
 	void Jump();
 	void StopJumping();
 	void SetupPlayerInputComponent(UInputComponent* InputComponent);
-	
-public:
-	ACustomPlayerController();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
+	void CheckDistanceKnife();
+	virtual void CheckDistanceKnife_Implementation();
+
+private:
+	void PushToKnife() const;
 };

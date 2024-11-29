@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "DrawDebugHelpers.h"
+#include "PhysicsAssetRenderUtils.h"
 #include "Math/Quat.h"
 
 AKnife::AKnife()
@@ -25,6 +26,7 @@ AKnife::AKnife()
 
 void AKnife::Throw_Implementation(FVector DirectionThrowKnife, FVector NewCameraForward)
 {
+	IsAttached = false;
 	ProjectileMovement->SetUpdatedComponent(GetRootComponent());
 	ProjectileMovement->InitialSpeed = Speed;
 	ProjectileMovement->Velocity = DirectionThrowKnife * Speed;
@@ -34,31 +36,24 @@ void AKnife::Throw_Implementation(FVector DirectionThrowKnife, FVector NewCamera
 
 void AKnife::StopMove_Implementation()
 {
-	BoxCollision->SetSimulatePhysics(false);
 	ProjectileMovement->Velocity = FVector::ZeroVector;
 	ProjectileMovement->InitialSpeed = 0;
 }
 
 void AKnife::ResetKnife_Implementation()
 {
-	ProjectileMovement->Activate();
-	BoxCollision->SetSimulatePhysics(false);
 	StopMove();
+	IsAttached = false;
 }
 
 void AKnife::Retain()
 {
-	StopMove();
-	ProjectileMovement->Deactivate();
-	BoxCollision->SetSimulatePhysics(true);
-	BoxCollision->SetPhysicsLinearVelocity(FVector::ZeroVector);
 	
-	FVector ImpulseVector = ThrowDirection * RetainForce * -1;
-	BoxCollision->AddImpulse(ImpulseVector);
 }
 
 void AKnife::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	IsAttached = true;
 	StopMove();
 	HitRotate(Hit);
 	ReplaceHitKnife(Hit);
@@ -79,27 +74,33 @@ void AKnife::HitRotate(const FHitResult& Hit)
 {
 	FVector HitNormal = Hit.ImpactNormal;
 	FRotator HitNormalRotation = (-HitNormal).Rotation();
-	
+
 	FRotator NewRotation = FRotator(CameraForward.Rotation().Pitch,CameraForward.Rotation().Yaw,HitNormalRotation.Roll);
-	
-	
+
 	SetActorRotation(NewRotation);
 }
 
 void AKnife::ReplaceHitKnife(const FHitResult& Hit)
 {
-	FVector ImpactLocation = Hit.ImpactPoint;
-	FRotator ActualRotation = GetActorRotation();
-	float DistanceBetweenMeshAndRootLocation = FVector::Distance(GetActorLocation(), StaticMeshKnife_->GetComponentLocation());
-
-	DrawDebugDirectionalArrow(GetWorld(),ImpactLocation, ImpactLocation + (StaticMeshKnife_->GetComponentLocation() - GetActorLocation()) * -1,
-		10,FColor::Red,true);
+	FHitResult HitResult(ForceInit);
 	
-	FVector NewLocation = GetActorLocation() - GetActorForwardVector() * DistanceBetweenMeshAndRootLocation;
-	// SetActorLocation(NewLocation);
+	FCollisionQueryParams RV_TraceParams = FCollisionQueryParams(FName(TEXT("RV_Trace")), true, this);
+	RV_TraceParams.bTraceComplex = true;
+
+	float LengthBoxCollision = BoxCollision->GetScaledBoxExtent().X;
+	FVector Start = GetActorLocation();
+	FVector End = Start + GetActorForwardVector() * (LengthBoxCollision + 100);
+	
+	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End,ECollisionChannel::ECC_Visibility, RV_TraceParams);
+	
+	FVector ImpactLocation = HitResult.ImpactPoint;
+	float DistanceBetweenMeshAndRootLocation = FVector::Distance(GetActorLocation(), StaticMeshKnife_->GetComponentLocation());
+	
+	FVector NewLocation = ImpactLocation - GetActorForwardVector() * DistanceBetweenMeshAndRootLocation;
+	SetActorLocation(NewLocation);
 }
 
 void AKnife::UpdateMove_Implementation()
 {
-	RotateThrow();
+	// RotateThrow();
 }

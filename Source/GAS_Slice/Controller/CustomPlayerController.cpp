@@ -12,8 +12,6 @@
 #include "DrawDebugHelpers.h"
 #include "MathUtil.h"
 #include "../Library/ConvertLibrary.h"
-#include "PointWeightMap.h"
-#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetStringLibrary.h"
 
@@ -25,6 +23,7 @@ ACustomPlayerController::ACustomPlayerController()
 void ACustomPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
 	PlayerCharacter = (AGAS_SliceCharacter*)UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
@@ -35,10 +34,15 @@ void ACustomPlayerController::BeginPlay()
 	if (PlayerCharacter != nullptr) {
 		SetupPlayerInputComponent(PlayerCharacter->InputComponent);
 		Knife = PlayerCharacter->GetKnife();
+		PlayerCharacter->LandedDelegate.AddDynamic(this, &ACustomPlayerController::LandedDelegate);
 
 		if (Knife != nullptr)
 			KnifeChildActor = Knife->GetParentComponent();
+
+		GEngine->AddOnScreenDebugMessage(-1,5,FColor::Black,"Character Name in cpp " + PlayerCharacter->GetName());
 	}
+
+	
 }
 
 void ACustomPlayerController::Move(const FInputActionValue& Value)
@@ -149,40 +153,43 @@ void ACustomPlayerController::CheckDistanceKnife_Implementation()
 	}
 }
 
-void ACustomPlayerController::PushToKnife() const
+void ACustomPlayerController::PushToKnife()
 {
 	if (Knife->GetIsAttached())
 	{
-		FVector LocalDirection = (Knife->GetActorLocation() - PlayerCameraManager->GetCameraLocation()).GetSafeNormal();
+		FVector LocalDirection = (Knife->GetActorLocation() - PlayerCameraManager->GetCameraLocation());
+		float LengthVectorDirection = LocalDirection.Length();
+		LocalDirection = LocalDirection.GetSafeNormal();
+		
 		float Angle = FMath::RadiansToDegrees(FMath::Acos(
 			FVector::DotProduct(LocalDirection, PlayerCharacter->GetActorForwardVector())));
 		float CoeffAngle = FVector::DotProduct(LocalDirection, -PlayerCharacter->GetActorUpVector());
 		bool AddBaseZVelocity = ConvertLibrary::ConvertFloatToBoolNegativePositiveRange(-CoeffAngle);
-		
-		FVector LocalNewVelocity = LocalDirection * PushForce;
-		// float CoeffZpushForce = CoeffAngle > 0? Angle/MaxAngle + LocalNewVelocity.Z: Angle/MaxAngle;
 		float LocalCoeffZpushForce = 1 - Angle/MaxAngle;
+
+		SetActualPushForce(LengthVectorDirection * CoeffAngle);
+
+		FVector LocalNewVelocity = LocalDirection * ActualPushForce;
 		
 		float LocalZPushForce = FMathf::Clamp(MaxZPushForce * LocalCoeffZpushForce,MinZPushForce,MaxZPushForce);
 		LocalNewVelocity.Z = LocalZPushForce + LocalNewVelocity.Z * AddBaseZVelocity;
 		
+		PlayerCharacter->GetCharacterMovement()->AddImpulse(LocalNewVelocity, true);
+
+		//Debug
 		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Emerald,
 			"Plus velocity " + FString::SanitizeFloat(LocalNewVelocity.Z * AddBaseZVelocity));
 
-		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Emerald,
+		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Yellow,
 			"Angle " + FString::SanitizeFloat(Angle));
 
-		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Red,
-		"NewZVelocity: " + FString::SanitizeFloat(LocalNewVelocity.Z));
+		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Green,
+		"Coeff Z push force: " + FString::SanitizeFloat(LocalCoeffZpushForce));
 
 		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Red,
 		"NewZVelocity: " + FString::SanitizeFloat(LocalNewVelocity.Z));
 		
 		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,LocalNewVelocity.ToString());
-		
-		PlayerCharacter->GetCharacterMovement()->AddImpulse(LocalNewVelocity, true);
-
-		PlayerCharacter->LaunchCharacter()
 	}
 }
 
@@ -192,4 +199,23 @@ void ACustomPlayerController::PullKnife_Implementation()
 	ResetKnife();
 }
 
+void ACustomPlayerController::LandedDelegate(const FHitResult& Hit)
+{
+	OnLandedCharacter();
+}
+
+void ACustomPlayerController::OnLandedCharacter_Implementation()
+{
+	
+}
+
+void ACustomPlayerController::UpdateLandedCharacter()
+{
+	CounterTimeReduceForceWhenLanded += GetWorld()->GetDeltaSeconds();
+
+	if (CounterTimeReduceForceWhenLanded >= TimeToReduceForceWhenLanded)
+	{
+		SetActualPushForce(-ReducePushForceWhenLanded);
+	}
+}
 

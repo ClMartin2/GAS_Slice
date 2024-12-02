@@ -46,7 +46,7 @@ private:
 	UInputAction* ResetKnifeAction;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	class UInputAction* LookAction;
+	UInputAction* LookAction;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
 	AKnife* Knife;
@@ -56,9 +56,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Settings|Knife", meta = (AllowPrivateAccess = "true"))
 	float MaxDistance;
-
-	UPROPERTY(EditAnywhere, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
-	float PushForce;
 	
 	UPROPERTY(EditAnywhere, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
 	float MaxZPushForce;
@@ -68,8 +65,23 @@ private:
 	
 	UPROPERTY(EditAnywhere, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
 	float MaxAngle = 90;
-	
+
+	UPROPERTY(EditAnywhere, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
+	float MaxPushForce = 2000;
+
+	UPROPERTY(EditAnywhere, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
+	float MinPushForce = 100;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
+	float ReducePushForceWhenLanded = 50;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
+	float TimeToReduceForceWhenLanded = 0.25;
+
+	float CounterTimeReduceForceWhenLanded;
+	float ActualPushForce = MinPushForce;
 	bool WasTheKnifeThrown = false;
+	
 public:
 	ACustomPlayerController();
 	
@@ -86,6 +98,16 @@ protected:
 	void PullKnife();
 	virtual void PullKnife_Implementation();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
+	void OnLandedCharacter();
+	virtual void OnLandedCharacter_Implementation();
+
+	UFUNCTION(BlueprintCallable, Category = "Character")
+	void UpdateLandedCharacter();
+	
+	UFUNCTION()
+	void LandedDelegate(const FHitResult& Hit);
+	
 	virtual void BeginPlay() override;
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
@@ -99,5 +121,12 @@ protected:
 
 private:
 	UFUNCTION()
-	void PushToKnife() const;
+	void PushToKnife();
+
+	void SetActualPushForce(float ForcetoAdd)
+	{
+		ActualPushForce += ForcetoAdd;
+		ActualPushForce = FMath::Clamp(ActualPushForce, MinPushForce, MaxPushForce);
+	}
 };
+

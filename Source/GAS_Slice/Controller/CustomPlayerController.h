@@ -27,7 +27,7 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
 	AGAS_SliceCharacter* PlayerCharacter;
 	
-	#pragma region MappingContext
+#pragma region Mapping
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
@@ -55,11 +55,16 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* DebugModeAction;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* GoDownAction;
 	
-	#pragma endregion MappingContext
+#pragma endregion Mapping
+
+#pragma region DebugSettings
+	UPROPERTY(EditAnywhere,Category="Settings|Debug", meta = (AllowPrivateAccess = "true"));
+	float SpeedUpDebugMode = 2000;
+
+	UPROPERTY(EditAnywhere,Category="Settings|Debug", meta = (AllowPrivateAccess = "true"));
+	float SpeedForwardDebugMode = 3000;
+#pragma endregion DebugSettings
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
 	AKnife* Knife;
@@ -95,6 +100,8 @@ private:
 	float ActualPushForce = MinPushForce;
 	bool WasTheKnifeThrown = false;
 	bool DebugModeActivated = false;
+
+	
 	
 public:
 	ACustomPlayerController();
@@ -125,13 +132,15 @@ protected:
 	virtual void BeginPlay() override;
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	void GoDown(const FInputActionValue& Value);
 	void GoUp(const FInputActionValue& Value);
 	void Jump();
 	void StopJumping();
-	void SetupDebugModeInputComponent(UInputComponent* PlayerInputComponent);
-	void SetupPlayerInputComponent(UInputComponent* InputComponent);
+	void SetupDebugModeInputComponent();
+	void SetUpPlayerInputComponent();
 	void ActivateDebugMode();
+	void ChangeMappingContext(UInputMappingContext* RemoveMappingContext, UInputMappingContext* AddMappingContext, TDelegate<void()>
+	                          DelegateChangeMappingContexte, EMovementMode
+	                          MovementMode);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void CheckDistanceKnife();

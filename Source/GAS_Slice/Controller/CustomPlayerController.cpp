@@ -2,6 +2,9 @@
 
 
 #include "CustomPlayerController.h"
+
+#include <string>
+
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "EnhancedInputComponent.h"
@@ -15,6 +18,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetStringLibrary.h"
 
+DECLARE_DELEGATE(FDelegateCallBackChangeMappingContext);
 
 ACustomPlayerController::ACustomPlayerController()
 {
@@ -32,7 +36,7 @@ void ACustomPlayerController::BeginPlay()
 	}
 
 	if (PlayerCharacter != nullptr) {
-		SetupPlayerInputComponent(InputComponent);
+		SetUpPlayerInputComponent();
 		Knife = PlayerCharacter->GetKnife();
 		PlayerCharacter->LandedDelegate.AddDynamic(this, &ACustomPlayerController::LandedDelegate);
 
@@ -42,8 +46,6 @@ void ACustomPlayerController::BeginPlay()
 		GEngine->AddOnScreenDebugMessage(-1,5,FColor::Black,"Character Name in cpp " + PlayerCharacter->GetName());
 		InputComponent->BindKey(EKeys::G,IE_Pressed,this,&ACustomPlayerController::ActivateDebugMode);
 	}
-
-	
 }
 
 void ACustomPlayerController::Move(const FInputActionValue& Value)
@@ -66,14 +68,10 @@ void ACustomPlayerController::Look(const FInputActionValue& Value)
 	PlayerCharacter->AddControllerPitchInput(LookAxisVector.Y);
 }
 
-void ACustomPlayerController::GoDown(const FInputActionValue& Value)
-{
-	GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,"You are going down!");
-}
-
 void ACustomPlayerController::GoUp(const FInputActionValue& Value)
 {
-	GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,"You are going up!");
+	float LocalDirection = Value.Get<float>();
+ 	PlayerCharacter->AddMovementInput(FVector::UpVector,LocalDirection,false);
 }
 
 void ACustomPlayerController::Jump() {
@@ -88,60 +86,60 @@ void ACustomPlayerController::StopJumping() {
 	}
 }
 
-void ACustomPlayerController::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ACustomPlayerController::SetUpPlayerInputComponent()
 {
-	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACustomPlayerController::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACustomPlayerController::StopJumping);
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Move);
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Look);
-		EnhancedInputComponent->BindAction(ThrowKnifeAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::ThrowKnife);
-		EnhancedInputComponent->BindAction(ResetKnifeAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::PullKnife);
-	}
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
+	
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACustomPlayerController::Jump);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACustomPlayerController::StopJumping);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Move);
+	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Look);
+	EnhancedInputComponent->BindAction(ThrowKnifeAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::ThrowKnife);
+	EnhancedInputComponent->BindAction(ResetKnifeAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::PullKnife);
 }
 
-void ACustomPlayerController::SetupDebugModeInputComponent(UInputComponent* PlayerInputComponent)
+void ACustomPlayerController::SetupDebugModeInputComponent()
 {
-	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
-	{
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Move);
-		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Look);
-		EnhancedInputComponent->BindAction(GoDownAction, ETriggerEvent::Ongoing, this, &ACustomPlayerController::GoDown);
-		EnhancedInputComponent->BindAction(GoUpAction, ETriggerEvent::Ongoing, this, &ACustomPlayerController::GoUp);
-	}
+	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
+	
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Move);
+	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Look);
+	EnhancedInputComponent->BindAction(GoUpAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::GoUp);
 }
 
 void ACustomPlayerController::ActivateDebugMode()
 {
-
 	UEnhancedInputLocalPlayerSubsystem* LocalSubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	
+
 	if (!DebugModeActivated)
 	{
-		LocalSubSystem->RemoveMappingContext(DefaultMappingContext);
-		LocalSubSystem->AddMappingContext(DebugModeMappingContext, 0);
-		SetupDebugModeInputComponent(InputComponent);
-		PlayerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		FDelegateCallBackChangeMappingContext DelegateSetDebugModeInput;
+		DelegateSetDebugModeInput.BindUObject(this,&ACustomPlayerController::SetupDebugModeInputComponent);
 		
-		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Emerald,
-   "Activate Debug Mode");
+		ChangeMappingContext(DefaultMappingContext,DebugModeMappingContext,
+			DelegateSetDebugModeInput,MOVE_Flying);
 	}
 	else
 	{
-		LocalSubSystem->RemoveMappingContext(DebugModeMappingContext);
-		LocalSubSystem->AddMappingContext(DefaultMappingContext, 0);
-		SetupPlayerInputComponent(InputComponent);
-		PlayerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Falling);
-
-		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Emerald,
-   "Deactivate Debug Mode");
+		FDelegateCallBackChangeMappingContext DelegateSetUpPlayerInput;
+		DelegateSetUpPlayerInput.BindUObject(this,&ACustomPlayerController::SetUpPlayerInputComponent);
 		
+		ChangeMappingContext(DebugModeMappingContext,DefaultMappingContext,
+			DelegateSetUpPlayerInput,MOVE_Falling);
 	}
 
 	DebugModeActivated = !DebugModeActivated;
+}
+
+void ACustomPlayerController::ChangeMappingContext(UInputMappingContext* RemoveMappingContext, UInputMappingContext*
+	AddMappingContext,FDelegateCallBackChangeMappingContext DelegateChangeMappingContexte,EMovementMode MovementMode)
+{
+	UEnhancedInputLocalPlayerSubsystem* LocalSubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	
+	LocalSubSystem->RemoveMappingContext(RemoveMappingContext);
+	LocalSubSystem->AddMappingContext(AddMappingContext, 0);
+	DelegateChangeMappingContexte.Execute();
+	PlayerCharacter->GetCharacterMovement()->SetMovementMode(MovementMode);
 }
 
 void ACustomPlayerController::ThrowKnife_Implementation()

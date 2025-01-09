@@ -39,14 +39,15 @@ void ACustomPlayerController::BeginPlay()
 		SetUpPlayerInputComponent();
 		Knife = PlayerCharacter->GetKnife();
 		PlayerCharacter->LandedDelegate.AddDynamic(this, &ACustomPlayerController::LandedDelegate);
-
+		
 		if (Knife != nullptr)
 			KnifeChildActor = Knife->GetParentComponent();
 
-		GEngine->AddOnScreenDebugMessage(-1,5,FColor::Black,"Character Name in cpp " + PlayerCharacter->GetName());
 		InputComponent->BindKey(EKeys::G,IE_Pressed,this,&ACustomPlayerController::ActivateDebugMode);
 	}
 }
+
+#pragma region InputFunction
 
 void ACustomPlayerController::Move(const FInputActionValue& Value)
 {
@@ -86,6 +87,10 @@ void ACustomPlayerController::StopJumping() {
 	}
 }
 
+#pragma endregion InputFunction 
+
+#pragma region SetUpInputFunction
+
 void ACustomPlayerController::SetUpPlayerInputComponent()
 {
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
@@ -106,6 +111,19 @@ void ACustomPlayerController::SetupDebugModeInputComponent()
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Look);
 	EnhancedInputComponent->BindAction(GoUpAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::GoUp);
 }
+
+void ACustomPlayerController::ChangeMappingContext(UInputMappingContext* RemoveMappingContext, UInputMappingContext*
+	AddMappingContext,FDelegateCallBackChangeMappingContext DelegateChangeMappingContexte,EMovementMode MovementMode)
+{
+	UEnhancedInputLocalPlayerSubsystem* LocalSubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	
+	LocalSubSystem->RemoveMappingContext(RemoveMappingContext);
+	LocalSubSystem->AddMappingContext(AddMappingContext, 0);
+	DelegateChangeMappingContexte.Execute();
+	PlayerCharacter->GetCharacterMovement()->SetMovementMode(MovementMode);
+}
+
+#pragma endregion SetUpInputFunction
 
 void ACustomPlayerController::ActivateDebugMode()
 {
@@ -131,16 +149,7 @@ void ACustomPlayerController::ActivateDebugMode()
 	DebugModeActivated = !DebugModeActivated;
 }
 
-void ACustomPlayerController::ChangeMappingContext(UInputMappingContext* RemoveMappingContext, UInputMappingContext*
-	AddMappingContext,FDelegateCallBackChangeMappingContext DelegateChangeMappingContexte,EMovementMode MovementMode)
-{
-	UEnhancedInputLocalPlayerSubsystem* LocalSubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	
-	LocalSubSystem->RemoveMappingContext(RemoveMappingContext);
-	LocalSubSystem->AddMappingContext(AddMappingContext, 0);
-	DelegateChangeMappingContexte.Execute();
-	PlayerCharacter->GetCharacterMovement()->SetMovementMode(MovementMode);
-}
+#pragma region Knife
 
 void ACustomPlayerController::ThrowKnife_Implementation()
 {
@@ -210,12 +219,13 @@ void ACustomPlayerController::PushToKnife()
 		float LocalCoeffZpushForce = 1 - Angle/MaxAngle;
 
 		SetActualPushForce(LengthVectorDirection * CoeffAngle);
-
+		
 		FVector LocalNewVelocity = LocalDirection * ActualPushForce;
 		
 		float LocalZPushForce = FMathf::Clamp(MaxZPushForce * LocalCoeffZpushForce,MinZPushForce,MaxZPushForce);
 		LocalNewVelocity.Z = LocalZPushForce + LocalNewVelocity.Z * AddBaseZVelocity;
-		
+
+		PlayerCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 		PlayerCharacter->GetCharacterMovement()->AddImpulse(LocalNewVelocity, true);
 
 		//Debug
@@ -232,6 +242,11 @@ void ACustomPlayerController::PushToKnife()
 		// "NewZVelocity: " + FString::SanitizeFloat(LocalNewVelocity.Z));
 		//
 		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,LocalNewVelocity.ToString());
+		//
+		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,"Actual Push Force "
+			+ FString::SanitizeFloat(ActualPushForce));
+		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,"Coeff Angle "
+			+ FString::SanitizeFloat(CoeffAngle));
 	}
 }
 
@@ -240,6 +255,10 @@ void ACustomPlayerController::PullKnife_Implementation()
 	PushToKnife();
 	ResetKnife();
 }
+
+#pragma endregion Knife
+
+#pragma region Landed
 
 void ACustomPlayerController::LandedDelegate(const FHitResult& Hit)
 {
@@ -260,4 +279,7 @@ void ACustomPlayerController::UpdateLandedCharacter()
 		SetActualPushForce(-ReducePushForceWhenLanded);
 	}
 }
+
+#pragma endregion Landed
+
 

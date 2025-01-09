@@ -101,8 +101,6 @@ private:
 	bool WasTheKnifeThrown = false;
 	bool DebugModeActivated = false;
 
-	
-	
 public:
 	ACustomPlayerController();
 	
@@ -152,7 +150,7 @@ private:
 
 	void SetActualPushForce(float ForcetoAdd)
 	{
-		ActualPushForce += ForcetoAdd;
+		ActualPushForce += /*FMath::Abs(*/ForcetoAdd/*)*/;
 		ActualPushForce = FMath::Clamp(ActualPushForce, MinPushForce, MaxPushForce);
 	}
 };

@@ -26,16 +26,21 @@ class GAS_SLICE_API ACustomPlayerController : public APlayerController
 private: 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
 	AGAS_SliceCharacter* PlayerCharacter;
+	
+	#pragma region MappingContext
 
-	/** MappingContext */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputMappingContext* DebugModeMappingContext;
 	
-	/** Jump Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* JumpAction;
-	
-	/** Move Input Action */
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UInputAction* GoUpAction;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
 
@@ -47,6 +52,14 @@ private:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* DebugModeAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* GoDownAction;
+	
+	#pragma endregion MappingContext
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
 	AKnife* Knife;
@@ -81,6 +94,7 @@ private:
 	float CounterTimeReduceForceWhenLanded;
 	float ActualPushForce = MinPushForce;
 	bool WasTheKnifeThrown = false;
+	bool DebugModeActivated = false;
 	
 public:
 	ACustomPlayerController();
@@ -111,9 +125,13 @@ protected:
 	virtual void BeginPlay() override;
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void GoDown(const FInputActionValue& Value);
+	void GoUp(const FInputActionValue& Value);
 	void Jump();
 	void StopJumping();
+	void SetupDebugModeInputComponent(UInputComponent* PlayerInputComponent);
 	void SetupPlayerInputComponent(UInputComponent* InputComponent);
+	void ActivateDebugMode();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void CheckDistanceKnife();

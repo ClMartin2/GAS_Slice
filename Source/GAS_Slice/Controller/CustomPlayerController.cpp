@@ -32,7 +32,7 @@ void ACustomPlayerController::BeginPlay()
 	}
 
 	if (PlayerCharacter != nullptr) {
-		SetupPlayerInputComponent(PlayerCharacter->InputComponent);
+		SetupPlayerInputComponent(InputComponent);
 		Knife = PlayerCharacter->GetKnife();
 		PlayerCharacter->LandedDelegate.AddDynamic(this, &ACustomPlayerController::LandedDelegate);
 
@@ -40,6 +40,7 @@ void ACustomPlayerController::BeginPlay()
 			KnifeChildActor = Knife->GetParentComponent();
 
 		GEngine->AddOnScreenDebugMessage(-1,5,FColor::Black,"Character Name in cpp " + PlayerCharacter->GetName());
+		InputComponent->BindKey(EKeys::G,IE_Pressed,this,&ACustomPlayerController::ActivateDebugMode);
 	}
 
 	
@@ -65,6 +66,16 @@ void ACustomPlayerController::Look(const FInputActionValue& Value)
 	PlayerCharacter->AddControllerPitchInput(LookAxisVector.Y);
 }
 
+void ACustomPlayerController::GoDown(const FInputActionValue& Value)
+{
+	GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,"You are going down!");
+}
+
+void ACustomPlayerController::GoUp(const FInputActionValue& Value)
+{
+	GEngine->AddOnScreenDebugMessage(-1,1.0f,FColor::Red,"You are going up!");
+}
+
 void ACustomPlayerController::Jump() {
 	if (PlayerCharacter != nullptr) {
 		PlayerCharacter->Jump();
@@ -82,22 +93,55 @@ void ACustomPlayerController::SetupPlayerInputComponent(UInputComponent* PlayerI
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		// Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACustomPlayerController::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACustomPlayerController::StopJumping);
-
-		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Move);
-
-		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Look);
-
-		//Throwing knife
 		EnhancedInputComponent->BindAction(ThrowKnifeAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::ThrowKnife);
-
-		//Reset knife
 		EnhancedInputComponent->BindAction(ResetKnifeAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::PullKnife);
 	}
+}
+
+void ACustomPlayerController::SetupDebugModeInputComponent(UInputComponent* PlayerInputComponent)
+{
+	// Set up action bindings
+	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Move);
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Look);
+		EnhancedInputComponent->BindAction(GoDownAction, ETriggerEvent::Ongoing, this, &ACustomPlayerController::GoDown);
+		EnhancedInputComponent->BindAction(GoUpAction, ETriggerEvent::Ongoing, this, &ACustomPlayerController::GoUp);
+	}
+}
+
+void ACustomPlayerController::ActivateDebugMode()
+{
+
+	UEnhancedInputLocalPlayerSubsystem* LocalSubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	
+	if (!DebugModeActivated)
+	{
+		LocalSubSystem->RemoveMappingContext(DefaultMappingContext);
+		LocalSubSystem->AddMappingContext(DebugModeMappingContext, 0);
+		SetupDebugModeInputComponent(InputComponent);
+		PlayerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+		
+		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Emerald,
+   "Activate Debug Mode");
+	}
+	else
+	{
+		LocalSubSystem->RemoveMappingContext(DebugModeMappingContext);
+		LocalSubSystem->AddMappingContext(DefaultMappingContext, 0);
+		SetupPlayerInputComponent(InputComponent);
+		PlayerCharacter->GetCharacterMovement()->SetMovementMode(MOVE_Falling);
+
+		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Emerald,
+   "Deactivate Debug Mode");
+		
+	}
+
+	DebugModeActivated = !DebugModeActivated;
 }
 
 void ACustomPlayerController::ThrowKnife_Implementation()
@@ -177,19 +221,19 @@ void ACustomPlayerController::PushToKnife()
 		PlayerCharacter->GetCharacterMovement()->AddImpulse(LocalNewVelocity, true);
 
 		//Debug
-		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Emerald,
-			"Plus velocity " + FString::SanitizeFloat(LocalNewVelocity.Z * AddBaseZVelocity));
-
-		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Yellow,
-			"Angle " + FString::SanitizeFloat(Angle));
-
-		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Green,
-		"Coeff Z push force: " + FString::SanitizeFloat(LocalCoeffZpushForce));
-
-		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Red,
-		"NewZVelocity: " + FString::SanitizeFloat(LocalNewVelocity.Z));
-		
-		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,LocalNewVelocity.ToString());
+		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Emerald,
+		// 	"Plus velocity " + FString::SanitizeFloat(LocalNewVelocity.Z * AddBaseZVelocity));
+		//
+		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Yellow,
+		// 	"Angle " + FString::SanitizeFloat(Angle));
+		//
+		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Green,
+		// "Coeff Z push force: " + FString::SanitizeFloat(LocalCoeffZpushForce));
+		//
+		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Red,
+		// "NewZVelocity: " + FString::SanitizeFloat(LocalNewVelocity.Z));
+		//
+		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,LocalNewVelocity.ToString());
 	}
 }
 

@@ -52,7 +52,10 @@ void ACustomPlayerController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red,"Actual Push Force: "
-		+ FString::SanitizeFloat(ActualPushForce));
+		+ FString::SanitizeFloat(CurrentPushForce));
+
+	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red,"Actual Speed: "
+		+ FString::SanitizeFloat(CurrentSpeed));
 }
 
 #pragma region InputFunction
@@ -227,15 +230,19 @@ void ACustomPlayerController::PushToKnife()
 		float LocalCoeffZpushForce = 1 - Angle/MaxAngle;
 
 		SetActualPushForce(LengthVectorDirection * FMath::Abs(CoeffForceToAdd));
+
+		float CoeffActualForce = CurrentPushForce/MaxPushForce;
 		
-		FVector LocalNewVelocity = LocalDirection * ActualPushForce;
+		if (CurrentSpeed/MaxSpeed < CoeffActualForce)
+			CurrentSpeed = FMath::Clamp(CoeffActualForce * MaxSpeed, MinSpeed, MaxSpeed);
+		
+		FVector LocalNewVelocity = LocalDirection * CurrentPushForce;
 		
 		float LocalZPushForce = FMathf::Clamp(MaxZPushForce * LocalCoeffZpushForce,MinZPushForce,MaxZPushForce);
 		LocalNewVelocity.Z = LocalZPushForce + LocalNewVelocity.Z * AddBaseZVelocity;
 
 		PlayerCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 		PlayerCharacter->GetCharacterMovement()->AddImpulse(LocalNewVelocity, true);
-		
 
 		//Debug
 		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Emerald,
@@ -259,6 +266,12 @@ void ACustomPlayerController::PushToKnife()
 	}
 }
 
+void ACustomPlayerController::SetActualPushForce(float ForceToAdd)
+{
+	CurrentPushForce += ForceToAdd;
+	CurrentPushForce = FMath::Clamp(CurrentPushForce, MinPushForce, MaxPushForce);
+}
+
 void ACustomPlayerController::PullKnife_Implementation()
 {
 	PushToKnife();
@@ -280,4 +293,9 @@ void ACustomPlayerController::OnLandedCharacter_Implementation()
 }
 #pragma endregion Landed
 
+void ACustomPlayerController::SetActualSpeed(float SpeedToAdd)
+{
+	CurrentSpeed += SpeedToAdd;
+	CurrentSpeed = FMath::Clamp(CurrentSpeed, MinSpeed, MaxSpeed);
+}
 

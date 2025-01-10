@@ -93,8 +93,17 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
 	float CoeffForceToAdd = 0.25;
 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Speed", meta = (AllowPrivateAccess = "true"))
+	float MinSpeed = 800;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Speed", meta = (AllowPrivateAccess = "true"))
+	float MaxSpeed = 2000;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Speed", meta = (AllowPrivateAccess = "true"))
+	float CurrentSpeed = MinSpeed;
+
 	float CounterTimeReduceForceWhenLanded;
-	float ActualPushForce = MinPushForce;
+	float CurrentPushForce = MinPushForce;
 	bool WasTheKnifeThrown = false;
 	bool DebugModeActivated = false;
 
@@ -143,10 +152,10 @@ private:
 	void PushToKnife();
 
 	UFUNCTION(BlueprintCallable,Category="Force", meta = (AllowPrivateAccess = "true"))
-	void SetActualPushForce(float ForcetoAdd)
-	{
-		ActualPushForce += ForcetoAdd;
-		ActualPushForce = FMath::Clamp(ActualPushForce, MinPushForce, MaxPushForce);
-	}
+	void SetActualPushForce(float ForceToAdd);
+	
+	UFUNCTION(BlueprintCallable,Category="Speed", meta = (AllowPrivateAccess = "true"))
+	void SetActualSpeed(float SpeedToAdd);
+
 };
 

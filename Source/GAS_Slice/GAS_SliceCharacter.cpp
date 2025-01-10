@@ -14,6 +14,7 @@
 #include "Kismet/KismetStringLibrary.h"
 #include "CableComponent.h"
 #include "Components/ChildActorComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AGAS_SliceCharacter::AGAS_SliceCharacter()
 {

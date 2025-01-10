@@ -46,11 +46,6 @@ void AKnife::ResetKnife_Implementation()
 	IsAttached = false;
 }
 
-void AKnife::Retain()
-{
-	
-}
-
 void AKnife::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	IsAttached = true;
@@ -61,22 +56,13 @@ void AKnife::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveC
 	DelegateHitKnife.Broadcast();
 }
 
-void AKnife::RotateThrow()
-{
-	FQuat CurrentRotation = GetActorRotation().Quaternion();
-	FRotator DeltaRotation = FRotator(-RotationSpeed * GetWorld()->GetDeltaSeconds(), 0, 0);
-	FQuat NewRotation = CurrentRotation * DeltaRotation.Quaternion();
-	
-	SetActorRotation(NewRotation);
-}
-
 void AKnife::HitRotate(const FHitResult& Hit)
 {
 	FVector HitNormal = Hit.ImpactNormal;
 	FRotator HitNormalRotation = (-HitNormal).Rotation();
 
 	FRotator NewRotation = FRotator(CameraForward.Rotation().Pitch,CameraForward.Rotation().Yaw,HitNormalRotation.Roll);
-
+	
 	SetActorRotation(NewRotation);
 }
 
@@ -98,9 +84,4 @@ void AKnife::ReplaceHitKnife(const FHitResult& Hit)
 	
 	FVector NewLocation = ImpactLocation - GetActorForwardVector() * DistanceBetweenMeshAndRootLocation;
 	SetActorLocation(NewLocation);
-}
-
-void AKnife::UpdateMove_Implementation()
-{
-	// RotateThrow();
 }

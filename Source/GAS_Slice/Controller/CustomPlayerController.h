@@ -91,10 +91,7 @@ private:
 	float MinPushForce = 100;
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
-	float ReducePushForceWhenLanded = 50;
-
-	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
-	float TimeToReduceForceWhenLanded = 0.25;
+	float CoeffForceToAdd = 0.25;
 
 	float CounterTimeReduceForceWhenLanded;
 	float ActualPushForce = MinPushForce;
@@ -121,13 +118,12 @@ protected:
 	void OnLandedCharacter();
 	virtual void OnLandedCharacter_Implementation();
 
-	UFUNCTION(BlueprintCallable, Category = "Character")
-	void UpdateLandedCharacter();
-	
 	UFUNCTION()
 	void LandedDelegate(const FHitResult& Hit);
 	
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaTime) override;
+	
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void GoUp(const FInputActionValue& Value);
@@ -137,9 +133,7 @@ protected:
 	void SetUpPlayerInputComponent();
 	void ActivateDebugMode();
 	void ChangeMappingContext(UInputMappingContext* RemoveMappingContext, UInputMappingContext* AddMappingContext, TDelegate<void()>
-	                          DelegateChangeMappingContexte, EMovementMode
-	                          MovementMode);
-
+	                          DelegateChangeMappingContexte, EMovementMode MovementMode);
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void CheckDistanceKnife();
 	virtual void CheckDistanceKnife_Implementation();
@@ -148,9 +142,10 @@ private:
 	UFUNCTION()
 	void PushToKnife();
 
+	UFUNCTION(BlueprintCallable,Category="Force", meta = (AllowPrivateAccess = "true"))
 	void SetActualPushForce(float ForcetoAdd)
 	{
-		ActualPushForce += /*FMath::Abs(*/ForcetoAdd/*)*/;
+		ActualPushForce += ForcetoAdd;
 		ActualPushForce = FMath::Clamp(ActualPushForce, MinPushForce, MaxPushForce);
 	}
 };

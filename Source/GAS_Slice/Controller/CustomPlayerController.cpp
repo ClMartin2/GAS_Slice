@@ -47,6 +47,14 @@ void ACustomPlayerController::BeginPlay()
 	}
 }
 
+void ACustomPlayerController::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red,"Actual Push Force: "
+		+ FString::SanitizeFloat(ActualPushForce));
+}
+
 #pragma region InputFunction
 
 void ACustomPlayerController::Move(const FInputActionValue& Value)
@@ -218,7 +226,7 @@ void ACustomPlayerController::PushToKnife()
 		bool AddBaseZVelocity = ConvertLibrary::ConvertFloatToBoolNegativePositiveRange(-CoeffAngle);
 		float LocalCoeffZpushForce = 1 - Angle/MaxAngle;
 
-		SetActualPushForce(LengthVectorDirection * CoeffAngle);
+		SetActualPushForce(LengthVectorDirection * FMath::Abs(CoeffForceToAdd));
 		
 		FVector LocalNewVelocity = LocalDirection * ActualPushForce;
 		
@@ -227,6 +235,7 @@ void ACustomPlayerController::PushToKnife()
 
 		PlayerCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 		PlayerCharacter->GetCharacterMovement()->AddImpulse(LocalNewVelocity, true);
+		
 
 		//Debug
 		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Emerald,
@@ -243,10 +252,10 @@ void ACustomPlayerController::PushToKnife()
 		//
 		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,LocalNewVelocity.ToString());
 		//
-		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,"Actual Push Force "
-			+ FString::SanitizeFloat(ActualPushForce));
-		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,"Coeff Angle "
-			+ FString::SanitizeFloat(CoeffAngle));
+		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,"Actual Push Force "
+		// 	+ FString::SanitizeFloat(ActualPushForce));
+		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,"Coeff Angle "
+		// 	+ FString::SanitizeFloat(CoeffAngle));
 	}
 }
 
@@ -269,17 +278,6 @@ void ACustomPlayerController::OnLandedCharacter_Implementation()
 {
 	
 }
-
-void ACustomPlayerController::UpdateLandedCharacter()
-{
-	CounterTimeReduceForceWhenLanded += GetWorld()->GetDeltaSeconds();
-
-	if (CounterTimeReduceForceWhenLanded >= TimeToReduceForceWhenLanded)
-	{
-		SetActualPushForce(-ReducePushForceWhenLanded);
-	}
-}
-
 #pragma endregion Landed
 
 

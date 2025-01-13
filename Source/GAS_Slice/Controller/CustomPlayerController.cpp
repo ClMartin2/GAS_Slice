@@ -177,7 +177,8 @@ void ACustomPlayerController::ThrowKnife_Implementation()
 	RV_TraceParams.bTraceComplex = true;
 	RV_TraceParams.bReturnPhysicalMaterial = false;
 
-	GetWorld()->LineTraceSingleByChannel(HitResult, CameraLocation, CameraLocation + ForwardThrowKnife * 99999999999999999,ECollisionChannel::ECC_Visibility, RV_TraceParams);
+	GetWorld()->LineTraceSingleByChannel(HitResult, CameraLocation, CameraLocation + ForwardThrowKnife * 99999999999999999,
+		ECollisionChannel::ECC_Visibility, RV_TraceParams);
 	
 	FVector DirectionKnife = FVector::ZeroVector;
 
@@ -238,8 +239,8 @@ void ACustomPlayerController::PushToKnife()
 		
 		FVector LocalNewVelocity = LocalDirection * CurrentPushForce;
 		
-		float LocalZPushForce = FMathf::Clamp(MaxZPushForce * LocalCoeffZpushForce,MinZPushForce,MaxZPushForce);
-		LocalNewVelocity.Z = LocalZPushForce + LocalNewVelocity.Z * AddBaseZVelocity;
+		// float LocalZPushForce = FMathf::Clamp(MaxZPushForce * LocalCoeffZpushForce,MinZPushForce,MaxZPushForce);
+		LocalNewVelocity.Z = MinZPushForce + LocalNewVelocity.Z * AddBaseZVelocity;
 
 		PlayerCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 		PlayerCharacter->GetCharacterMovement()->AddImpulse(LocalNewVelocity, true);
@@ -257,7 +258,7 @@ void ACustomPlayerController::PushToKnife()
 		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Red,
 		// "NewZVelocity: " + FString::SanitizeFloat(LocalNewVelocity.Z));
 		//
-		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,LocalNewVelocity.ToString());
+		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,"New Velocity " + LocalNewVelocity.ToString());
 		//
 		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,"Actual Push Force "
 		// 	+ FString::SanitizeFloat(ActualPushForce));

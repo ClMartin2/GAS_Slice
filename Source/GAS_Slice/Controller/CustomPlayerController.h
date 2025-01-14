@@ -5,8 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "AI/Navigation/NavAgentInterface.h"
+#include "GAS_Slice/GAS_SliceCharacter.h"
 #include "CustomPlayerController.generated.h"
 
+class UCharacterMovementComponent;
 class UInputComponent;
 class UInputAction;
 class UInputMappingContext;
@@ -99,13 +101,19 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Speed", meta = (AllowPrivateAccess = "true"))
 	float MaxSpeed = 2000;
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Speed", meta = (AllowPrivateAccess = "true"))
-	float CurrentSpeed = MinSpeed;
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AirControl", meta = (AllowPrivateAccess = "true"))
+	float BaseAirControl = 0.5;
 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AirContol", meta = (AllowPrivateAccess = "true"))
+	float AirControlPushToKnife = 0.25;
+	
+	float CurrentSpeed = MinSpeed;
 	float CounterTimeReduceForceWhenLanded;
 	float CurrentPushForce = MinPushForce;
-	bool WasTheKnifeThrown = false;
-	bool DebugModeActivated = false;
+	float BaseAirControlValue = 0;
+
+	bool bWasTheKnifeThrown = false;
+	bool bDebugModeActivated = false;
 
 public:
 	ACustomPlayerController();
@@ -156,6 +164,8 @@ private:
 	
 	UFUNCTION(BlueprintCallable,Category="Speed", meta = (AllowPrivateAccess = "true"))
 	void SetActualSpeed(float SpeedToAdd);
-
+	
+	UFUNCTION(BlueprintCallable,Category="Player", meta = (AllowPrivateAccess = "true"))
+	UCharacterMovementComponent* GetPlayerCharacterMovement();
 };
 

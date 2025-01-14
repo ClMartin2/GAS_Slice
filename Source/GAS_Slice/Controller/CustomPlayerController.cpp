@@ -239,31 +239,11 @@ void ACustomPlayerController::PushToKnife()
 		
 		FVector LocalNewVelocity = LocalDirection * CurrentPushForce;
 		
-		// float LocalZPushForce = FMathf::Clamp(MaxZPushForce * LocalCoeffZpushForce,MinZPushForce,MaxZPushForce);
-		LocalNewVelocity.Z = MinZPushForce + LocalNewVelocity.Z * AddBaseZVelocity;
+		LocalNewVelocity.Z = FMathf::Clamp(MinZPushForce * AddBaseZVelocity + LocalNewVelocity.Z
+			,MinZPushForce,MaxZPushForce);
 
 		PlayerCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
 		PlayerCharacter->GetCharacterMovement()->AddImpulse(LocalNewVelocity, true);
-
-		//Debug
-		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Emerald,
-		// 	"Plus velocity " + FString::SanitizeFloat(LocalNewVelocity.Z * AddBaseZVelocity));
-		//
-		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Yellow,
-		// 	"Angle " + FString::SanitizeFloat(Angle));
-		//
-		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Green,
-		// "Coeff Z push force: " + FString::SanitizeFloat(LocalCoeffZpushForce));
-		//
-		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Red,
-		// "NewZVelocity: " + FString::SanitizeFloat(LocalNewVelocity.Z));
-		//
-		GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,"New Velocity " + LocalNewVelocity.ToString());
-		//
-		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,"Actual Push Force "
-		// 	+ FString::SanitizeFloat(ActualPushForce));
-		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,"Coeff Angle "
-		// 	+ FString::SanitizeFloat(CoeffAngle));
 	}
 }
 

@@ -1,6 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "CustomPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
@@ -21,6 +18,7 @@ ACustomPlayerController::ACustomPlayerController()
 {
 }
 
+#pragma region Unreal Functions
 void ACustomPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -56,6 +54,8 @@ void ACustomPlayerController::Tick(float DeltaTime)
 	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red,"Actual Speed: "
 		+ FString::SanitizeFloat(CurrentSpeed));
 }
+
+#pragma endregion	Unreal Functions
 
 #pragma region InputFunction
 
@@ -286,4 +286,3 @@ UCharacterMovementComponent* ACustomPlayerController::GetPlayerCharacterMovement
 	else
 		return nullptr;
 }
-

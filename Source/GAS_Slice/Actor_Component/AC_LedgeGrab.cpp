@@ -97,8 +97,6 @@ void UAC_LedgeGrab::UpdateTimerLedgeGrab()
 	
 	FVector NewLocation = FMath::Lerp(StartPositionLerpLedgeGrab, EndPositionLerpLedgeGrab, Ratio);
 	GetOwner()->SetActorLocation(NewLocation,false);
-	GEngine->AddOnScreenDebugMessage(-1,1000,FColor::Red,
-		FString::SanitizeFloat(CounterTimerLedgeGrab));
 
 	if (Ratio >= 1)
 	{

@@ -12,8 +12,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetStringLibrary.h"
 
-DECLARE_DELEGATE(FDelegateCallBackChangeMappingContext);
-
 ACustomPlayerController::ACustomPlayerController()
 {
 }
@@ -37,7 +35,7 @@ void ACustomPlayerController::BeginPlay()
 		
 		if (Knife != nullptr)
 			KnifeChildActor = Knife->GetParentComponent();
-
+		
 		InputComponent->BindKey(EKeys::G,IE_Pressed,this,&ACustomPlayerController::ActivateDebugMode);
 
 		GetPlayerCharacterMovement()->AirControl = BaseAirControlValue;

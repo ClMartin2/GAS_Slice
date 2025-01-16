@@ -1,11 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "Components/TimelineComponent.h"
 #include "AC_LedgeGrab.generated.h"
-
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class GAS_SLICE_API UAC_LedgeGrab : public UActorComponent
@@ -34,9 +32,22 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Settings",meta=(AllowPrivateAccess=true))
 	UCurveFloat* CurveLerpGrabLedge;
 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Settings",meta=(AllowPrivateAccess=true))
+	float DurationToLerpToLedge = 0.2;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Debug",meta=(AllowPrivateAccess=true))
+	bool DrawCapsule = false;
+
 	ACharacter* CharacterOwner;
-	bool LerpingToLedge = false;
 	
+	FVector StartPositionLerpLedgeGrab;
+	FVector EndPositionLerpLedgeGrab;
+	
+	FTimerHandle TimerLedgeGrab;
+	
+	float CounterTimerLedgeGrab;
+
+	bool LerpLedgeGrab;
 	
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
@@ -47,4 +58,8 @@ protected:
 
 private:
 	void CheckParentIsACharacter();
+	void StartTimerLedgeGrab();
+
+	void UpdateTimerLedgeGrab();
+	void UpdateCheckCollision();
 };

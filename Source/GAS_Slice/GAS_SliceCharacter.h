@@ -15,8 +15,11 @@ class UInputMappingContext;
 class AKnife;
 class UCableComponent;
 class UChildActorComponent;
+class UAC_LedgeGrab;
 
 struct FInputActionValue;
+
+DECLARE_DELEGATE(FDelegateCallBackChangeMappingContext);
 
 UCLASS(config=Game)
 class AGAS_SliceCharacter : public ACharacter
@@ -44,17 +47,20 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Cable", meta = (AllowPrivateAccess = "true"))
 	UCableComponent* Cable;
 	
+	UPROPERTY(VisibleAnywhere,Category="Actor Component", meta=(AllowPrivateAccess = "true"))
+	UAC_LedgeGrab* LedgeGrabComponent;
+	
 	FVector KnifeStartLocation;
 	FRotator KnifeStartRotation;
+	
 	UChildActorComponent* KnifeChildActorComponent;
 
 public:
-	/** Returns Mesh1P subobject **/
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
-	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 	AKnife* GetKnife() const { return Knife; }
 	UStaticMeshComponent* GetHandStart() const {return HandStart;}
+	UAC_LedgeGrab* GetLedgeGrab() const {return LedgeGrabComponent;}
 
 public:
 	AGAS_SliceCharacter();

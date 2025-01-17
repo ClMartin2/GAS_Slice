@@ -101,16 +101,20 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Speed", meta = (AllowPrivateAccess = "true"))
 	float MaxSpeed = 2000;
 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Jump", meta = (AllowPrivateAccess = "true"))
+    float DistanceBuffedJump = 50;
+
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AirControl", meta = (AllowPrivateAccess = "true"))
 	float BaseAirControl = 0.5;
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AirContol", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AirControl", meta = (AllowPrivateAccess = "true"))
 	float AirControlPushToKnife = 0.25;
 	
 	float CurrentSpeed = MinSpeed;
 	float CounterTimeReduceForceWhenLanded;
 	float CurrentPushForce = MinPushForce;
 	float BaseAirControlValue = 0;
+	float JumpCount = 0;
 
 	bool bWasTheKnifeThrown = false;
 	bool bDebugModeActivated = false;
@@ -151,6 +155,7 @@ protected:
 	void ActivateDebugMode();
 	void ChangeMappingContext(UInputMappingContext* RemoveMappingContext, UInputMappingContext* AddMappingContext, TDelegate<void()>
 	                          DelegateChangeMappingContexte, EMovementMode MovementMode);
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void CheckDistanceKnife();
 	virtual void CheckDistanceKnife_Implementation();

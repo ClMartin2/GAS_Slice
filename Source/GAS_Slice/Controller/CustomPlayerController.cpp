@@ -9,6 +9,7 @@
 #include "DrawDebugHelpers.h"
 #include "MathUtil.h"
 #include "../Library/ConvertLibrary.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetStringLibrary.h"
 
@@ -84,8 +85,30 @@ void ACustomPlayerController::GoUp(const FInputActionValue& Value)
 }
 
 void ACustomPlayerController::Jump() {
-	if (PlayerCharacter != nullptr) {
-		PlayerCharacter->Jump();
+	if (JumpCount >= PlayerCharacter->JumpMaxCount)
+		return;
+	
+	FCollisionQueryParams RV_TraceParams =
+		FCollisionQueryParams(FName(TEXT("RV_Trace")), true, PlayerCharacter);
+	RV_TraceParams.bTraceComplex = true;
+	RV_TraceParams.bReturnPhysicalMaterial = false;
+
+	FHitResult RV_Hit(ForceInit);
+
+	FVector Start = PlayerCharacter->GetActorLocation() -
+		PlayerCharacter->GetActorUpVector() * PlayerCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	FVector End = Start - PlayerCharacter->GetActorUpVector() * DistanceBuffedJump;
+	
+	GetWorld()->LineTraceSingleByChannel(RV_Hit,	Start,End,ECC_Visibility,RV_TraceParams);
+
+	if (RV_Hit.bBlockingHit)
+	{
+		GetPlayerCharacterMovement()->SetMovementMode(MOVE_Walking);
+		
+		if (PlayerCharacter != nullptr) {
+			PlayerCharacter->Jump();
+			JumpCount++;
+		}
 	}
 }
 
@@ -261,7 +284,8 @@ void ACustomPlayerController::PullKnife_Implementation()
 
 void ACustomPlayerController::LandedDelegate(const FHitResult& Hit)
 {
-	GetPlayerCharacterMovement()->AirControl = BaseAirControl; 
+	GetPlayerCharacterMovement()->AirControl = BaseAirControl;
+	JumpCount = 0;
 	OnLandedCharacter();
 }
 

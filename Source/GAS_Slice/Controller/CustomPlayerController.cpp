@@ -308,3 +308,8 @@ UCharacterMovementComponent* ACustomPlayerController::GetPlayerCharacterMovement
 	else
 		return nullptr;
 }
+
+FGenericTeamId ACustomPlayerController::GetGenericTeamId() const
+{
+	return 	FGenericTeamId(TeamId);
+}

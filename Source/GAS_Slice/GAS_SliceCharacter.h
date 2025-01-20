@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+
 #include "GAS_SliceCharacter.generated.h"
 
 class UInputComponent;
@@ -49,6 +50,9 @@ private:
 	
 	UPROPERTY(VisibleAnywhere,Category="Actor Component", meta=(AllowPrivateAccess = "true"))
 	UAC_LedgeGrab* LedgeGrabComponent;
+
+	UPROPERTY(VisibleAnywhere,Category="AI", meta=(AllowPrivateAccess = "true"))
+	UAC_LedgeGrab* TeamID = 0;
 	
 	FVector KnifeStartLocation;
 	FRotator KnifeStartRotation;

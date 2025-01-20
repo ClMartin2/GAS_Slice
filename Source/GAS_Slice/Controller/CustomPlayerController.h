@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "AI/Navigation/NavAgentInterface.h"
 #include "GAS_Slice/GAS_SliceCharacter.h"
+#include "GenericTeamAgentInterface.h"
 #include "CustomPlayerController.generated.h"
 
 class UCharacterMovementComponent;
@@ -21,7 +22,7 @@ struct FInputActionValue;
  * 
  */
 UCLASS()
-class GAS_SLICE_API ACustomPlayerController : public APlayerController
+class GAS_SLICE_API ACustomPlayerController : public APlayerController, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -109,6 +110,9 @@ private:
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AirControl", meta = (AllowPrivateAccess = "true"))
 	float AirControlPushToKnife = 0.25;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|ID", meta = (AllowPrivateAccess = "true"))
+	uint8 TeamId;
 	
 	float CurrentSpeed = MinSpeed;
 	float CounterTimeReduceForceWhenLanded;
@@ -172,5 +176,7 @@ private:
 	
 	UFUNCTION(BlueprintCallable,Category="Player", meta = (AllowPrivateAccess = "true"))
 	UCharacterMovementComponent* GetPlayerCharacterMovement();
+
+	virtual FGenericTeamId GetGenericTeamId() const override;
 };
 

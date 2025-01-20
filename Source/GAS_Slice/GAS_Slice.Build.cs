@@ -9,6 +9,6 @@ public class GAS_Slice : ModuleRules
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "CableComponent" });
-		PrivateDependencyModuleNames.AddRange(new string[] { "CableComponent", "ClothingSystemRuntimeCommon" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "CableComponent", "ClothingSystemRuntimeCommon", "AIModule" });
 	}
 }

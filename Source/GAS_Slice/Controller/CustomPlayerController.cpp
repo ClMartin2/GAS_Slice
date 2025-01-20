@@ -1,10 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "CustomPlayerController.h"
-
-#include <string>
-
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "EnhancedInputComponent.h"
@@ -15,15 +9,15 @@
 #include "DrawDebugHelpers.h"
 #include "MathUtil.h"
 #include "../Library/ConvertLibrary.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetStringLibrary.h"
-
-DECLARE_DELEGATE(FDelegateCallBackChangeMappingContext);
 
 ACustomPlayerController::ACustomPlayerController()
 {
 }
 
+#pragma region Unreal Functions
 void ACustomPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -42,8 +36,10 @@ void ACustomPlayerController::BeginPlay()
 		
 		if (Knife != nullptr)
 			KnifeChildActor = Knife->GetParentComponent();
-
+		
 		InputComponent->BindKey(EKeys::G,IE_Pressed,this,&ACustomPlayerController::ActivateDebugMode);
+
+		GetPlayerCharacterMovement()->AirControl = BaseAirControlValue;
 	}
 }
 
@@ -58,13 +54,15 @@ void ACustomPlayerController::Tick(float DeltaTime)
 		+ FString::SanitizeFloat(CurrentSpeed));
 }
 
+#pragma endregion	Unreal Functions
+
 #pragma region InputFunction
 
 void ACustomPlayerController::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
-
+	
 	// add movement 
 	PlayerCharacter->AddMovementInput(PlayerCharacter->GetActorForwardVector(), MovementVector.Y);
 	PlayerCharacter->AddMovementInput(PlayerCharacter->GetActorRightVector(), MovementVector.X);	
@@ -87,8 +85,30 @@ void ACustomPlayerController::GoUp(const FInputActionValue& Value)
 }
 
 void ACustomPlayerController::Jump() {
-	if (PlayerCharacter != nullptr) {
-		PlayerCharacter->Jump();
+	if (JumpCount >= PlayerCharacter->JumpMaxCount)
+		return;
+	
+	FCollisionQueryParams RV_TraceParams =
+		FCollisionQueryParams(FName(TEXT("RV_Trace")), true, PlayerCharacter);
+	RV_TraceParams.bTraceComplex = true;
+	RV_TraceParams.bReturnPhysicalMaterial = false;
+
+	FHitResult RV_Hit(ForceInit);
+
+	FVector Start = PlayerCharacter->GetActorLocation() -
+		PlayerCharacter->GetActorUpVector() * PlayerCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	FVector End = Start - PlayerCharacter->GetActorUpVector() * DistanceBuffedJump;
+	
+	GetWorld()->LineTraceSingleByChannel(RV_Hit,	Start,End,ECC_Visibility,RV_TraceParams);
+
+	if (RV_Hit.bBlockingHit)
+	{
+		GetPlayerCharacterMovement()->SetMovementMode(MOVE_Walking);
+		
+		if (PlayerCharacter != nullptr) {
+			PlayerCharacter->Jump();
+			JumpCount++;
+		}
 	}
 }
 
@@ -131,7 +151,7 @@ void ACustomPlayerController::ChangeMappingContext(UInputMappingContext* RemoveM
 	LocalSubSystem->RemoveMappingContext(RemoveMappingContext);
 	LocalSubSystem->AddMappingContext(AddMappingContext, 0);
 	DelegateChangeMappingContexte.Execute();
-	PlayerCharacter->GetCharacterMovement()->SetMovementMode(MovementMode);
+	GetPlayerCharacterMovement()->SetMovementMode(MovementMode);
 }
 
 #pragma endregion SetUpInputFunction
@@ -140,7 +160,7 @@ void ACustomPlayerController::ActivateDebugMode()
 {
 	UEnhancedInputLocalPlayerSubsystem* LocalSubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
 
-	if (!DebugModeActivated)
+	if (!bDebugModeActivated)
 	{
 		FDelegateCallBackChangeMappingContext DelegateSetDebugModeInput;
 		DelegateSetDebugModeInput.BindUObject(this,&ACustomPlayerController::SetupDebugModeInputComponent);
@@ -157,14 +177,14 @@ void ACustomPlayerController::ActivateDebugMode()
 			DelegateSetUpPlayerInput,MOVE_Falling);
 	}
 
-	DebugModeActivated = !DebugModeActivated;
+	bDebugModeActivated = !bDebugModeActivated;
 }
 
 #pragma region Knife
 
 void ACustomPlayerController::ThrowKnife_Implementation()
 {
-	if (WasTheKnifeThrown)
+	if (bWasTheKnifeThrown)
 		return;
 
 	FVector ForwardThrowKnife = PlayerCameraManager->GetCameraRotation().Vector();
@@ -177,7 +197,8 @@ void ACustomPlayerController::ThrowKnife_Implementation()
 	RV_TraceParams.bTraceComplex = true;
 	RV_TraceParams.bReturnPhysicalMaterial = false;
 
-	GetWorld()->LineTraceSingleByChannel(HitResult, CameraLocation, CameraLocation + ForwardThrowKnife * 99999999999999999,ECollisionChannel::ECC_Visibility, RV_TraceParams);
+	GetWorld()->LineTraceSingleByChannel(HitResult, CameraLocation, CameraLocation + ForwardThrowKnife * 99999999999999999,
+		ECollisionChannel::ECC_Visibility, RV_TraceParams);
 	
 	FVector DirectionKnife = FVector::ZeroVector;
 
@@ -191,18 +212,18 @@ void ACustomPlayerController::ThrowKnife_Implementation()
 	PlayerCharacter->ThrowKnife();
 	Knife->Throw(DirectionKnife,ForwardThrowKnife);
 	
-	WasTheKnifeThrown = true;
+	bWasTheKnifeThrown = true;
 } 
 
 void ACustomPlayerController::ResetKnife_Implementation()
 {
-	if (!WasTheKnifeThrown)
+	if (!bWasTheKnifeThrown)
 		return;
 
 	PlayerCharacter->ResetKnife();
 	Knife->ResetKnife();
 	
-	WasTheKnifeThrown = false;
+	bWasTheKnifeThrown = false;
 }
 
 void ACustomPlayerController::CheckDistanceKnife_Implementation()
@@ -217,53 +238,32 @@ void ACustomPlayerController::CheckDistanceKnife_Implementation()
 
 void ACustomPlayerController::PushToKnife()
 {
-	if (Knife->GetIsAttached())
-	{
-		FVector LocalDirection = (Knife->GetActorLocation() - PlayerCameraManager->GetCameraLocation());
-		float LengthVectorDirection = LocalDirection.Length();
-		LocalDirection = LocalDirection.GetSafeNormal();
-		
-		float Angle = FMath::RadiansToDegrees(FMath::Acos(
-			FVector::DotProduct(LocalDirection, PlayerCharacter->GetActorForwardVector())));
-		float CoeffAngle = FVector::DotProduct(LocalDirection, -PlayerCharacter->GetActorUpVector());
-		bool AddBaseZVelocity = ConvertLibrary::ConvertFloatToBoolNegativePositiveRange(-CoeffAngle);
-		float LocalCoeffZpushForce = 1 - Angle/MaxAngle;
+	if (!Knife->GetIsAttached())
+		return;
+	
+	FVector LocalDirection = (Knife->GetActorLocation() - PlayerCameraManager->GetCameraLocation());
+	float LengthVectorDirection = LocalDirection.Length();
+	LocalDirection = LocalDirection.GetSafeNormal();
+	
+	float Angle = FMath::RadiansToDegrees(FMath::Acos(
+		FVector::DotProduct(LocalDirection, PlayerCharacter->GetActorForwardVector())));
+	float CoeffAngle = FVector::DotProduct(LocalDirection, -PlayerCharacter->GetActorUpVector());
+	bool AddBaseZVelocity = ConvertLibrary::ConvertFloatToBoolNegativePositiveRange(-CoeffAngle);
+	// float LocalCoeffZpushForce = 1 - Angle/MaxAngle;
+	SetActualPushForce(LengthVectorDirection * FMath::Abs(CoeffForceToAdd));
+	float CoeffActualForce = CurrentPushForce/MaxPushForce;
+	
+	if (CurrentSpeed/MaxSpeed < CoeffActualForce)
+		CurrentSpeed = FMath::Clamp(CoeffActualForce * MaxSpeed, MinSpeed, MaxSpeed);
+	
+	FVector LocalNewVelocity = LocalDirection * CurrentPushForce;
+	
+	LocalNewVelocity.Z = FMathf::Clamp(MinZPushForce * AddBaseZVelocity + LocalNewVelocity.Z
+		,MinZPushForce,MaxZPushForce);
 
-		SetActualPushForce(LengthVectorDirection * FMath::Abs(CoeffForceToAdd));
-
-		float CoeffActualForce = CurrentPushForce/MaxPushForce;
-		
-		if (CurrentSpeed/MaxSpeed < CoeffActualForce)
-			CurrentSpeed = FMath::Clamp(CoeffActualForce * MaxSpeed, MinSpeed, MaxSpeed);
-		
-		FVector LocalNewVelocity = LocalDirection * CurrentPushForce;
-		
-		float LocalZPushForce = FMathf::Clamp(MaxZPushForce * LocalCoeffZpushForce,MinZPushForce,MaxZPushForce);
-		LocalNewVelocity.Z = LocalZPushForce + LocalNewVelocity.Z * AddBaseZVelocity;
-
-		PlayerCharacter->GetCharacterMovement()->Velocity = FVector::ZeroVector;
-		PlayerCharacter->GetCharacterMovement()->AddImpulse(LocalNewVelocity, true);
-
-		//Debug
-		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Emerald,
-		// 	"Plus velocity " + FString::SanitizeFloat(LocalNewVelocity.Z * AddBaseZVelocity));
-		//
-		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Yellow,
-		// 	"Angle " + FString::SanitizeFloat(Angle));
-		//
-		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Green,
-		// "Coeff Z push force: " + FString::SanitizeFloat(LocalCoeffZpushForce));
-		//
-		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Red,
-		// "NewZVelocity: " + FString::SanitizeFloat(LocalNewVelocity.Z));
-		//
-		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,LocalNewVelocity.ToString());
-		//
-		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,"Actual Push Force "
-		// 	+ FString::SanitizeFloat(ActualPushForce));
-		// GEngine->AddOnScreenDebugMessage(-1,2,FColor::Blue,"Coeff Angle "
-		// 	+ FString::SanitizeFloat(CoeffAngle));
-	}
+	GetPlayerCharacterMovement()->Velocity = FVector::ZeroVector;
+	GetPlayerCharacterMovement()->AddImpulse(LocalNewVelocity, true);
+	GetPlayerCharacterMovement()->AirControl = AirControlPushToKnife; 
 }
 
 void ACustomPlayerController::SetActualPushForce(float ForceToAdd)
@@ -284,6 +284,8 @@ void ACustomPlayerController::PullKnife_Implementation()
 
 void ACustomPlayerController::LandedDelegate(const FHitResult& Hit)
 {
+	GetPlayerCharacterMovement()->AirControl = BaseAirControl;
+	JumpCount = 0;
 	OnLandedCharacter();
 }
 
@@ -299,3 +301,15 @@ void ACustomPlayerController::SetActualSpeed(float SpeedToAdd)
 	CurrentSpeed = FMath::Clamp(CurrentSpeed, MinSpeed, MaxSpeed);
 }
 
+UCharacterMovementComponent* ACustomPlayerController::GetPlayerCharacterMovement()
+{
+	if (PlayerCharacter != nullptr)
+		return PlayerCharacter->GetCharacterMovement();
+	else
+		return nullptr;
+}
+
+FGenericTeamId ACustomPlayerController::GetGenericTeamId() const
+{
+	return 	FGenericTeamId(TeamId);
+}

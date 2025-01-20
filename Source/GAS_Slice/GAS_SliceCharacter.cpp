@@ -1,20 +1,15 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "GAS_SliceCharacter.h"
-#include "GAS_SliceProjectile.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "EnhancedInputComponent.h"
-#include "EnhancedInputSubsystems.h"
-#include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
 #include "Weapon/Knife.h"
-#include "Kismet/KismetStringLibrary.h"
 #include "CableComponent.h"
 #include "Components/ChildActorComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
+#include "Actor_Component/AC_LedgeGrab.h"
 
 AGAS_SliceCharacter::AGAS_SliceCharacter()
 {
@@ -40,6 +35,8 @@ AGAS_SliceCharacter::AGAS_SliceCharacter()
 
 	Cable = CreateDefaultSubobject<UCableComponent>(TEXT("Cable"));
 	Cable->SetupAttachment(HandStart);
+	
+	LedgeGrabComponent = CreateDefaultSubobject<UAC_LedgeGrab>(TEXT("Ledge Grab"));
 }
 
 void AGAS_SliceCharacter::BeginPlay()

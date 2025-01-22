@@ -39,13 +39,6 @@ AGAS_SliceCharacter::AGAS_SliceCharacter()
 	LedgeGrabComponent = CreateDefaultSubobject<UAC_LedgeGrab>(TEXT("Ledge Grab"));
 }
 
-void AGAS_SliceCharacter::BeginPlay()
-{
-	Super::BeginPlay();
-	
-	Knife->DelegateHitKnife.AddDynamic(this, &AGAS_SliceCharacter::OnHitKnife);
-}
-
 void AGAS_SliceCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -73,16 +66,17 @@ void AGAS_SliceCharacter::PostInitializeComponents()
 	}
 }
 
+void AGAS_SliceCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+	ResetKnife();
+}
+
 void AGAS_SliceCharacter::ResetKnife_Implementation()
 {
 	Knife->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	Knife->AttachToComponent(ParentKnife, FAttachmentTransformRules::KeepWorldTransform);
 	Knife->SetActorRelativeTransform(FTransform(KnifeStartRotation, KnifeStartLocation));
-}
-
-void AGAS_SliceCharacter::OnHitKnife_Implementation()
-{
-	
 }
 
 void AGAS_SliceCharacter::ThrowKnife_Implementation()

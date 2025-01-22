@@ -1,9 +1,7 @@
 #include "Knife.h"
-
 #include "Components/BoxComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
-#include "Kismet/KismetStringLibrary.h"
 #include "DrawDebugHelpers.h"
 #include "Math/Quat.h"
 
@@ -43,6 +41,7 @@ void AKnife::ResetKnife_Implementation()
 {
 	StopMove();
 	IsAttached = false;
+	BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 }
 
 void AKnife::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -52,7 +51,7 @@ void AKnife::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveC
 	HitRotate(Hit);
 	ReplaceHitKnife(Hit);
 	AttachToActor(OtherActor, FAttachmentTransformRules::KeepWorldTransform);
-	DelegateHitKnife.Broadcast();
+	BoxCollision->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AKnife::HitRotate(const FHitResult& Hit)
@@ -81,6 +80,6 @@ void AKnife::ReplaceHitKnife(const FHitResult& Hit)
 	FVector ImpactLocation = HitResult.ImpactPoint;
 	float DistanceBetweenMeshAndRootLocation = FVector::Distance(GetActorLocation(), StaticMeshKnife_->GetComponentLocation());
 	
-	FVector NewLocation = ImpactLocation - GetActorForwardVector() * DistanceBetweenMeshAndRootLocation;
-	SetActorLocation(NewLocation);
+	FVector NewLocation = (ImpactLocation - (GetActorForwardVector() * DistanceBetweenMeshAndRootLocation));
+	SetActorLocation(NewLocation + GetActorForwardVector() * DriveAttach);
 }

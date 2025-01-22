@@ -18,6 +18,7 @@ ACustomPlayerController::ACustomPlayerController()
 }
 
 #pragma region Unreal Functions
+
 void ACustomPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -60,20 +61,16 @@ void ACustomPlayerController::Tick(float DeltaTime)
 
 void ACustomPlayerController::Move(const FInputActionValue& Value)
 {
-	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 	
-	// add movement 
 	PlayerCharacter->AddMovementInput(PlayerCharacter->GetActorForwardVector(), MovementVector.Y);
 	PlayerCharacter->AddMovementInput(PlayerCharacter->GetActorRightVector(), MovementVector.X);	
 }
 
 void ACustomPlayerController::Look(const FInputActionValue& Value)
 {
-	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
-	// add yaw and pitch input to controller
 	PlayerCharacter->AddControllerYawInput(LookAxisVector.X);
 	PlayerCharacter->AddControllerPitchInput(LookAxisVector.Y);
 }
@@ -82,6 +79,11 @@ void ACustomPlayerController::GoUp(const FInputActionValue& Value)
 {
 	float LocalDirection = Value.Get<float>();
  	PlayerCharacter->AddMovementInput(FVector::UpVector,LocalDirection,false);
+}
+
+void ACustomPlayerController::AttackEnemy_Implementation()
+{
+	
 }
 
 void ACustomPlayerController::Jump() {
@@ -118,7 +120,7 @@ void ACustomPlayerController::StopJumping() {
 	}
 }
 
-#pragma endregion InputFunction 
+#pragma endregion InputFunction
 
 #pragma region SetUpInputFunction
 
@@ -132,6 +134,7 @@ void ACustomPlayerController::SetUpPlayerInputComponent()
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Look);
 	EnhancedInputComponent->BindAction(ThrowKnifeAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::ThrowKnife);
 	EnhancedInputComponent->BindAction(ResetKnifeAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::PullKnife);
+	EnhancedInputComponent->BindAction(AttackEnemyAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::AttackEnemy);
 }
 
 void ACustomPlayerController::SetupDebugModeInputComponent()
@@ -153,7 +156,6 @@ void ACustomPlayerController::ChangeMappingContext(UInputMappingContext* RemoveM
 	DelegateChangeMappingContexte.Execute();
 	GetPlayerCharacterMovement()->SetMovementMode(MovementMode);
 }
-
 #pragma endregion SetUpInputFunction
 
 void ACustomPlayerController::ActivateDebugMode()

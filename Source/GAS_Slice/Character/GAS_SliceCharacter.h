@@ -78,11 +78,7 @@ public:
 	virtual void ResetKnife_Implementation();
 	
 protected:
-	virtual void BeginPlay() override;
 	virtual void PostInitializeComponents() override;
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
-	void OnHitKnife();
-	void OnHitKnife_Implementation();
+	virtual void BeginPlay() override;
 };
 

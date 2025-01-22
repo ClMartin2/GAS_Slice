@@ -57,6 +57,9 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* DebugModeAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* AttackEnemyAction;
 	
 #pragma endregion Mapping
 
@@ -141,6 +144,10 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void OnLandedCharacter();
 	virtual void OnLandedCharacter_Implementation();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
+	void AttackEnemy();
+	virtual void AttackEnemy_Implementation();
 
 	UFUNCTION()
 	void LandedDelegate(const FHitResult& Hit);

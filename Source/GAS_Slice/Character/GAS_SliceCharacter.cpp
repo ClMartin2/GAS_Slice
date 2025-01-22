@@ -6,10 +6,10 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/LocalPlayer.h"
-#include "Weapon/Knife.h"
+#include "../Weapon/Knife.h"
 #include "CableComponent.h"
 #include "Components/ChildActorComponent.h"
-#include "Actor_Component/AC_LedgeGrab.h"
+#include "../Component/ActorComponent/AC_LedgeGrab.h"
 
 AGAS_SliceCharacter::AGAS_SliceCharacter()
 {

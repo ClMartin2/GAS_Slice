@@ -5,7 +5,6 @@
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/KismetStringLibrary.h"
 #include "DrawDebugHelpers.h"
-#include "PhysicsAssetRenderUtils.h"
 #include "Math/Quat.h"
 
 AKnife::AKnife()

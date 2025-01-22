@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "AI/Navigation/NavAgentInterface.h"
-#include "GAS_Slice/GAS_SliceCharacter.h"
 #include "GenericTeamAgentInterface.h"
 #include "CustomPlayerController.generated.h"
 

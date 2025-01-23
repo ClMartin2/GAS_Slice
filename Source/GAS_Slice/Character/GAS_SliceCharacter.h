@@ -49,6 +49,9 @@ private:
 	UPROPERTY(VisibleAnywhere,Category="Actor Component", meta=(AllowPrivateAccess = "true"))
 	UAC_LedgeGrab* LedgeGrabComponent;
 
+	UPROPERTY(VisibleAnywhere,Category="Actor Component", meta=(AllowPrivateAccess = "true"))
+	UArrowComponent* DirectionAnimationKnife;
+
 	UPROPERTY(VisibleAnywhere,Category="AI", meta=(AllowPrivateAccess = "true"))
 	UAC_LedgeGrab* TeamID = 0;
 	
@@ -63,6 +66,7 @@ public:
 	AKnife* GetKnife() const { return Knife; }
 	UStaticMeshComponent* GetHandStart() const {return HandStart;}
 	UAC_LedgeGrab* GetLedgeGrab() const {return LedgeGrabComponent;}
+	UArrowComponent* GetDirectionAnimationKnife() const {return DirectionAnimationKnife;}
 
 public:
 	AGAS_SliceCharacter();

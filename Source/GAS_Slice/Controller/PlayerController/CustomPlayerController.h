@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "AI/Navigation/NavAgentInterface.h"
 #include "GenericTeamAgentInterface.h"
+#include "Components/TimelineComponent.h"
 #include "CustomPlayerController.generated.h"
 
 class UCharacterMovementComponent;
@@ -31,34 +32,34 @@ private:
 	
 #pragma region Mapping
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Input", meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DefaultMappingContext;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Input", meta = (AllowPrivateAccess = "true"))
 	UInputMappingContext* DebugModeMappingContext;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Settings|Input", meta=(AllowPrivateAccess = "true"))
 	UInputAction* JumpAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Settings|Input", meta=(AllowPrivateAccess = "true"))
 	UInputAction* GoUpAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Settings|Input", meta=(AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* ThrowKnifeAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* ResetKnifeAction;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* DebugModeAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Settings|Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* AttackEnemyAction;
 	
 #pragma endregion Mapping
@@ -71,10 +72,7 @@ private:
 	float SpeedForwardDebugMode = 3000;
 #pragma endregion DebugSettings
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
 	AKnife* Knife;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Knife", meta = (AllowPrivateAccess = "true"))
 	USceneComponent* KnifeChildActor;
 
 	UPROPERTY(EditAnywhere, Category = "Settings|Knife", meta = (AllowPrivateAccess = "true"))
@@ -113,6 +111,21 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AirControl", meta = (AllowPrivateAccess = "true"))
 	float AirControlPushToKnife = 0.25;
 
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AnimAttack", meta = (AllowPrivateAccess = "true"))
+	float DistanceAttackAnim = 30;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AnimAttack", meta = (AllowPrivateAccess = "true"))
+	float DurationAnimAttack = 0.2;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AnimAttack", meta = (AllowPrivateAccess = "true"))
+	FRotator RotationAnimAttack = FRotator::ZeroRotator;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AnimAttack", meta = (AllowPrivateAccess = "true"))
+	FRotator EndRotationAnimAttack = FRotator::ZeroRotator;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AnimAttack", meta = (AllowPrivateAccess = "true"))
+	UCurveFloat* CurveTimelineAttackAnimation = nullptr;
+
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|ID", meta = (AllowPrivateAccess = "true"))
 	uint8 TeamId;
 	
@@ -121,9 +134,15 @@ private:
 	float CurrentPushForce = MinPushForce;
 	float BaseAirControlValue = 0;
 	float JumpCount = 0;
+	FVector StartLocationKnifeAttackAnim = FVector::Zero();
+	FVector StartLocationKnife = FVector::Zero();
+	FRotator StartRotationKnifeAttackAnim = FRotator::ZeroRotator;
 
 	bool bWasTheKnifeThrown = false;
 	bool bDebugModeActivated = false;
+	bool AlreadyAttack = false;
+
+	FTimeline TimelineAttackAnimation;
 
 public:
 	ACustomPlayerController();
@@ -148,13 +167,15 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void AttackEnemy();
 	virtual void AttackEnemy_Implementation();
-
-	UFUNCTION()
-	void LandedDelegate(const FHitResult& Hit);
 	
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
+	void CheckDistanceKnife();
+	virtual void CheckDistanceKnife_Implementation();
+
+private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void GoUp(const FInputActionValue& Value);
@@ -164,16 +185,20 @@ protected:
 	void SetUpPlayerInputComponent();
 	void ActivateDebugMode();
 	void ChangeMappingContext(UInputMappingContext* RemoveMappingContext, UInputMappingContext* AddMappingContext, TDelegate<void()>
-	                          DelegateChangeMappingContexte, EMovementMode MovementMode);
+							  DelegateChangeMappingContexte, EMovementMode MovementMode);
 	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
-	void CheckDistanceKnife();
-	virtual void CheckDistanceKnife_Implementation();
-
-private:
 	UFUNCTION()
 	void PushToKnife();
 
+	UFUNCTION()
+	void AttackAnimationUpdate(float Ratio);
+
+	UFUNCTION()
+	void AttackAnimationFinish();
+	
+	UFUNCTION()
+	void LandedDelegate(const FHitResult& Hit);
+	
 	UFUNCTION(BlueprintCallable,Category="Force", meta = (AllowPrivateAccess = "true"))
 	void SetActualPushForce(float ForceToAdd);
 	

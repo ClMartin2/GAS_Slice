@@ -10,6 +10,7 @@
 #include "CableComponent.h"
 #include "Components/ChildActorComponent.h"
 #include "../Component/ActorComponent/AC_LedgeGrab.h"
+#include "Components/ArrowComponent.h"
 
 AGAS_SliceCharacter::AGAS_SliceCharacter()
 {
@@ -35,6 +36,9 @@ AGAS_SliceCharacter::AGAS_SliceCharacter()
 
 	Cable = CreateDefaultSubobject<UCableComponent>(TEXT("Cable"));
 	Cable->SetupAttachment(HandStart);
+
+	DirectionAnimationKnife = CreateDefaultSubobject<UArrowComponent>(TEXT("DirectionAnimationKnife"));
+	DirectionAnimationKnife->SetupAttachment(FirstPersonCameraComponent);
 	
 	LedgeGrabComponent = CreateDefaultSubobject<UAC_LedgeGrab>(TEXT("Ledge Grab"));
 }
@@ -70,6 +74,7 @@ void AGAS_SliceCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	ResetKnife();
+	Cable->SetAttachEndToComponent(Knife->GetRootComponent());
 }
 
 void AGAS_SliceCharacter::ResetKnife_Implementation()
@@ -82,5 +87,4 @@ void AGAS_SliceCharacter::ResetKnife_Implementation()
 void AGAS_SliceCharacter::ThrowKnife_Implementation()
 {
 	Knife->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	Cable->SetAttachEndToComponent(Knife->GetRootComponent());
 }

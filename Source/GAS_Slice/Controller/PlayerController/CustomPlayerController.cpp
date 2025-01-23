@@ -1,4 +1,6 @@
 #include "CustomPlayerController.h"
+
+#include "CableComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "EnhancedInputComponent.h"
@@ -9,8 +11,10 @@
 #include "DrawDebugHelpers.h"
 #include "MathUtil.h"
 #include "../../Library/ConvertLibrary.h"
+#include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetStringLibrary.h"
 
 ACustomPlayerController::ACustomPlayerController()
@@ -41,12 +45,25 @@ void ACustomPlayerController::BeginPlay()
 		InputComponent->BindKey(EKeys::G,IE_Pressed,this,&ACustomPlayerController::ActivateDebugMode);
 
 		GetPlayerCharacterMovement()->AirControl = BaseAirControlValue;
+		StartLocationKnife = Knife->GetActorLocation();
 	}
+
+	FOnTimelineFloat ProgressUpdate;
+	ProgressUpdate.BindUFunction(this,FName("AttackAnimationUpdate"));
+
+	FOnTimelineEvent FinishedEvent;
+	FinishedEvent.BindUFunction(this,FName("AttackAnimationFinish"));
+
+	TimelineAttackAnimation.AddInterpFloat(CurveTimelineAttackAnimation,ProgressUpdate);
+	TimelineAttackAnimation.SetTimelineFinishedFunc(FinishedEvent);
+	TimelineAttackAnimation.SetPlayRate(1/DurationAnimAttack);
 }
 
 void ACustomPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	TimelineAttackAnimation.TickTimeline(DeltaTime);
 
 	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red,"Actual Push Force: "
 		+ FString::SanitizeFloat(CurrentPushForce));
@@ -83,7 +100,20 @@ void ACustomPlayerController::GoUp(const FInputActionValue& Value)
 
 void ACustomPlayerController::AttackEnemy_Implementation()
 {
+	if (AlreadyAttack)
+		return;
 	
+	FVector StartLocation = PlayerCharacter->GetDirectionAnimationKnife()->GetRelativeLocation();
+	FRotator StartRotation = RotationAnimAttack;
+	
+	Knife->SetActorRelativeLocation(StartLocation,false,nullptr,ETeleportType::ResetPhysics);
+	Knife->SetActorRelativeRotation(StartRotation,false,nullptr,ETeleportType::ResetPhysics);
+
+	StartLocationKnifeAttackAnim = StartLocation;
+	StartRotationKnifeAttackAnim = StartRotation;
+	
+	TimelineAttackAnimation.PlayFromStart();
+	AlreadyAttack = true;
 }
 
 void ACustomPlayerController::Jump() {
@@ -219,9 +249,6 @@ void ACustomPlayerController::ThrowKnife_Implementation()
 
 void ACustomPlayerController::ResetKnife_Implementation()
 {
-	if (!bWasTheKnifeThrown)
-		return;
-
 	PlayerCharacter->ResetKnife();
 	Knife->ResetKnife();
 	
@@ -276,6 +303,9 @@ void ACustomPlayerController::SetActualPushForce(float ForceToAdd)
 
 void ACustomPlayerController::PullKnife_Implementation()
 {
+	if (!bWasTheKnifeThrown)
+		return;
+	
 	PushToKnife();
 	ResetKnife();
 }
@@ -314,4 +344,24 @@ UCharacterMovementComponent* ACustomPlayerController::GetPlayerCharacterMovement
 FGenericTeamId ACustomPlayerController::GetGenericTeamId() const
 {
 	return 	FGenericTeamId(TeamId);
+}
+
+void ACustomPlayerController::AttackAnimationUpdate(float Ratio)
+{
+	FVector StartLocation = StartLocationKnifeAttackAnim;
+	FVector LocalForwardArrowVector = UKismetMathLibrary::InverseTransformDirection(PlayerCharacter->GetTransform()
+		,PlayerCharacter->GetDirectionAnimationKnife()->GetForwardVector());
+	FVector EndLocation = StartLocation + LocalForwardArrowVector * DistanceAttackAnim;
+
+	FRotator StartRotation = StartRotationKnifeAttackAnim;
+	FRotator EndRotation = StartRotation + EndRotationAnimAttack;
+	
+	Knife->SetActorRelativeLocation(FMath::Lerp(StartLocation,EndLocation,Ratio),false,nullptr,ETeleportType::ResetPhysics);
+	Knife->SetActorRelativeRotation(FMath::Lerp(StartRotation,EndRotation,Ratio),false,nullptr,ETeleportType::ResetPhysics);
+}
+
+void ACustomPlayerController::AttackAnimationFinish()
+{
+	ResetKnife();
+	AlreadyAttack = false;
 }

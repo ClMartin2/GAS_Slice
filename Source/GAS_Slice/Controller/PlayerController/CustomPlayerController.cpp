@@ -11,6 +11,7 @@
 #include "DrawDebugHelpers.h"
 #include "MathUtil.h"
 #include "../../Library/ConvertLibrary.h"
+#include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -96,24 +97,6 @@ void ACustomPlayerController::GoUp(const FInputActionValue& Value)
 {
 	float LocalDirection = Value.Get<float>();
  	PlayerCharacter->AddMovementInput(FVector::UpVector,LocalDirection,false);
-}
-
-void ACustomPlayerController::AttackEnemy_Implementation()
-{
-	if (AlreadyAttack)
-		return;
-	
-	FVector StartLocation = PlayerCharacter->GetDirectionAnimationKnife()->GetRelativeLocation();
-	FRotator StartRotation = RotationAnimAttack;
-	
-	Knife->SetActorRelativeLocation(StartLocation,false,nullptr,ETeleportType::ResetPhysics);
-	Knife->SetActorRelativeRotation(StartRotation,false,nullptr,ETeleportType::ResetPhysics);
-
-	StartLocationKnifeAttackAnim = StartLocation;
-	StartRotationKnifeAttackAnim = StartRotation;
-	
-	TimelineAttackAnimation.PlayFromStart();
-	AlreadyAttack = true;
 }
 
 void ACustomPlayerController::Jump() {
@@ -216,7 +199,7 @@ void ACustomPlayerController::ActivateDebugMode()
 
 void ACustomPlayerController::ThrowKnife_Implementation()
 {
-	if (bWasTheKnifeThrown)
+	if (bWasTheKnifeThrown && bIsAttacking)
 		return;
 
 	FVector ForwardThrowKnife = PlayerCameraManager->GetCameraRotation().Vector();
@@ -303,7 +286,7 @@ void ACustomPlayerController::SetActualPushForce(float ForceToAdd)
 
 void ACustomPlayerController::PullKnife_Implementation()
 {
-	if (!bWasTheKnifeThrown)
+	if (!bWasTheKnifeThrown && bIsAttacking)
 		return;
 	
 	PushToKnife();
@@ -346,10 +329,31 @@ FGenericTeamId ACustomPlayerController::GetGenericTeamId() const
 	return 	FGenericTeamId(TeamId);
 }
 
+#pragma region Attack
+
+void ACustomPlayerController::AttackEnemy_Implementation()
+{
+	if (bIsAttacking && bWasTheKnifeThrown)
+		return;
+	
+	FVector StartLocation = PlayerCharacter->GetDirectionAnimationKnife()->GetRelativeLocation();
+	FRotator StartRotation = RotationAnimAttack;
+	
+	Knife->SetActorLocation(StartLocation,false,nullptr,ETeleportType::ResetPhysics);
+	Knife->SetActorRelativeRotation(StartRotation,false,nullptr,ETeleportType::ResetPhysics);
+
+	StartLocationKnifeAttackAnim = StartLocation;
+	StartRotationKnifeAttackAnim = StartRotation;
+	
+	TimelineAttackAnimation.PlayFromStart();
+	bIsAttacking = true;
+}
+
+
 void ACustomPlayerController::AttackAnimationUpdate(float Ratio)
 {
 	FVector StartLocation = StartLocationKnifeAttackAnim;
-	FVector LocalForwardArrowVector = UKismetMathLibrary::InverseTransformDirection(PlayerCharacter->GetTransform()
+	FVector LocalForwardArrowVector = UKismetMathLibrary::InverseTransformDirection(PlayerCharacter->GetFirstPersonCameraComponent()->GetComponentTransform()
 		,PlayerCharacter->GetDirectionAnimationKnife()->GetForwardVector());
 	FVector EndLocation = StartLocation + LocalForwardArrowVector * DistanceAttackAnim;
 
@@ -363,5 +367,7 @@ void ACustomPlayerController::AttackAnimationUpdate(float Ratio)
 void ACustomPlayerController::AttackAnimationFinish()
 {
 	ResetKnife();
-	AlreadyAttack = false;
+	bIsAttacking = false;
 }
+
+#pragma endregion Attack

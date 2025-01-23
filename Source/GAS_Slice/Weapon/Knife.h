@@ -24,7 +24,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	float DriveAttach = 30;
 
-	UPROPERTY(VisibleAnywhere, Category = Collision, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Collision, meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* BoxCollision;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Visual", meta = (AllowPrivateAccess = "true"))
@@ -33,7 +33,6 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
 	
-	FVector ThrowDirection;
 	FVector CameraForward;
 	bool IsAttached;
 

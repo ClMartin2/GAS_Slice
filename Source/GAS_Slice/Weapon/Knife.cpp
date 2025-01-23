@@ -27,7 +27,6 @@ void AKnife::Throw_Implementation(FVector DirectionThrowKnife, FVector NewCamera
 	ProjectileMovement->SetUpdatedComponent(GetRootComponent());
 	ProjectileMovement->InitialSpeed = Speed;
 	ProjectileMovement->Velocity = DirectionThrowKnife * Speed;
-	ThrowDirection = DirectionThrowKnife;
 	CameraForward = NewCameraForward;
 }
 
@@ -46,6 +45,7 @@ void AKnife::ResetKnife_Implementation()
 
 void AKnife::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	GEngine->AddOnScreenDebugMessage(-1,100,FColor::Green,"On hit Knife");
 	IsAttached = true;
 	StopMove();
 	HitRotate(Hit);

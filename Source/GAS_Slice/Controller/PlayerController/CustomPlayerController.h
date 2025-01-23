@@ -140,7 +140,7 @@ private:
 
 	bool bWasTheKnifeThrown = false;
 	bool bDebugModeActivated = false;
-	bool AlreadyAttack = false;
+	bool bIsAttacking = false;
 
 	FTimeline TimelineAttackAnimation;
 

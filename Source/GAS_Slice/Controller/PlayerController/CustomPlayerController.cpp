@@ -16,6 +16,7 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetStringLibrary.h"
 
 ACustomPlayerController::ACustomPlayerController()
@@ -119,11 +120,11 @@ void ACustomPlayerController::Jump() {
 	if (RV_Hit.bBlockingHit)
 	{
 		GetPlayerCharacterMovement()->SetMovementMode(MOVE_Walking);
-		
-		if (PlayerCharacter != nullptr) {
-			PlayerCharacter->Jump();
-			JumpCount++;
-		}
+	}
+
+	if (PlayerCharacter != nullptr) {
+		PlayerCharacter->Jump();
+		JumpCount++;
 	}
 }
 
@@ -362,6 +363,8 @@ void ACustomPlayerController::AttackAnimationUpdate(float Ratio)
 	
 	Knife->SetActorRelativeLocation(FMath::Lerp(StartLocation,EndLocation,Ratio),false,nullptr,ETeleportType::ResetPhysics);
 	Knife->SetActorRelativeRotation(FMath::Lerp(StartRotation,EndRotation,Ratio),false,nullptr,ETeleportType::ResetPhysics);
+
+	// UKismetSystemLibrary::BoxOverlapActors(this,)
 }
 
 void ACustomPlayerController::AttackAnimationFinish()

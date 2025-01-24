@@ -45,7 +45,6 @@ void AKnife::ResetKnife_Implementation()
 
 void AKnife::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	GEngine->AddOnScreenDebugMessage(-1,100,FColor::Green,"On hit Knife");
 	IsAttached = true;
 	StopMove();
 	HitRotate(Hit);

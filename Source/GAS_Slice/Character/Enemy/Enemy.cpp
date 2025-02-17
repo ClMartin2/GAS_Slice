@@ -1,6 +1,7 @@
 #include "../../Character/Enemy/Enemy.h"
 #include "Components/StaticMeshComponent.h"
 #include "../../Component/StaticMeshComponent/SMC_Gun.h"
+#include "GAS_Slice/Component/ActorComponent/AC_Health.h"
 
 AEnemy::AEnemy()
 {
@@ -14,7 +15,16 @@ AEnemy::AEnemy()
 
 	BarrelPosition = CreateDefaultSubobject<USceneComponent>(TEXT("Barrel Position"));
 	BarrelPosition->SetupAttachment(SMCGun);
-	
+
 	SMCGun->SetBarrelPostion(BarrelPosition);
+	
+	healthComponent = CreateDefaultSubobject<UAC_Health>(TEXT("Health Component"));
+	healthComponent->OnDeath.AddDynamic(this,&AEnemy::Death);
+	
+}
+
+void AEnemy::Death()
+{
+	
 }
 

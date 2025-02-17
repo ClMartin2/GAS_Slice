@@ -111,19 +111,19 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AirControl", meta = (AllowPrivateAccess = "true"))
 	float AirControlPushToKnife = 0.25;
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AnimAttack", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Attack", meta = (AllowPrivateAccess = "true"))
 	float DistanceAttackAnim = 30;
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AnimAttack", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Attack", meta = (AllowPrivateAccess = "true"))
 	float DurationAnimAttack = 0.2;
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AnimAttack", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Attack", meta = (AllowPrivateAccess = "true"))
 	FRotator RotationAnimAttack = FRotator::ZeroRotator;
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AnimAttack", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Attack", meta = (AllowPrivateAccess = "true"))
 	FRotator EndRotationAnimAttack = FRotator::ZeroRotator;
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|AnimAttack", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Attack", meta = (AllowPrivateAccess = "true"))
 	UCurveFloat* CurveTimelineAttackAnimation = nullptr;
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|ID", meta = (AllowPrivateAccess = "true"))

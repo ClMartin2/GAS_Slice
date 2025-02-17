@@ -4,6 +4,7 @@
 #include "GameFramework/Character.h"
 #include "Enemy.generated.h"
 
+class UAC_Health;
 class USMC_Gun;
 class UStaticMeshComponent;
 
@@ -23,4 +24,11 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Component, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* BarrelPosition;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Component, meta = (AllowPrivateAccess = "true"))
+	UAC_Health* healthComponent;
+
+private:
+	UFUNCTION()
+	void Death();
 };

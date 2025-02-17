@@ -24,6 +24,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	float DriveAttach = 30;
 
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	bool DrawDebugBoxCollisionAttack = false;
+
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	float Damage = 10;
+
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Collision, meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* BoxCollision;
 
@@ -35,6 +41,7 @@ private:
 	
 	FVector CameraForward;
 	bool IsAttached;
+	bool hasAlreadyAttack = false;
 
 public:
 	AKnife();	
@@ -50,6 +57,9 @@ public:
 
 	bool GetIsAttached() const {return IsAttached;}
 
+	void CheckCollisionAttack();
+	void FinishCheckCollisionAttack();
+	
 protected:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")

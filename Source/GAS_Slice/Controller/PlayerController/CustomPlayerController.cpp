@@ -1,6 +1,7 @@
 #include "CustomPlayerController.h"
 
 #include "CableComponent.h"
+#include "CollisionDebugDrawingPublic.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "EnhancedInputComponent.h"
@@ -115,8 +116,6 @@ void ACustomPlayerController::Jump() {
 		PlayerCharacter->GetActorUpVector() * PlayerCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	FVector End = Start - PlayerCharacter->GetActorUpVector() * DistanceBuffedJump;
 	
-	GetWorld()->LineTraceSingleByChannel(RV_Hit,	Start,End,ECC_Visibility,RV_TraceParams);
-
 	if (RV_Hit.bBlockingHit)
 	{
 		GetPlayerCharacterMovement()->SetMovementMode(MOVE_Walking);
@@ -364,13 +363,14 @@ void ACustomPlayerController::AttackAnimationUpdate(float Ratio)
 	Knife->SetActorRelativeLocation(FMath::Lerp(StartLocation,EndLocation,Ratio),false,nullptr,ETeleportType::ResetPhysics);
 	Knife->SetActorRelativeRotation(FMath::Lerp(StartRotation,EndRotation,Ratio),false,nullptr,ETeleportType::ResetPhysics);
 
-	// UKismetSystemLibrary::BoxOverlapActors(this,)
+	Knife->CheckCollisionAttack();
 }
 
 void ACustomPlayerController::AttackAnimationFinish()
 {
 	ResetKnife();
 	bIsAttacking = false;
+	Knife->FinishCheckCollisionAttack();
 }
 
 #pragma endregion Attack

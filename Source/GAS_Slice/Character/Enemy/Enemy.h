@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "GAS_Slice/Character/BaseCharacter.h"
 #include "Enemy.generated.h"
 
 class UAC_Health;
@@ -9,7 +10,7 @@ class USMC_Gun;
 class UStaticMeshComponent;
 
 UCLASS()
-class GAS_SLICE_API AEnemy : public ACharacter
+class GAS_SLICE_API AEnemy : public ABaseCharacter
 {
 	GENERATED_BODY()
 

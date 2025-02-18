@@ -8,7 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "../../Weapon/Knife.h"
-#include "../../Character/GAS_SliceCharacter.h"
+#include "../../Character/PlayerCharacter/GAS_SliceCharacter.h"
 #include "DrawDebugHelpers.h"
 #include "MathUtil.h"
 #include "../../Library/ConvertLibrary.h"

@@ -67,6 +67,11 @@ protected:
 
 	virtual void StopMove_Implementation();
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
+	void MakeDamage(FHitResult OutHit);
+
+	virtual void MakeDamage_Implementation(FHitResult OutHit);
+
 private:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);

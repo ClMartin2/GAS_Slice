@@ -119,6 +119,7 @@ void AKnife::CheckCollisionAttack()
 		
 		if (healthComponent)
 		{
+			MakeDamage(OutHit);
 			healthComponent->TakeDamage(Damage);
 			hasAlreadyAttack = true;
 		}
@@ -134,4 +135,9 @@ void AKnife::CheckCollisionAttack()
 void AKnife::FinishCheckCollisionAttack()
 {
 	hasAlreadyAttack = false;
+}
+
+void AKnife::MakeDamage_Implementation(FHitResult OutHit)
+{
+	
 }

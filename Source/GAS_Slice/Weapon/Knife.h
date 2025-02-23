@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "Knife.generated.h"
 
+class UGameplayEffect;
 class UProjectileMovementComponent;
 class UBoxComponent;
 class UStaticMeshComponent;
@@ -25,7 +26,7 @@ private:
 	float DriveAttach = 30;
 
 	UPROPERTY(EditAnywhere, Category = "Settings")
-	bool DrawDebugBoxCollisionAttack = false;
+	bool DebugCollisionAttack = false;
 
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	float Damage = 10;
@@ -38,6 +39,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
+
+	UPROPERTY(EditAnywhere, Category = "Settings|GAS", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UGameplayEffect> GameplayEffectClass;
 	
 	FVector CameraForward;
 	bool IsAttached;
@@ -67,15 +71,11 @@ protected:
 
 	virtual void StopMove_Implementation();
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
-	void MakeDamage(FHitResult OutHit);
-
-	virtual void MakeDamage_Implementation(FHitResult OutHit);
-
 private:
 	UFUNCTION()
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	void HitRotate(const FHitResult& Hit);
 	void ReplaceHitKnife(const FHitResult& Hit);
+	void MakeDamage(FHitResult OutHit);
 };

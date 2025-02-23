@@ -1,5 +1,6 @@
 #include "../Character/BaseCharacter.h"
 #include "AbilitySystemComponent.h"
+#include "../GAS/AttributeSet/BasicAttributeSet.h"
 
 
 ABaseCharacter::ABaseCharacter()

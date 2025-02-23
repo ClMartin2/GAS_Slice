@@ -74,10 +74,12 @@ private:
 
 	AKnife* Knife;
 	USceneComponent* KnifeChildActor;
-
+	
 	UPROPERTY(EditAnywhere, Category = "Settings|Knife", meta = (AllowPrivateAccess = "true"))
 	float MaxDistance;
-	
+
+#pragma region ForceSettings
+
 	UPROPERTY(EditAnywhere, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
 	float MaxZPushForce;
 
@@ -95,6 +97,7 @@ private:
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
 	float CoeffForceToAdd = 0.25;
+#pragma endregion ForceSettings
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Speed", meta = (AllowPrivateAccess = "true"))
 	float MinSpeed = 800;
@@ -143,7 +146,7 @@ private:
 	bool bIsAttacking = false;
 
 	FTimeline TimelineAttackAnimation;
-
+	FTimerHandle UpdateAttackTimerHandle;
 public:
 	ACustomPlayerController();
 	
@@ -191,7 +194,7 @@ private:
 	void PushToKnife();
 
 	UFUNCTION()
-	void AttackAnimationUpdate(float Ratio);
+	void AttackAnimationUpdate(float Ratio) const;
 
 	UFUNCTION()
 	void AttackAnimationFinish();
@@ -209,5 +212,6 @@ private:
 	UCharacterMovementComponent* GetPlayerCharacterMovement();
 
 	virtual FGenericTeamId GetGenericTeamId() const override;
+	void CheckCollisionAttack() const;
 };
 

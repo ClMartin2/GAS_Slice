@@ -8,6 +8,7 @@
 #include "BaseCharacter.generated.h"
 
 class UAbilitySystemComponent;
+class UBasicAttributeSet;
 
 UCLASS()
 class GAS_SLICE_API ABaseCharacter : public ACharacter, public IAbilitySystemInterface
@@ -29,5 +30,4 @@ protected:
 	
 protected:
 	virtual void BeginPlay() override;
-
 };

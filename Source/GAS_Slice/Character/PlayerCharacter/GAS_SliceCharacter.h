@@ -17,7 +17,6 @@ class AKnife;
 class UCableComponent;
 class UChildActorComponent;
 class UAC_LedgeGrab;
-class UBasicAttributeSet;
 
 struct FInputActionValue;
 

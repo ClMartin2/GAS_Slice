@@ -346,11 +346,13 @@ void ACustomPlayerController::AttackEnemy_Implementation()
 	StartRotationKnifeAttackAnim = StartRotation;
 	
 	TimelineAttackAnimation.PlayFromStart();
+	GetWorldTimerManager().SetTimer(UpdateAttackTimerHandle, this, &ACustomPlayerController::CheckCollisionAttack,
+		0.01f, true);
 	bIsAttacking = true;
 }
 
 
-void ACustomPlayerController::AttackAnimationUpdate(float Ratio)
+void ACustomPlayerController::AttackAnimationUpdate(float Ratio) const
 {
 	FVector StartLocation = StartLocationKnifeAttackAnim;
 	FVector LocalForwardArrowVector = UKismetMathLibrary::InverseTransformDirection(PlayerCharacter->GetFirstPersonCameraComponent()->GetComponentTransform()
@@ -359,11 +361,13 @@ void ACustomPlayerController::AttackAnimationUpdate(float Ratio)
 
 	FRotator StartRotation = StartRotationKnifeAttackAnim;
 	FRotator EndRotation = StartRotation + EndRotationAnimAttack;
-	
-	Knife->SetActorRelativeLocation(FMath::Lerp(StartLocation,EndLocation,Ratio),false,nullptr,ETeleportType::ResetPhysics);
-	Knife->SetActorRelativeRotation(FMath::Lerp(StartRotation,EndRotation,Ratio),false,nullptr,ETeleportType::ResetPhysics);
 
-	Knife->CheckCollisionAttack();
+	FRotator LerpRotation = FMath::Lerp(StartRotation,EndRotation,Ratio);
+	FVector LerpLocation = FMath::Lerp(StartLocation,EndLocation,Ratio);
+	
+	FTransform NewTransform = FTransform(LerpRotation,LerpLocation,Knife->GetActorScale());
+	
+	Knife->SetActorRelativeTransform(NewTransform,false,nullptr,ETeleportType::ResetPhysics);
 }
 
 void ACustomPlayerController::AttackAnimationFinish()
@@ -371,6 +375,12 @@ void ACustomPlayerController::AttackAnimationFinish()
 	ResetKnife();
 	bIsAttacking = false;
 	Knife->FinishCheckCollisionAttack();
+	GetWorldTimerManager().ClearTimer(UpdateAttackTimerHandle);
+}
+
+void ACustomPlayerController::CheckCollisionAttack() const
+{
+	Knife->CheckCollisionAttack();
 }
 
 #pragma endregion Attack

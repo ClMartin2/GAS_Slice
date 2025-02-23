@@ -3,8 +3,9 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "DrawDebugHelpers.h"
-#include "GAS_Slice/Component/ActorComponent/AC_Health.h"
-#include "Kismet/KismetSystemLibrary.h"
+#include "AbilitySystemComponent.h"
+#include "AbilitySystemInterface.h"
+#include "GameplayEffect.h"
 #include "Math/Quat.h"
 
 AKnife::AKnife()
@@ -92,9 +93,6 @@ void AKnife::CheckCollisionAttack()
 {
 	if (hasAlreadyAttack)
 		return;
-	
-	UWorld* World = GetWorld();
-	if (!World) return;
 
 	FVector BoxPosition = GetActorLocation();
 	FVector BoxExtent = BoxCollision->GetScaledBoxExtent(); 
@@ -109,27 +107,23 @@ void AKnife::CheckCollisionAttack()
 
 	FHitResult OutHit; 
 
-	bool bHit = World->SweepSingleByObjectType(OutHit, BoxPosition, BoxPosition + FVector(0.f, 0.f, -1.f)
+	bool bHit = GetWorld()->SweepSingleByObjectType(OutHit, BoxPosition, BoxPosition + FVector(0.f, 0.f, -1.f)
 		, BoxRotation, ObjectParams,FCollisionShape::MakeBox(BoxExtent)
 	);
 
 	if (bHit)
-	{
-		UAC_Health* healthComponent = OutHit.GetActor()->FindComponentByClass<UAC_Health>();
-		
-		if (healthComponent)
-		{
-			MakeDamage(OutHit);
-			healthComponent->TakeDamage(Damage);
-			hasAlreadyAttack = true;
-		}
-		
-		GEngine->AddOnScreenDebugMessage(-1,10.0f,FColor::Red,"Hit");
-		UE_LOG(LogTemp, Warning, TEXT("Actor detected: %s"), *OutHit.GetActor()->GetName());
-	}
+		MakeDamage(OutHit);
 	
-	if (DrawDebugBoxCollisionAttack)
-		DrawDebugBox(World,BoxPosition,BoxExtent,BoxRotation,FColor::Red,false, 5.0f );
+	if (DebugCollisionAttack)
+	{
+		DrawDebugBox(GetWorld(),BoxPosition,BoxExtent,BoxRotation,FColor::Red,false, 5.0f );
+
+		if (OutHit.GetActor() != nullptr)
+		{
+			GEngine->AddOnScreenDebugMessage(-1,10.0f,FColor::Red,"Hit : " + OutHit.GetActor()->GetName());
+			UE_LOG(LogTemp, Warning, TEXT("Actor detected: %s"), *OutHit.GetActor()->GetName());
+		}
+	}
 }
 
 void AKnife::FinishCheckCollisionAttack()
@@ -137,7 +131,22 @@ void AKnife::FinishCheckCollisionAttack()
 	hasAlreadyAttack = false;
 }
 
-void AKnife::MakeDamage_Implementation(FHitResult OutHit)
+void AKnife::MakeDamage(FHitResult OutHit)
 {
-	
+	if (IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(OutHit.GetActor()))
+	{
+		UAbilitySystemComponent* TargetAbilitySystemComponent = ASCInterface->GetAbilitySystemComponent();
+		FGameplayEffectContextHandle EffectContext = TargetAbilitySystemComponent->MakeEffectContext();
+		EffectContext.AddSourceObject(this);
+
+		FGameplayEffectSpecHandle EffectSpecHandle = TargetAbilitySystemComponent->MakeOutgoingSpec(GameplayEffectClass, 1.f, EffectContext);
+		
+		if (EffectSpecHandle.IsValid())
+		{
+			EffectSpecHandle.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Event.Damage")), -Damage);
+			TargetAbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetAbilitySystemComponent);
+		}
+		
+		hasAlreadyAttack = true;
+	}
 }

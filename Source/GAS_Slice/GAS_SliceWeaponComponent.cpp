@@ -2,7 +2,7 @@
 
 
 #include "GAS_SliceWeaponComponent.h"
-#include "Character/GAS_SliceCharacter.h"
+#include "Character/PlayerCharacter/GAS_SliceCharacter.h"
 #include "GAS_SliceProjectile.h"
 #include "GameFramework/PlayerController.h"
 #include "Camera/PlayerCameraManager.h"

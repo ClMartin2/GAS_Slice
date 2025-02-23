@@ -26,10 +26,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Component, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* BarrelPosition;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Component, meta = (AllowPrivateAccess = "true"))
-	UAC_Health* healthComponent;
-
 private:
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void Death();
 };

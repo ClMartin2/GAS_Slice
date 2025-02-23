@@ -22,6 +22,5 @@ public:
 	
 private:
 	virtual void BeginPlay() override;
-	
 };
 

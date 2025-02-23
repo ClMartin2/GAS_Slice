@@ -1,7 +1,6 @@
- #include "../../Character/Enemy/Enemy.h"
+#include "../../Character/Enemy/Enemy.h"
 #include "Components/StaticMeshComponent.h"
 #include "../../Component/StaticMeshComponent/SMC_Gun.h"
-#include "GAS_Slice/Component/ActorComponent/AC_Health.h"
 
 AEnemy::AEnemy()
 {
@@ -19,8 +18,15 @@ AEnemy::AEnemy()
 	SMCGun->SetBarrelPostion(BarrelPosition);
 }
 
-void AEnemy::Death()
-{
+ void AEnemy::BeginPlay()
+ {
+	Super::BeginPlay();
+	SMCGun->SetAbilitySystemComponent(GetAbilitySystemComponent());
+ }
+
+ void AEnemy::Death_Implementation()
+ {
+	Super::Death_Implementation();
 	Destroy();
-}
+ }
 

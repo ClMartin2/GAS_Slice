@@ -16,18 +16,8 @@ public:
 public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,BlueprintAssignable, Category = "Settings", meta = (AllowPrivateAccess = "true"))
 	FDeath OnDeath;
-	
-private:
-	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings", meta = (AllowPrivateAccess = "true"))
-	float Health;
-
-	float CurrentHealth;
-	
-protected:
-	virtual void BeginPlay() override;
 
 public:
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	void TakeDamage(float Damage);
+	void TakeDamage();
 	void Death() const;
 };

@@ -5,23 +5,9 @@ UAC_Health::UAC_Health()
 	PrimaryComponentTick.bCanEverTick = true;
 }
 
-void UAC_Health::BeginPlay()
+void UAC_Health::TakeDamage()
 {
-	Super::BeginPlay();
-	CurrentHealth = Health;
-}
-
-void UAC_Health::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-}
-
-void UAC_Health::TakeDamage(float Damage)
-{
-	CurrentHealth -= Damage;
-
-	if (CurrentHealth <= 0)
-		Death();
+	Death();
 }
 
 void UAC_Health::Death() const

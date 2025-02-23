@@ -3,10 +3,8 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "DrawDebugHelpers.h"
-#include "AbilitySystemComponent.h"
-#include "AbilitySystemInterface.h"
-#include "GameplayEffect.h"
 #include "Math/Quat.h"
+#include "../Library/Utils.h"
 
 AKnife::AKnife()
 {
@@ -133,20 +131,6 @@ void AKnife::FinishCheckCollisionAttack()
 
 void AKnife::MakeDamage(FHitResult OutHit)
 {
-	if (IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(OutHit.GetActor()))
-	{
-		UAbilitySystemComponent* TargetAbilitySystemComponent = ASCInterface->GetAbilitySystemComponent();
-		FGameplayEffectContextHandle EffectContext = TargetAbilitySystemComponent->MakeEffectContext();
-		EffectContext.AddSourceObject(this);
-
-		FGameplayEffectSpecHandle EffectSpecHandle = TargetAbilitySystemComponent->MakeOutgoingSpec(GameplayEffectClass, 1.f, EffectContext);
-		
-		if (EffectSpecHandle.IsValid())
-		{
-			EffectSpecHandle.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(FName("Event.Damage")), -Damage);
-			TargetAbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetAbilitySystemComponent);
-		}
-		
-		hasAlreadyAttack = true;
-	}
+	Utils::ApplyGameplayEffectToTargetSetByCaller(this,OutHit.GetActor(),GameplayEffectClass,PlayerAbilitySystemComponent,-Damage,FName("Event.Damage"));
+	hasAlreadyAttack = true;
 }

@@ -4,6 +4,7 @@
 #include "GameFramework/Actor.h"
 #include "Knife.generated.h"
 
+class UAbilitySystemComponent;
 class UGameplayEffect;
 class UProjectileMovementComponent;
 class UBoxComponent;
@@ -47,6 +48,9 @@ private:
 	bool IsAttached;
 	bool hasAlreadyAttack = false;
 
+private:
+	UAbilitySystemComponent* PlayerAbilitySystemComponent;
+
 public:
 	AKnife();	
 	
@@ -63,6 +67,7 @@ public:
 
 	void CheckCollisionAttack();
 	void FinishCheckCollisionAttack();
+	void SetAbilitySystemComponent(UAbilitySystemComponent* AbilitySystemComponent){PlayerAbilitySystemComponent = AbilitySystemComponent;}
 	
 protected:
 

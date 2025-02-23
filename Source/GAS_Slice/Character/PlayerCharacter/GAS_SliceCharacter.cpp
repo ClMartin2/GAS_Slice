@@ -63,6 +63,7 @@ void AGAS_SliceCharacter::PostInitializeComponents()
 			ParentKnife = KnifeChildActorComponent->GetAttachParent();
 			KnifeStartLocation = KnifeChildActorComponent->GetRelativeLocation();
 			KnifeStartRotation = KnifeChildActorComponent->GetRelativeRotation();
+			Knife->SetAbilitySystemComponent(GetAbilitySystemComponent());
 		}
 	}
 }

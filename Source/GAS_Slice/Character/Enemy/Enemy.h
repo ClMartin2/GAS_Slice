@@ -26,7 +26,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Component, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* BarrelPosition;
 
+protected:
+	virtual void BeginPlay() override;
+	
 private:
-	UFUNCTION(BlueprintCallable)
-	void Death();
+	virtual void Death_Implementation() override;
 };

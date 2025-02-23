@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayEffectTypes.h"
 #include "BaseCharacter.generated.h"
 
 class UAbilitySystemComponent;
@@ -30,4 +31,10 @@ protected:
 	
 protected:
 	virtual void BeginPlay() override;
+
+	UFUNCTION(BlueprintNativeEvent)
+	void Death();
+
+	virtual void Death_Implementation();
+	virtual void OnHealthChanged(const FOnAttributeChangeData& Data);
 };

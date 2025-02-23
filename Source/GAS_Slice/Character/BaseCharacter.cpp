@@ -15,7 +15,22 @@ void ABaseCharacter::BeginPlay()
 	
 	if (IsValid(AbilitySystemComponent))
 	{
-		BasicAttributeset = AbilitySystemComponent->GetSet<UBasicAttributeSet>();	
+		BasicAttributeset = AbilitySystemComponent->GetSet<UBasicAttributeSet>();
+		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UBasicAttributeSet::GetHealthAttribute()).AddUObject(this, &ABaseCharacter::OnHealthChanged);
+	}
+}
+
+void ABaseCharacter::Death_Implementation()
+{
+}
+
+void ABaseCharacter::OnHealthChanged(const FOnAttributeChangeData& Data)
+{
+	float NewHealth = Data.NewValue;
+	
+	if (NewHealth <= 0)
+	{
+		Death();
 	}
 }
 

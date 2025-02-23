@@ -11,14 +11,12 @@
 #include "../../Character/PlayerCharacter/GAS_SliceCharacter.h"
 #include "DrawDebugHelpers.h"
 #include "MathUtil.h"
-#include "../../Library/ConvertLibrary.h"
+#include "../../Library/Utils.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
-#include "Kismet/KismetSystemLibrary.h"
-#include "Kismet/KismetStringLibrary.h"
 
 ACustomPlayerController::ACustomPlayerController()
 {
@@ -260,7 +258,7 @@ void ACustomPlayerController::PushToKnife()
 	float Angle = FMath::RadiansToDegrees(FMath::Acos(
 		FVector::DotProduct(LocalDirection, PlayerCharacter->GetActorForwardVector())));
 	float CoeffAngle = FVector::DotProduct(LocalDirection, -PlayerCharacter->GetActorUpVector());
-	bool AddBaseZVelocity = ConvertLibrary::ConvertFloatToBoolNegativePositiveRange(-CoeffAngle);
+	bool AddBaseZVelocity = Utils::ConvertFloatToBoolNegativePositiveRange(-CoeffAngle);
 	// float LocalCoeffZpushForce = 1 - Angle/MaxAngle;
 	SetActualPushForce(LengthVectorDirection * FMath::Abs(CoeffForceToAdd));
 	float CoeffActualForce = CurrentPushForce/MaxPushForce;

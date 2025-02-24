@@ -1,5 +1,4 @@
 #include "CustomPlayerController.h"
-
 #include "CableComponent.h"
 #include "CollisionDebugDrawingPublic.h"
 #include "Kismet/GameplayStatics.h"
@@ -11,16 +10,11 @@
 #include "../../Character/PlayerCharacter/GAS_SliceCharacter.h"
 #include "DrawDebugHelpers.h"
 #include "MathUtil.h"
-#include "../../Library/Utils.h"
 #include "Camera/CameraComponent.h"
 #include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
-
-ACustomPlayerController::ACustomPlayerController()
-{
-}
 
 #pragma region Unreal Functions
 
@@ -258,7 +252,7 @@ void ACustomPlayerController::PushToKnife()
 	float Angle = FMath::RadiansToDegrees(FMath::Acos(
 		FVector::DotProduct(LocalDirection, PlayerCharacter->GetActorForwardVector())));
 	float CoeffAngle = FVector::DotProduct(LocalDirection, -PlayerCharacter->GetActorUpVector());
-	bool AddBaseZVelocity = Utils::ConvertFloatToBoolNegativePositiveRange(-CoeffAngle);
+	bool AddBaseZVelocity = -CoeffAngle >= 0.0f;
 	// float LocalCoeffZpushForce = 1 - Angle/MaxAngle;
 	SetActualPushForce(LengthVectorDirection * FMath::Abs(CoeffForceToAdd));
 	float CoeffActualForce = CurrentPushForce/MaxPushForce;

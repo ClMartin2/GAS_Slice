@@ -36,6 +36,9 @@ AGAS_SliceCharacter::AGAS_SliceCharacter()
 
 	DirectionAnimationKnife = CreateDefaultSubobject<UArrowComponent>(TEXT("DirectionAnimationKnife"));
 	DirectionAnimationKnife->SetupAttachment(FirstPersonCameraComponent);
+
+	SpawnSpellPosition = CreateDefaultSubobject<USceneComponent>(TEXT("Spawn Spell Position"));
+	SpawnSpellPosition->SetupAttachment(FirstPersonCameraComponent);
 	
 	LedgeGrabComponent = CreateDefaultSubobject<UAC_LedgeGrab>(TEXT("Ledge Grab"));
 }

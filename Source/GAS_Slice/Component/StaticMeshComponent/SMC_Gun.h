@@ -11,7 +11,7 @@ class GAS_SLICE_API USMC_Gun : public UStaticMeshComponent
 {
 	GENERATED_BODY()
 public:
-	USMC_Gun();
+	USMC_Gun() = default;
 
 private:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Settings", meta=(AllowPrivateAccess=true))

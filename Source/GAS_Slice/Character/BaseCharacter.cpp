@@ -12,7 +12,7 @@ ABaseCharacter::ABaseCharacter()
 void ABaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	if (IsValid(AbilitySystemComponent))
 	{
 		BasicAttributeset = AbilitySystemComponent->GetSet<UBasicAttributeSet>();

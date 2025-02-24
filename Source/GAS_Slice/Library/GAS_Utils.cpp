@@ -1,31 +1,16 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "Utils.h"
+#include "GAS_Utils.h"
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemInterface.h"
 #include "GameplayEffect.h"
 
-Utils::Utils()
-{
-}
-
-Utils::~Utils()
-{
-}
-
-bool Utils::ConvertFloatToBoolNegativePositiveRange(float Value)
-{
-	return Value >= 0.0f;
-}
-
-void Utils::ApplyGameplayEffectToTargetSetByCaller(UObject* Source,AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass 
+void GAS_Utils::ApplyGameplayEffectToTargetSetByCaller(UObject* Source,AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass 
 	, UAbilitySystemComponent* AbilitySystemComponent, float Value, FName GameplayTagName,float Level)
 {
-	if (IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(TargetActor))
+	UAbilitySystemComponent* TargetAbilitySystemComponent = GetAbilitySystem(TargetActor);
+	
+	if (TargetAbilitySystemComponent!= nullptr)
 	{
-		UAbilitySystemComponent* TargetAbilitySystemComponent = ASCInterface->GetAbilitySystemComponent();
 		FGameplayEffectContextHandle EffectContext = TargetAbilitySystemComponent->MakeEffectContext();
 		EffectContext.AddSourceObject(Source);
 
@@ -37,4 +22,14 @@ void Utils::ApplyGameplayEffectToTargetSetByCaller(UObject* Source,AActor* Targe
 			AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetAbilitySystemComponent);
 		}
 	}
+}
+
+UAbilitySystemComponent* GAS_Utils::GetAbilitySystem(AActor* TargetActor)
+{
+	if (IAbilitySystemInterface* ASCInterface = Cast<IAbilitySystemInterface>(TargetActor))
+	{
+		return ASCInterface->GetAbilitySystemComponent();
+	}
+	
+	return nullptr;
 }

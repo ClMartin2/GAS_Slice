@@ -25,7 +25,9 @@ UCLASS()
 class GAS_SLICE_API ACustomPlayerController : public APlayerController, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
-
+public:
+	ACustomPlayerController() = default;
+	
 private: 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Character, meta = (AllowPrivateAccess = "true"))
 	AGAS_SliceCharacter* PlayerCharacter;
@@ -147,8 +149,6 @@ private:
 
 	FTimeline TimelineAttackAnimation;
 	FTimerHandle UpdateAttackTimerHandle;
-public:
-	ACustomPlayerController();
 	
 protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")

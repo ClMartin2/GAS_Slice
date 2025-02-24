@@ -1,11 +1,6 @@
 #include "../../Component/StaticMeshComponent/SMC_Gun.h"
 #include "GAS_Slice/Projectiles/EnemyProjectile.h"
 
-
-USMC_Gun::USMC_Gun()
-{
-}
-
 void USMC_Gun::SetBarrelPostion(USceneComponent* NewBarrelPostion)
 {
 	BarrelPostion = NewBarrelPostion;

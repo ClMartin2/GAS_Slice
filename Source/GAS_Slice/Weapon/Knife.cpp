@@ -4,7 +4,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Math/Quat.h"
-#include "../Library/Utils.h"
+#include "../Library/GAS_Utils.h"
 
 AKnife::AKnife()
 {
@@ -131,6 +131,6 @@ void AKnife::FinishCheckCollisionAttack()
 
 void AKnife::MakeDamage(FHitResult OutHit)
 {
-	Utils::ApplyGameplayEffectToTargetSetByCaller(this,OutHit.GetActor(),GameplayEffectClass,PlayerAbilitySystemComponent,-Damage,FName("Event.Damage"));
+	GAS_Utils::ApplyGameplayEffectToTargetSetByCaller(this,OutHit.GetActor(),GameplayEffectClass,PlayerAbilitySystemComponent,-Damage,FName("Event.Damage"));
 	hasAlreadyAttack = true;
 }

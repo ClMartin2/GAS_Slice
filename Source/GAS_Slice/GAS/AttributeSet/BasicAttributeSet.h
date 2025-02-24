@@ -32,4 +32,8 @@ public:
 	UPROPERTY(BlueprintReadOnly,Category="Attribute")
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ACCESSORS(UBasicAttributeSet,MaxMana);
+
+protected:
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 };

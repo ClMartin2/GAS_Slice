@@ -22,6 +22,9 @@ protected:
 	float SpellValue;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings", meta=(AllowPrivateAccess=true))
+	float DurationSpell;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings", meta=(AllowPrivateAccess=true))
 	FName EffectGameplayTagName = "Event.Spell" ;
 
 protected:

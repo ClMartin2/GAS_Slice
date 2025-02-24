@@ -5,7 +5,7 @@
 #include "GameplayEffect.h"
 
 void GAS_Utils::ApplyGameplayEffectToTargetSetByCaller(UObject* Source,AActor* TargetActor, TSubclassOf<UGameplayEffect> GameplayEffectClass 
-	, UAbilitySystemComponent* AbilitySystemComponent, float Value, FName GameplayTagName,float Level)
+	, UAbilitySystemComponent* AbilitySystemComponent, float Value, FName GameplayTagName,float Duration, float Level)
 {
 	UAbilitySystemComponent* TargetAbilitySystemComponent = GetAbilitySystem(TargetActor);
 	
@@ -18,7 +18,9 @@ void GAS_Utils::ApplyGameplayEffectToTargetSetByCaller(UObject* Source,AActor* T
 		
 		if (EffectSpecHandle.IsValid())
 		{
-			EffectSpecHandle.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(GameplayTagName), Value);
+			FGameplayTag GameplayTag = FGameplayTag::RequestGameplayTag(GameplayTagName);
+			EffectSpecHandle.Data->SetSetByCallerMagnitude(GameplayTag, Value);
+			EffectSpecHandle.Data->SetDuration(Duration,true);
 			AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetAbilitySystemComponent);
 		}
 	}

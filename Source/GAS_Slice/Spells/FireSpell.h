@@ -3,12 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "../Spells/BaseProjectileSpell.h"
+#include "GEProjectileSpell.h"
 #include "FireSpell.generated.h"
 
 
 UCLASS()
-class GAS_SLICE_API AFireSpell : public ABaseProjectileSpell
+class GAS_SLICE_API AFireSpell : public AGEProjectileSpell
 {
 	GENERATED_BODY()
 protected:

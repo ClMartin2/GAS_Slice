@@ -1,22 +1,21 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
 #pragma once
 
 #include "CoreMinimal.h"
-#include "../Spells/BaseSpell.h"
+#include "Components/ActorComponent.h"
 #include "AbilitySystemComponent.h"
-#include "GAS_Slice/Library/GAS_Utils.h"
-#include "GameplayEffectSpell.generated.h"
+#include "AC_GameplayEffectSpell.generated.h"
 
-UCLASS()
-class GAS_SLICE_API AGameplayEffectSpell : public ABaseSpell
+
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+class GAS_SLICE_API UAC_GameplayEffectSpell : public UActorComponent
 {
 	GENERATED_BODY()
 
-protected:
+private:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Settings", meta=(AllowPrivateAccess=true))
 	TSubclassOf<UGameplayEffect> GameplayEffectClass;
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings", meta=(AllowPrivateAccess=true))
-	UAbilitySystemComponent* OwnerAbilitySystemComponent;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings", meta=(AllowPrivateAccess=true))
 	float SpellValue;
@@ -25,8 +24,9 @@ protected:
 	float DurationSpell;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings", meta=(AllowPrivateAccess=true))
-	FName EffectGameplayTagName = "Event.Spell" ;
+	FName EffectGameplayTagName = "Event.Spell";
 
-protected:
-	virtual void BeginPlay() override;
+public:
+	void ApplyGameplayEffect(AActor* TargetActor, UAbilitySystemComponent* AbilitySystemComponent);
+
 };

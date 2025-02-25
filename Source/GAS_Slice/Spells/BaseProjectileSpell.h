@@ -4,14 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
-#include "GameplayEffectSpell.h"
+#include "BaseSpell.h"
 #include "BaseProjectileSpell.generated.h"
 
 class USphereComponent;
 class UProjectileMovementComponent;
 
 UCLASS()
-class GAS_SLICE_API ABaseProjectileSpell : public AGameplayEffectSpell
+class GAS_SLICE_API ABaseProjectileSpell : public ABaseSpell
 {
 	GENERATED_BODY()
 
@@ -26,7 +26,7 @@ private:
 	USphereComponent* SphereCollider;
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category= "Projectile", meta=(AllowPrivateAccess=true))
-	class UProjectileMovementComponent* ProjectileMovement;
+	UProjectileMovementComponent* ProjectileMovement;
 
 protected:
 	virtual void OnOverlapActor(AActor* CollideActor);

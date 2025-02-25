@@ -13,5 +13,4 @@ class GAS_SLICE_API ABaseSpell : public AActor
 	
 public:	
 	ABaseSpell() = default;
-	
 };

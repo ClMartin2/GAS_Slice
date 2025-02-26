@@ -21,6 +21,15 @@ void GAS_Utils::ApplyGameplayEffectToTargetSetByCaller(UObject* Source,AActor* T
 			FGameplayTag GameplayTag = FGameplayTag::RequestGameplayTag(GameplayTagName);
 			EffectSpecHandle.Data->SetSetByCallerMagnitude(GameplayTag, Value);
 			EffectSpecHandle.Data->SetDuration(Duration,true);
+			
+			// FGameplayTag BlockTag = FGameplayTag::RequestGameplayTag(FName("Event.Spell.Ice"));
+			//
+			// if (TargetAbilitySystemComponent->HasMatchingGameplayTag(BlockTag))
+			// {
+			// 	UE_LOG(LogTemp, Warning, TEXT("L'effet ne sera pas appliqué car la cible a le tag %s"), *BlockTag.ToString());
+			// 	return;
+			// }
+			
 			AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetAbilitySystemComponent);
 		}
 	}

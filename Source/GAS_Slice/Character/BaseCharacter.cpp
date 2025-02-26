@@ -18,6 +18,8 @@ void ABaseCharacter::BeginPlay()
 		BasicAttributeset = AbilitySystemComponent->GetSet<UBasicAttributeSet>();
 		AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UBasicAttributeSet::GetHealthAttribute()).AddUObject(this, &ABaseCharacter::OnHealthChanged);
 	}
+	
+	OnBeginPlay();
 }
 
 void ABaseCharacter::Death_Implementation()

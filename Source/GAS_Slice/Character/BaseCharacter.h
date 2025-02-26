@@ -32,6 +32,9 @@ protected:
 protected:
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintImplementableEvent, Category=Events)
+	void OnBeginPlay();
+
 	UFUNCTION(BlueprintNativeEvent)
 	void Death();
 

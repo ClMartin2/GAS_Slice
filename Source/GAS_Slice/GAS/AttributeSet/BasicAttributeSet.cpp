@@ -8,6 +8,8 @@ void UBasicAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute,
 {
 	if (Attribute == GetManaAttribute())
 		NewValue = FMath::Clamp<float>(NewValue, 0.0f, GetMaxMana());
+	// else if (Attribute == GetSpeedAttribute())
+	// 	NewValue = FMath::Clamp<float>(NewValue, GetMinSpeed(), 9999999999999999);
 
 	Super::PreAttributeChange(Attribute, NewValue);
 }
@@ -15,7 +17,7 @@ void UBasicAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute,
 void UBasicAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
 	Super::PostGameplayEffectExecute(Data);
-	
+
 	if (Data.EvaluatedData.Attribute == GetManaAttribute())
 		Mana.SetBaseValue(FMath::Clamp(Mana.GetCurrentValue(), 0.0f,  GetMaxMana()));
 }

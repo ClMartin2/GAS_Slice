@@ -59,12 +59,6 @@ void ACustomPlayerController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	TimelineAttackAnimation.TickTimeline(DeltaTime);
-
-	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red,"Actual Push Force: "
-		+ FString::SanitizeFloat(CurrentPushForce));
-
-	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red,"Actual Speed: "
-		+ FString::SanitizeFloat(CurrentSpeed));
 }
 
 #pragma endregion	Unreal Functions

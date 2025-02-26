@@ -22,16 +22,20 @@ public:
 	ATTRIBUTE_ACCESSORS(UBasicAttributeSet,Health);
 
 	UPROPERTY(BlueprintReadOnly,Category="Attribute")
-	FGameplayAttributeData MaxHealth;
-	ATTRIBUTE_ACCESSORS(UBasicAttributeSet,MaxHealth);
-
-	UPROPERTY(BlueprintReadOnly,Category="Attribute")
 	FGameplayAttributeData Mana;
 	ATTRIBUTE_ACCESSORS(UBasicAttributeSet,Mana);
 
 	UPROPERTY(BlueprintReadOnly,Category="Attribute")
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ACCESSORS(UBasicAttributeSet,MaxMana);
+
+	UPROPERTY(BlueprintReadOnly,Category="Attribute")
+	FGameplayAttributeData Speed;
+	ATTRIBUTE_ACCESSORS(UBasicAttributeSet,Speed);
+
+	UPROPERTY(BlueprintReadOnly,Category="Attribute")
+	FGameplayAttributeData MinSpeed;
+	ATTRIBUTE_ACCESSORS(UBasicAttributeSet,MinSpeed);
 
 protected:
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;

@@ -8,8 +8,6 @@ void UBasicAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute,
 {
 	if (Attribute == GetManaAttribute())
 		NewValue = FMath::Clamp<float>(NewValue, 0.0f, GetMaxMana());
-	// else if (Attribute == GetSpeedAttribute())
-	// 	NewValue = FMath::Clamp<float>(NewValue, GetMinSpeed(), 9999999999999999);
 
 	Super::PreAttributeChange(Attribute, NewValue);
 }

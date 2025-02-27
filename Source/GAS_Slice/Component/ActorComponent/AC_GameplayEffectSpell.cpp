@@ -4,9 +4,15 @@
 #include "../../Component/ActorComponent/AC_GameplayEffectSpell.h"
 #include "GAS_Slice/Library/GAS_Utils.h"
 
-void UAC_GameplayEffectSpell::ApplyGameplayEffect(AActor* TargetActor, UAbilitySystemComponent* AbilitySystemComponent)
+void UAC_GameplayEffectSpell::ApplyGameplayEffectToTarget(AActor* TargetActor, UAbilitySystemComponent* AbilitySystemComponent)
 {
 	GAS_Utils::ApplyGameplayEffectToTargetSetByCaller(this,TargetActor,GameplayEffectClass,AbilitySystemComponent,SpellValue
+		,EffectGameplayTagName,DurationSpell);
+}
+
+void UAC_GameplayEffectSpell::ApplyGameplayEffectToSelf(UAbilitySystemComponent* AbilitySystemComponent)
+{
+	GAS_Utils::ApplyGameplayEffectToSelfSetByCaller(this,GameplayEffectClass,AbilitySystemComponent,SpellValue
 		,EffectGameplayTagName,DurationSpell);
 }
 

@@ -3,5 +3,5 @@
 void AFireSpell::OnOverlapActor(AActor* CollideActor)
 {
 	Super::OnOverlapActor(CollideActor);
-	GameplayEffectSpell->ApplyGameplayEffect(CollideActor, GetOwnerAbilitySystemComponent());
+	GameplayEffectSpell->ApplyGameplayEffectToTarget(CollideActor, GetOwnerAbilitySystemComponent());
 }

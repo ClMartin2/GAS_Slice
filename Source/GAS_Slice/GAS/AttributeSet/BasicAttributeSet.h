@@ -34,8 +34,8 @@ public:
 	ATTRIBUTE_ACCESSORS(UBasicAttributeSet,Speed);
 
 	UPROPERTY(BlueprintReadOnly,Category="Attribute")
-	FGameplayAttributeData MinSpeed;
-	ATTRIBUTE_ACCESSORS(UBasicAttributeSet,MinSpeed);
+	FGameplayAttributeData Shield;
+	ATTRIBUTE_ACCESSORS(UBasicAttributeSet,Shield);
 
 protected:
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;

@@ -8,6 +8,6 @@ void AZonePoison::OnOverlapZone(const TArray<AActor*> OverlappingActors) const
 	
 	for (AActor* OverlappingActor : OverlappingActors)
 	{
-		GameplayEffectSpell->ApplyGameplayEffect(OverlappingActor, GetOwnerAbilitySystemComponent());
+		GameplayEffectSpell->ApplyGameplayEffectToTarget(OverlappingActor, GetOwnerAbilitySystemComponent());
 	}
 }

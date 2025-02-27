@@ -11,28 +11,16 @@ void GAS_Utils::ApplyGameplayEffectToTargetSetByCaller(UObject* Source,AActor* T
 	
 	if (TargetAbilitySystemComponent!= nullptr)
 	{
-		FGameplayEffectContextHandle EffectContext = TargetAbilitySystemComponent->MakeEffectContext();
-		EffectContext.AddSourceObject(Source);
-
-		FGameplayEffectSpecHandle EffectSpecHandle = TargetAbilitySystemComponent->MakeOutgoingSpec(GameplayEffectClass, Level, EffectContext);
-		
-		if (EffectSpecHandle.IsValid())
-		{
-			FGameplayTag GameplayTag = FGameplayTag::RequestGameplayTag(GameplayTagName);
-			EffectSpecHandle.Data->SetSetByCallerMagnitude(GameplayTag, Value);
-			EffectSpecHandle.Data->SetDuration(Duration,true);
-			
-			// FGameplayTag BlockTag = FGameplayTag::RequestGameplayTag(FName("Event.Spell.Ice"));
-			//
-			// if (TargetAbilitySystemComponent->HasMatchingGameplayTag(BlockTag))
-			// {
-			// 	UE_LOG(LogTemp, Warning, TEXT("L'effet ne sera pas appliqué car la cible a le tag %s"), *BlockTag.ToString());
-			// 	return;
-			// }
-			
-			AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*EffectSpecHandle.Data.Get(), TargetAbilitySystemComponent);
-		}
+		AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*MakeEffectSpecHandle(Source,GameplayEffectClass,TargetAbilitySystemComponent,
+				Value,GameplayTagName,Duration,Level).Data.Get(), TargetAbilitySystemComponent);
 	}
+}
+
+void GAS_Utils::ApplyGameplayEffectToSelfSetByCaller(UObject* Source, TSubclassOf<UGameplayEffect> GameplayEffectClass,
+	UAbilitySystemComponent* AbilitySystemComponent, float Value, FName GameplayTagName, float Duration, float Level)
+{
+	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*MakeEffectSpecHandle(Source,GameplayEffectClass,AbilitySystemComponent,
+		Value,GameplayTagName,Duration,Level).Data);
 }
 
 UAbilitySystemComponent* GAS_Utils::GetAbilitySystem(AActor* TargetActor)
@@ -43,4 +31,22 @@ UAbilitySystemComponent* GAS_Utils::GetAbilitySystem(AActor* TargetActor)
 	}
 	
 	return nullptr;
+}
+
+FGameplayEffectSpecHandle GAS_Utils::MakeEffectSpecHandle(UObject* Source, TSubclassOf<UGameplayEffect> GameplayEffectClass,
+	UAbilitySystemComponent* AbilitySystemComponent, float Value, FName GameplayTagName, float Duration, float Level)
+{
+	FGameplayEffectContextHandle EffectContext = AbilitySystemComponent->MakeEffectContext();
+	EffectContext.AddSourceObject(Source);
+
+	FGameplayEffectSpecHandle EffectSpecHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffectClass, Level, EffectContext);
+		
+	if (EffectSpecHandle.IsValid())
+	{
+		FGameplayTag GameplayTag = FGameplayTag::RequestGameplayTag(GameplayTagName);
+		EffectSpecHandle.Data->SetSetByCallerMagnitude(GameplayTag, Value);
+		EffectSpecHandle.Data->SetDuration(Duration,true);
+	}
+	
+	return EffectSpecHandle;
 }

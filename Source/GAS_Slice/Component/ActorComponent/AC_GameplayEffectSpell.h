@@ -27,5 +27,6 @@ private:
 	FName EffectGameplayTagName = "Event.Spell";
 
 public:
-	void ApplyGameplayEffect(AActor* TargetActor, UAbilitySystemComponent* AbilitySystemComponent);
+	void ApplyGameplayEffectToTarget(AActor* TargetActor, UAbilitySystemComponent* AbilitySystemComponent);
+	void ApplyGameplayEffectToSelf(UAbilitySystemComponent* AbilitySystemComponent);
 };

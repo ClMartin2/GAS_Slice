@@ -1,4 +1,4 @@
-#include "../Spells/FireSpell.h"
+#include "../../Spells/ProjectileSpell/FireSpell.h"
 
 void AFireSpell::OnOverlapActor(AActor* CollideActor)
 {

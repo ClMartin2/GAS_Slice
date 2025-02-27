@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
-#include "BaseSpell.h"
+#include "../BaseSpell.h"
 #include "BaseProjectileSpell.generated.h"
 
 class USphereComponent;
@@ -17,18 +17,17 @@ class GAS_SLICE_API ABaseProjectileSpell : public ABaseSpell
 
 public:
 	ABaseProjectileSpell();
-
-private:
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category= "Visual", meta=(AllowPrivateAccess=true))
-	UStaticMeshComponent* Mesh;
-
+	
+protected:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category= "Collider", meta=(AllowPrivateAccess=true))
 	USphereComponent* SphereCollider;
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category= "Projectile", meta=(AllowPrivateAccess=true))
 	UProjectileMovementComponent* ProjectileMovement;
 
-protected:
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category= "Visual", meta=(AllowPrivateAccess=true))
+	UStaticMeshComponent* Mesh;
+
 	virtual void OnOverlapActor(AActor* CollideActor);
 	
 private :

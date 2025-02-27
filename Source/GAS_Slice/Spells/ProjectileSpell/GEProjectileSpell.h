@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "../Spells/BaseProjectileSpell.h"
+#include "../../Spells/ProjectileSpell/BaseProjectileSpell.h"
 #include "GAS_Slice/Component/ActorComponent/AC_GameplayEffectSpell.h"
 #include "GEProjectileSpell.generated.h"
 

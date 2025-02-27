@@ -1,4 +1,4 @@
-#include "../Spells/GEProjectileSpell.h"
+#include "../../Spells/ProjectileSpell/GEProjectileSpell.h"
 #include "GAS_Slice/Library/GAS_Utils.h"
 
 AGEProjectileSpell::AGEProjectileSpell()
@@ -10,7 +10,6 @@ void AGEProjectileSpell::BeginPlay()
 {
 	Super::BeginPlay();
 	OwnerAbilitySystemComponent = GAS_Utils::GetAbilitySystem(GetOwner());
-
 }
 
 

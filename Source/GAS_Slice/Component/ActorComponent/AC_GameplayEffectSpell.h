@@ -28,5 +28,4 @@ private:
 
 public:
 	void ApplyGameplayEffect(AActor* TargetActor, UAbilitySystemComponent* AbilitySystemComponent);
-
 };

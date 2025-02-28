@@ -27,6 +27,7 @@ private:
 
 protected:
 	virtual void BeginPlay() override;
+	
 	UAbilitySystemComponent* GetOwnerAbilitySystemComponent() const {return OwnerAbilitySystemComponent;}
 
 };

@@ -36,6 +36,14 @@ public:
 	UPROPERTY(BlueprintReadOnly,Category="Attribute")
 	FGameplayAttributeData Shield;
 	ATTRIBUTE_ACCESSORS(UBasicAttributeSet,Shield);
+	
+	UPROPERTY(BlueprintReadOnly,Category="Attribute")
+	FGameplayAttributeData MinShield;
+	ATTRIBUTE_ACCESSORS(UBasicAttributeSet,MinShield);
+
+	UPROPERTY(BlueprintReadOnly,Category="Attribute")
+	FGameplayAttributeData Damage;
+	ATTRIBUTE_ACCESSORS(UBasicAttributeSet,Damage);
 
 protected:
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;

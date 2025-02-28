@@ -8,14 +8,16 @@ void UBasicAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute,
 {
 	if (Attribute == GetManaAttribute())
 		NewValue = FMath::Clamp<float>(NewValue, 0.0f, GetMaxMana());
+	if (Attribute == GetShieldAttribute())
+		NewValue = FMath::Clamp<float>(NewValue, GetMinShield(), 99999999999);
 
 	Super::PreAttributeChange(Attribute, NewValue);
 }
 
 void UBasicAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
 {
-	Super::PostGameplayEffectExecute(Data);
-
 	if (Data.EvaluatedData.Attribute == GetManaAttribute())
 		Mana.SetBaseValue(FMath::Clamp(Mana.GetCurrentValue(), 0.0f,  GetMaxMana()));
+
+	Super::PostGameplayEffectExecute(Data);
 }

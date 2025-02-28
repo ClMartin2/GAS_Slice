@@ -19,9 +19,14 @@ class GAS_SLICE_API AEnemyProjectile : public AGAS_SliceProjectile
 private:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Settings",meta=(AllowPrivateAccess=true))
 	float Damage;
+	
 	UAbilitySystemComponent* EnemyAbilitySystemComponent;
+	
 	UPROPERTY(EditAnywhere, Category = "Settings|GAS", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<UGameplayEffect> GameplayEffectClass;
+	TSubclassOf<UGameplayEffect> GameplayEffectClassHealth;
+
+	UPROPERTY(EditAnywhere, Category = "Settings|GAS", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UGameplayEffect> GameplayEffectClassShield;
 public:
 	void SetAbilitySystemComponent(UAbilitySystemComponent* AbilitySystemComponent){ EnemyAbilitySystemComponent = AbilitySystemComponent;};
 	

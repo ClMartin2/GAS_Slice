@@ -16,3 +16,5 @@ void AShieldSpell::BeginPlay()
 	OwnerAbilitySystemComponent = GAS_Utils::GetAbilitySystem(GetOwner());
 	GameplayEffectSpell->ApplyGameplayEffectToSelf(GetOwnerAbilitySystemComponent());
 }
+
+

@@ -1,14 +1,14 @@
 #include "../../Character/Enemy/Enemy.h"
-#include "Components/StaticMeshComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "../../Component/StaticMeshComponent/SMC_Gun.h"
 
 AEnemy::AEnemy()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	
-	BodyVisual = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Body Visual"));
+
+	BodyVisual = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Body_Visual"));
 	BodyVisual->SetupAttachment(RootComponent);
-	
+
 	SMCGun = CreateDefaultSubobject<USMC_Gun>(TEXT("Gun"));
 	SMCGun->SetupAttachment(BodyVisual);
 
@@ -18,15 +18,14 @@ AEnemy::AEnemy()
 	SMCGun->SetBarrelPostion(BarrelPosition);
 }
 
- void AEnemy::BeginPlay()
- {
+void AEnemy::BeginPlay()
+{
 	Super::BeginPlay();
 	SMCGun->SetAbilitySystemComponent(GetAbilitySystemComponent());
- }
+}
 
- void AEnemy::Death_Implementation()
- {
+void AEnemy::Death_Implementation()
+{
 	Super::Death_Implementation();
 	Destroy();
- }
-
+}

@@ -30,9 +30,11 @@ protected:
 
 	virtual void OnOverlapActor(AActor* CollideActor);
 	
-private :
-	UFUNCTION()
+protected:
+	UFUNCTION(BlueprintNativeEvent,Category="Collision",meta = (AllowPrivateAccess=true))
 	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	
+	void OnSphereBeginOverlap_Implementation(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

@@ -32,5 +32,4 @@ void ABaseProjectileSpell::OnSphereBeginOverlap_Implementation(UPrimitiveCompone
 	UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	OnOverlapActor(OtherActor);
-	Destroy();
 }

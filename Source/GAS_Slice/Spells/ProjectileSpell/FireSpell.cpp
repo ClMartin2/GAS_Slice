@@ -4,5 +4,11 @@ void AFireSpell::OnOverlapActor(AActor* CollideActor)
 {
 	Super::OnOverlapActor(CollideActor);
 	GameplayEffectSpell->ApplyGameplayEffectToTarget(CollideActor, GetOwnerAbilitySystemComponent());
+	Death();
+}
+
+void AFireSpell::Death_Implementation()
+{
+	Super::Death_Implementation();
 	Destroy();
 }

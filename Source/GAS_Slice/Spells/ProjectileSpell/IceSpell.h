@@ -15,4 +15,5 @@ class GAS_SLICE_API AIceSpell : public AGEProjectileSpell
 protected:
 	GENERATED_BODY()
 	virtual void OnOverlapActor(AActor* CollideActor) override;
+	virtual void Death_Implementation() override;
 };

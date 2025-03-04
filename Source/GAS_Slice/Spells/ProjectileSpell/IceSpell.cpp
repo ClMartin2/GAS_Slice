@@ -7,4 +7,11 @@ void AIceSpell::OnOverlapActor(AActor* CollideActor)
 {
 	Super::OnOverlapActor(CollideActor);
 	GameplayEffectSpell->ApplyGameplayEffectToTarget(CollideActor, GetOwnerAbilitySystemComponent());
+	Death();
+}
+
+void AIceSpell::Death_Implementation()
+{
+	Super::Death_Implementation();
+	Destroy();
 }

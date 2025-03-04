@@ -4,4 +4,7 @@
 #include "../Spells/BaseSpell.h"
 
 
-
+void ABaseSpell::Death_Implementation()
+{
+	
+}

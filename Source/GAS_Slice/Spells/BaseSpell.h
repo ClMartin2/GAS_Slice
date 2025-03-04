@@ -13,4 +13,10 @@ class GAS_SLICE_API ABaseSpell : public AActor
 	
 public:	
 	ABaseSpell() = default;
+
+protected:
+	UFUNCTION(BlueprintNativeEvent,meta=(AllowPrivateAccess=true))
+	void Death();
+
+	virtual void Death_Implementation();
 };

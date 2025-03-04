@@ -26,7 +26,6 @@ void AGEZoneSpell::OnOverlapZone(const TArray<AActor*> OverlappingActors) const
 {
 }
 
-
 void AGEZoneSpell::ZoneCollisionUpdate() const
 {
 	FVector SphereCenter = GetActorLocation();
@@ -46,7 +45,8 @@ void AGEZoneSpell::ZoneCollisionUpdate() const
 		OverlappingActors
 	);
 
-	DrawDebugSphere(GetWorld(), SphereCenter, ZoneRadius, 16, FColor::Red, false, ZoneDuration);
+	if (Debug)
+		DrawDebugSphere(GetWorld(), SphereCenter, ZoneRadius, 16, FColor::Red, false, ZoneDuration);
 
 	if (bHit)
 		OnOverlapZone(OverlappingActors);
@@ -55,5 +55,11 @@ void AGEZoneSpell::ZoneCollisionUpdate() const
 void AGEZoneSpell::ZoneCollisionFinished()
 {
 	GetWorldTimerManager().ClearTimer(UpdateZoneCollisionTimerHandle);
+	Death();
+}
+
+void AGEZoneSpell::Death_Implementation()
+{
+	Super::Death_Implementation();
 	Destroy();
 }

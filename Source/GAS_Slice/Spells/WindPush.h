@@ -15,7 +15,7 @@ class GAS_SLICE_API AWindPush : public ABaseSpell
 	GENERATED_BODY()
 
 private:
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Settings|", meta=(allowPrivateAccess="true"))
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Settings", meta=(allowPrivateAccess="true"))
 	float PushForce = 2000;
 	
 protected:

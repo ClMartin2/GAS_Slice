@@ -32,6 +32,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	float Damage = 10;
 
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	float OffsetBoxExtentCollisionAttack = 100;
+
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Collision, meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* BoxCollision;
 

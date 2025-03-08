@@ -1,9 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
+#include "../../Spells/ZoneSpell/GEZoneSpell.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "DrawDebugHelpers.h"
-#include "../../Spells/ZoneSpell/GEZoneSpell.h"
-#include "Curves/CurveFloat.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 

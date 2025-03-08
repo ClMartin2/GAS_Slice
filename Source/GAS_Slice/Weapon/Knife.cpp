@@ -93,7 +93,7 @@ void AKnife::CheckCollisionAttack()
 		return;
 
 	FVector BoxPosition = GetActorLocation();
-	FVector BoxExtent = BoxCollision->GetScaledBoxExtent() + FVector::One() * OffsetBoxExtentCollisionAttack; 
+	FVector BoxExtent = BoxCollision->GetScaledBoxExtent() + OffsetBoxExtentCollisionAttack; 
 	FQuat BoxRotation = GetActorQuat(); 
 
 	FCollisionQueryParams Params;

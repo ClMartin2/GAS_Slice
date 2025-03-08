@@ -33,7 +33,7 @@ private:
 	float Damage = 10;
 
 	UPROPERTY(EditAnywhere, Category = "Settings")
-	float OffsetBoxExtentCollisionAttack = 100;
+	FVector OffsetBoxExtentCollisionAttack = FVector::Zero();
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Collision, meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* BoxCollision;

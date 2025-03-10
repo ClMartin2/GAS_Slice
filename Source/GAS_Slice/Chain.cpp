@@ -39,13 +39,13 @@ void AChain::OnConstruction(const FTransform& Transform)
 			FVector NewPosition = LastPosition + FVector(LengthStaticMesh + OffsetStaticMesh, 0, 0);
 			StaticMeshComponent->SetRelativeLocation(NewPosition);
 			LastPosition = NewPosition;
-
-			StaticMeshComponent->SetSimulatePhysics(true);
 		}
 
+		StaticMeshComponent->SetSimulatePhysics(true);
 		StaticMeshComponent->SetLinearDamping(LinearDampling);
 		StaticMeshComponent->SetAngularDamping(AngularDampling);
 		StaticMeshComponent->SetCollisionProfileName("KnifeCable");
+		StaticMeshComponent->SetMassOverrideInKg(NAME_None,Mass);
 
 		ChainLinks.Add(StaticMeshComponent);
 		StaticMeshComponents.Add(StaticMeshComponent);
@@ -59,6 +59,13 @@ void AChain::OnConstruction(const FTransform& Transform)
 			                        ,0,0),true);
 		}
 	}
+	
+	UPhysicsConstraintComponent* MiddlePhysicsConstraint = CreatePhysicsConstraint(ChainLinks[0],ChainLinks[NumberOfLinks - 1],
+							GetActorLocation() + GetActorForwardVector() *
+							((LengthStaticMesh + OffsetStaticMesh)  * NumberOfLinks/2),false);
+
+	MiddlePhysicsConstraint->SetLinearXLimit(MiddleLimitLinearConstraintMotion,MiddleLimitSize);
+	MiddlePhysicsConstraint->ConstraintInstance.SetSoftLinearLimitParams(MiddleIsSoftLimit,MiddleStifness,0,0,0);
 
 	if (AttachStart)
 	{
@@ -77,7 +84,7 @@ void AChain::OnConstruction(const FTransform& Transform)
 	
 	if (AttachEnd)
 	{
-		UStaticMeshComponent* EndStaticMeshComponent = StaticMeshComponents[StaticMeshComponents.Num() - 1];
+		UStaticMeshComponent* EndStaticMeshComponent = StaticMeshComponents[NumberOfLinks - 1];
 		EndStaticMeshComponent->SetSimulatePhysics(false);
 		AActor* OwingActor = GetParentActor();
 
@@ -132,18 +139,36 @@ void AChain::CustomDestroyConstructedComponents()
 	PhysicsConstraints.Empty();
 }
 
-void AChain::CreatePhysicsConstraint(UPrimitiveComponent* FirstComponent, UPrimitiveComponent* SecondComponent,
+UPhysicsConstraintComponent* AChain::CreatePhysicsConstraint(UPrimitiveComponent* FirstComponent, UPrimitiveComponent* SecondComponent,
                                      FVector Location, bool IsRelativeLocation)
 {
 	UPhysicsConstraintComponent* PhysicsConstraint = NewObject<UPhysicsConstraintComponent>(this);
 	PhysicsConstraint->RegisterComponent();
 	PhysicsConstraint->AttachToComponent(CustomRootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	PhysicsConstraint->SetConstrainedComponents(FirstComponent, NAME_None, SecondComponent, NAME_None);
-	PhysicsConstraints.Add(PhysicsConstraint);
 	IsRelativeLocation?PhysicsConstraint->SetRelativeLocation(Location):PhysicsConstraint->SetWorldLocation(Location);
 	PhysicsConstraint->SetDisableCollision(true);
 
 	PhysicsConstraint->SetAngularTwistLimit(ConstraintTwistMotion, TwistLimitAngle);
 	PhysicsConstraint->SetAngularSwing1Limit(ConstraintSwing1Motion, Swing1LimitAngle);
 	PhysicsConstraint->SetAngularSwing2Limit(ConstraintSwing2Motion, Swing2LimitAngle);
+
+	PhysicsConstraint->SetLinearXLimit(XLinearConstraintMotionLimit,XLimitSize);
+	PhysicsConstraint->SetLinearYLimit(YLinearConstraintMotionLimit,YLimitSize);
+	PhysicsConstraint->SetLinearZLimit(ZLinearConstraintMotionLimit,ZLimitSize);
+
+	PhysicsConstraint->SetProjectionEnabled(ProjectionEnabled);
+
+	PhysicsConstraint->SetAngularDriveMode(AngularDriveMode);
+	PhysicsConstraint->SetAngularVelocityTarget(TargetVelocity);
+	PhysicsConstraint->SetAngularVelocityDrive(EnableSwingDrive,EnableTwistDrive);
+	PhysicsConstraint->SetAngularVelocityDriveSLERP(EnableSlerpDrive);
+	PhysicsConstraint->SetAngularDriveParams(PositionStrength,VelocityStrength,MaxForce);
+
+	PhysicsConstraint->SetAngularBreakable(AngularBreakable,AngularBreakThreshold);
+	
+	PhysicsConstraint->ConstraintInstance.ProfileInstance.bEnableMassConditioning = EnableMassConditioning;
+	PhysicsConstraints.Add(PhysicsConstraint);
+
+	return PhysicsConstraint;
 }

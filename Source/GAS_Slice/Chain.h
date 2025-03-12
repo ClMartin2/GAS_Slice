@@ -100,9 +100,24 @@ private:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
 	TEnumAsByte<ELinearConstraintMotion> ZLinearConstraintMotionLimit;
-
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
 	float ZLimitSize;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	bool SoftConstraint = true;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	float LinearStifness = 100;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	float LinearDamping = 0;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	float LimitSize = 180;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	TEnumAsByte<ELinearConstraintMotion> LimitLinearConstraintMotion = LCM_Locked;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
 	TEnumAsByte<EAngularDriveMode::Type> AngularDriveMode;
@@ -111,13 +126,19 @@ private:
 	FVector TargetVelocity;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
-	bool EnableSwingDrive;
+	FRotator TargetOrientation;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
-	bool EnableTwistDrive;
+	bool EnableSwingDriveTargetVelocityAngularMotor;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
-	bool EnableSlerpDrive;
+	bool EnableTwistDriveTargetVelocityAngularMotor;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
+	bool EnableSwingDriveTargetOrientationAngularMotor;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
+	bool EnableTwistDriveTargetOrientationAngularMotor;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
 	float PositionStrength;
@@ -135,10 +156,16 @@ private:
 	bool ProjectionEnabled = true;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
-	bool MiddleIsSoftLimit = true;
+	bool HasMiddleConstraint = false;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
+	bool MiddleIsSoftConstraint = true;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
 	float MiddleStifness = 100;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
+	float MiddleDamping = 0;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
 	float MiddleLimitSize = 180;

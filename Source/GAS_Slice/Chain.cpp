@@ -49,7 +49,6 @@ void AChain::OnConstruction(const FTransform& Transform)
 
 		ChainLinks.Add(StaticMeshComponent);
 		StaticMeshComponents.Add(StaticMeshComponent);
-
 		StaticMeshComponent->RegisterComponent();
 
 		if (i > 0)
@@ -59,14 +58,17 @@ void AChain::OnConstruction(const FTransform& Transform)
 			                        ,0,0),true);
 		}
 	}
+
+	if (HasMiddleConstraint)
+	{
+		UPhysicsConstraintComponent* MiddlePhysicsConstraint = CreatePhysicsConstraint(ChainLinks[0],ChainLinks[NumberOfLinks - 1],
+								GetActorLocation() + GetActorForwardVector() *
+								((LengthStaticMesh + OffsetStaticMesh)  * NumberOfLinks/2),false);
+
+		MiddlePhysicsConstraint->SetLinearXLimit(MiddleLimitLinearConstraintMotion,MiddleLimitSize);
+		MiddlePhysicsConstraint->ConstraintInstance.SetSoftLinearLimitParams(MiddleIsSoftConstraint,MiddleStifness,MiddleDamping,0,0);
+	}
 	
-	UPhysicsConstraintComponent* MiddlePhysicsConstraint = CreatePhysicsConstraint(ChainLinks[0],ChainLinks[NumberOfLinks - 1],
-							GetActorLocation() + GetActorForwardVector() *
-							((LengthStaticMesh + OffsetStaticMesh)  * NumberOfLinks/2),false);
-
-	MiddlePhysicsConstraint->SetLinearXLimit(MiddleLimitLinearConstraintMotion,MiddleLimitSize);
-	MiddlePhysicsConstraint->ConstraintInstance.SetSoftLinearLimitParams(MiddleIsSoftLimit,MiddleStifness,0,0,0);
-
 	if (AttachStart)
 	{
 		UStaticMeshComponent* StartStaticMeshComponent = StaticMeshComponents[0];
@@ -161,13 +163,30 @@ UPhysicsConstraintComponent* AChain::CreatePhysicsConstraint(UPrimitiveComponent
 
 	PhysicsConstraint->SetAngularDriveMode(AngularDriveMode);
 	PhysicsConstraint->SetAngularVelocityTarget(TargetVelocity);
-	PhysicsConstraint->SetAngularVelocityDrive(EnableSwingDrive,EnableTwistDrive);
-	PhysicsConstraint->SetAngularVelocityDriveSLERP(EnableSlerpDrive);
+	PhysicsConstraint->SetAngularVelocityDrive(EnableSwingDriveTargetVelocityAngularMotor,EnableTwistDriveTargetVelocityAngularMotor);
 	PhysicsConstraint->SetAngularDriveParams(PositionStrength,VelocityStrength,MaxForce);
 
+	PhysicsConstraint->SetAngularOrientationDrive(EnableSwingDriveTargetVelocityAngularMotor,EnableTwistDriveTargetVelocityAngularMotor);
+	PhysicsConstraint->SetAngularOrientationTarget(TargetOrientation);
+
+	if (AngularDriveMode == EAngularDriveMode::TwistAndSwing)
+	{
+		PhysicsConstraint->SetAngularVelocityDriveSLERP(false);
+		PhysicsConstraint->SetOrientationDriveSLERP(false);
+	}
+	else
+	{
+		PhysicsConstraint->SetAngularVelocityDriveSLERP(true);
+		PhysicsConstraint->SetOrientationDriveSLERP(true);
+	}
+	
 	PhysicsConstraint->SetAngularBreakable(AngularBreakable,AngularBreakThreshold);
 	
 	PhysicsConstraint->ConstraintInstance.ProfileInstance.bEnableMassConditioning = EnableMassConditioning;
+
+	PhysicsConstraint->SetLinearXLimit(LimitLinearConstraintMotion,LimitSize);
+	PhysicsConstraint->ConstraintInstance.SetSoftLinearLimitParams(SoftConstraint,LinearStifness,LinearDamping,0,0);
+	
 	PhysicsConstraints.Add(PhysicsConstraint);
 
 	return PhysicsConstraint;

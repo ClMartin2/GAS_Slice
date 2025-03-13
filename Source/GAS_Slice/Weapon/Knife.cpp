@@ -31,21 +31,21 @@ void AKnife::Throw_Implementation(FVector DirectionThrowKnife, FVector NewCamera
 	CameraForward = NewCameraForward;
 }
 
-void AKnife::StopMove_Implementation()
-{
-	ProjectileMovement->Velocity = FVector::ZeroVector;
-	ProjectileMovement->InitialSpeed = 0;
-}
-
-void AKnife::ResetKnife_Implementation()
+void AKnife::ResetKnife()
 {
 	StopMove();
 	IsAttached = false;
 	BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 }
 
-void AKnife::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-                   FVector NormalImpulse, const FHitResult& Hit)
+void AKnife::StopMove_Implementation()
+{
+	ProjectileMovement->Velocity = FVector::ZeroVector;
+	ProjectileMovement->InitialSpeed = 0;
+}
+
+void AKnife::OnHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	FVector NormalImpulse, const FHitResult& Hit)
 {
 	IsAttached = true;
 	StopMove();

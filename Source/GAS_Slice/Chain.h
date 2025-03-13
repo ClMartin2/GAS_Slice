@@ -173,6 +173,17 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
 	TEnumAsByte<ELinearConstraintMotion> MiddleLimitLinearConstraintMotion = LCM_Limited;
 
+public :
+	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
+	void ActivatePhysics();
+	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
+	void DeactivatePhysics();
+
+	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
+	void ActivatePhysicsConstraint();
+	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
+	void DeactivatePhysicsConstraint();
+	
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 	void CustomDestroyConstructedComponents();
@@ -180,4 +191,6 @@ protected:
 private:
 	UPhysicsConstraintComponent* CreatePhysicsConstraint(UPrimitiveComponent* FirstComponent, UPrimitiveComponent* SecondComponent, FVector Location, bool
 	                             IsRelativeLocation = true);
+	void SetSimulatePhysics(bool IsSimulatePhysics);
+	void SetPhysicsConstraint(bool IsSimulatePhysics);
 };

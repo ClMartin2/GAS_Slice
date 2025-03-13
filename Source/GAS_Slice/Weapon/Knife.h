@@ -62,9 +62,8 @@ public:
 
 	virtual void Throw_Implementation(FVector DirectionThrowKnife, FVector NewCameraForward);
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
+	UFUNCTION(BlueprintCallable, Category = "Knife")
 	void ResetKnife();
-	virtual void ResetKnife_Implementation();
 
 	bool GetIsAttached() const {return IsAttached;}
 
@@ -78,11 +77,13 @@ protected:
 	void StopMove();
 
 	virtual void StopMove_Implementation();
-
-private:
-	UFUNCTION()
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	void OnHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	
+private:
 	void HitRotate(const FHitResult& Hit);
 	void ReplaceHitKnife(const FHitResult& Hit);
 	void MakeDamage(FHitResult OutHit);

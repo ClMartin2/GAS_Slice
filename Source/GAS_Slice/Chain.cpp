@@ -14,12 +14,13 @@ void AChain::OnConstruction(const FTransform& Transform)
 	if (!Reset)
 		return;
 
+	GEngine->AddOnScreenDebugMessage(-1,2,FColor::Red,"Construct");
+
 	DestroyConstructedComponents();
 	CustomDestroyConstructedComponents();
 
 	float LengthStaticMesh = (StaticMesh != nullptr) ? (StaticMesh->GetBounds().GetBox().GetSize() * Scale).X : 0.0f;
 
-	TArray<UStaticMeshComponent*> ChainLinks;
 	FVector LastPosition = FVector::ZeroVector;
 
 	for (int i = 0; i < NumberOfLinks; i++)
@@ -47,13 +48,12 @@ void AChain::OnConstruction(const FTransform& Transform)
 		StaticMeshComponent->SetCollisionProfileName("KnifeCable");
 		StaticMeshComponent->SetMassOverrideInKg(NAME_None,Mass);
 
-		ChainLinks.Add(StaticMeshComponent);
 		StaticMeshComponents.Add(StaticMeshComponent);
 		StaticMeshComponent->RegisterComponent();
 
 		if (i > 0)
 		{
-			CreatePhysicsConstraint(ChainLinks[i - 1], ChainLinks[i],
+			CreatePhysicsConstraint(StaticMeshComponents[i - 1], StaticMeshComponents[i],
 			                        LastPosition - FVector((LengthStaticMesh + OffsetStaticMesh) - (LengthStaticMesh / 2 + OffsetPhysicConstraint)
 			                        ,0,0),true);
 		}
@@ -61,7 +61,7 @@ void AChain::OnConstruction(const FTransform& Transform)
 
 	if (HasMiddleConstraint)
 	{
-		UPhysicsConstraintComponent* MiddlePhysicsConstraint = CreatePhysicsConstraint(ChainLinks[0],ChainLinks[NumberOfLinks - 1],
+		UPhysicsConstraintComponent* MiddlePhysicsConstraint = CreatePhysicsConstraint(StaticMeshComponents[0],StaticMeshComponents[NumberOfLinks - 1],
 								GetActorLocation() + GetActorForwardVector() *
 								((LengthStaticMesh + OffsetStaticMesh)  * NumberOfLinks/2),false);
 
@@ -77,7 +77,8 @@ void AChain::OnConstruction(const FTransform& Transform)
 		if (GetParentComponent() != nullptr)
 		{
 			USceneComponent* AttachSceneComponent = GetParentComponent()->GetAttachParent();
-			GetRootComponent()->AttachToComponent(AttachSceneComponent, FAttachmentTransformRules::KeepWorldTransform);
+			GEngine->AddOnScreenDebugMessage(-1,5,FColor::Yellow,AttachSceneComponent->GetName());
+			GetRootComponent()->AttachToComponent(AttachSceneComponent, FAttachmentTransformRules::KeepRelativeTransform);
 		}
 	}
 
@@ -98,19 +99,12 @@ void AChain::OnConstruction(const FTransform& Transform)
 
 		for (UActorComponent* Component : Components)
 		{
-			GEngine->AddOnScreenDebugMessage(-1,5,FColor::Yellow,Component->GetName());
-
 			if (Component->GetName() == AttachEndComponentName)
 			{
 				if (USceneComponent* SceneComponent = Cast<USceneComponent>(Component))
 				{
-					EndStaticMeshComponent->AttachToComponent(SceneComponent,
-					FAttachmentTransformRules::KeepRelativeTransform);
-					GEngine->AddOnScreenDebugMessage(-1,5,FColor::Blue,SceneComponent->GetName());
-
 					if (UPrimitiveComponent* PrimitiveComponent = Cast<UPrimitiveComponent>(Component))
 					{
-						GEngine->AddOnScreenDebugMessage(-1,5,FColor::Blue,PrimitiveComponent->GetName());
 						CreatePhysicsConstraint(PrimitiveComponent,EndStaticMeshComponent,
 							SceneComponent->GetComponentLocation(),false);
 					}
@@ -191,3 +185,49 @@ UPhysicsConstraintComponent* AChain::CreatePhysicsConstraint(UPrimitiveComponent
 
 	return PhysicsConstraint;
 }
+
+void AChain::ActivatePhysics()
+{
+	SetSimulatePhysics(true);
+}
+
+void AChain::DeactivatePhysics()
+{
+	SetSimulatePhysics(false);
+}
+
+void AChain::SetSimulatePhysics(bool IsSimulatePhysics)
+{
+	for (int i = 1; i < StaticMeshComponents.Num() - 1; i++)
+	{
+		UStaticMeshComponent* StaticMeshComponent = StaticMeshComponents[i];
+		StaticMeshComponent->SetSimulatePhysics(IsSimulatePhysics);
+		
+		if (!IsSimulatePhysics)
+			StaticMeshComponent->AttachToComponent(CustomRootComponent, FAttachmentTransformRules::KeepWorldTransform);
+	}
+}
+
+void AChain::ActivatePhysicsConstraint()
+{
+	SetPhysicsConstraint(true);
+}
+
+void AChain::DeactivatePhysicsConstraint()
+{
+	SetPhysicsConstraint(false);
+}
+
+
+void AChain::SetPhysicsConstraint(bool IsSimulatePhysics)
+{
+	for (int i = 1; i < PhysicsConstraints.Num(); i++)
+	{
+		UPhysicsConstraintComponent* PhysicsConstraint = PhysicsConstraints[i];
+		if (IsSimulatePhysics)
+			PhysicsConstraint->Activate();
+		else
+			PhysicsConstraint->Deactivate();
+	}
+}
+

@@ -17,6 +17,8 @@ public:
 	AChain();
 
 private:
+#pragma region Settings
+
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
 	bool Reset = false;
 
@@ -61,6 +63,23 @@ private:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
 	float Mass = 1;
+	
+#pragma endregion Settings
+
+#pragma region Settings|Physics
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
+	bool bLockXRotation = true;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
+	bool bLockYRotation = true;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
+	bool bLockZRotation = true;
+
+#pragma endregion Settings Physics
+
+#pragma region Settings PhysicsConstraint AngularLimit
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
 	TEnumAsByte<EAngularConstraintMotion> ConstraintTwistMotion;
@@ -85,7 +104,11 @@ private:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
 	float AngularBreakThreshold = 0;
-	
+
+#pragma endregion Settings PhysicsConstraint AngularLimit
+
+#pragma region Settings PhysicsConstraint LinearLimit
+
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
 	TEnumAsByte<ELinearConstraintMotion> XLinearConstraintMotionLimit;
 
@@ -119,6 +142,10 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
 	TEnumAsByte<ELinearConstraintMotion> LimitLinearConstraintMotion = LCM_Locked;
 
+#pragma endregion Settings PhysicsConstraint LinearLimit
+
+#pragma region Settings PhysicsConstraint AngularMotor
+
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
 	TEnumAsByte<EAngularDriveMode::Type> AngularDriveMode;
 
@@ -149,11 +176,19 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
 	float MaxForce;
 
+#pragma endregion Settings PhysicsConstraint AngularMotor
+
+#pragma region Settings PhysicsConstraint ConstraintBehaviour
+	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true))
 	bool EnableMassConditioning = true;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true))
 	bool ProjectionEnabled = true;
+	
+#pragma endregion Settings PhysicsConstraint ConstraintBehaviour
+
+#pragma region Settings PhysicsConstraint MiddleConstraint
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
 	bool HasMiddleConstraint = false;
@@ -172,18 +207,25 @@ private:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
 	TEnumAsByte<ELinearConstraintMotion> MiddleLimitLinearConstraintMotion = LCM_Limited;
+#pragma endregion Settings PhysicsConstraint MiddleConstraint
 
+	FVector LastPosition = FVector::Zero();
+	float LengthStaticMesh = 0;
+	int currentIndex = 0;
+	
 public :
 	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
-	void ActivatePhysics();
-	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
-	void DeactivatePhysics();
+	void SetSimulatePhysics(bool IsSimulatePhysics);
 
 	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
-	void ActivatePhysicsConstraint();
-	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
-	void DeactivatePhysicsConstraint();
-	
+	UStaticMeshComponent* AddDynamicMesh();
+
+	UFUNCTION(BlueprintCallable,Category="Vector",meta=(AllowPrivateAccess=true))
+	FVector GetLastPosition() const {return LastPosition;}
+
+	UFUNCTION(BlueprintCallable,Category="Vector",meta=(AllowPrivateAccess=true))
+	float GetLengthStaticMesh() const {return LengthStaticMesh;}
+
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 	void CustomDestroyConstructedComponents();
@@ -191,6 +233,5 @@ protected:
 private:
 	UPhysicsConstraintComponent* CreatePhysicsConstraint(UPrimitiveComponent* FirstComponent, UPrimitiveComponent* SecondComponent, FVector Location, bool
 	                             IsRelativeLocation = true);
-	void SetSimulatePhysics(bool IsSimulatePhysics);
-	void SetPhysicsConstraint(bool IsSimulatePhysics);
+	UStaticMeshComponent* CreateStaticMesh(bool SimulatePhysic, bool FirstMesh);
 };

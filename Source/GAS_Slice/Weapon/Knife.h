@@ -2,8 +2,10 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GAS_Slice/Chain.h"
 #include "Knife.generated.h"
 
+class AChain;
 class UAbilitySystemComponent;
 class UGameplayEffect;
 class UProjectileMovementComponent;
@@ -44,6 +46,15 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	UProjectileMovementComponent* ProjectileMovement;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Settings", meta = (AllowPrivateAccess = "true"))
+	UChildActorComponent* Chain;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<AChain> ChainClass;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Actor", meta = (AllowPrivateAccess = "true"))
+	AChain* BP_Chain;
+
 	UPROPERTY(EditAnywhere, Category = "Settings|GAS", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UGameplayEffect> GameplayEffectClass;
 	
@@ -70,9 +81,13 @@ public:
 	void CheckCollisionAttack();
 	void FinishCheckCollisionAttack();
 	void SetAbilitySystemComponent(UAbilitySystemComponent* AbilitySystemComponent){PlayerAbilitySystemComponent = AbilitySystemComponent;}
+
+	UFUNCTION(BlueprintCallable,Category="Getter",meta = (allowPrivateAccess = "true"))
+	AChain* GetBPChain() const {return BP_Chain;}
 	
 protected:
-
+	virtual void BeginPlay() override;
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void StopMove();
 

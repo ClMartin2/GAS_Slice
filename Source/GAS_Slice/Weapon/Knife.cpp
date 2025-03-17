@@ -5,6 +5,7 @@
 #include "DrawDebugHelpers.h"
 #include "Math/Quat.h"
 #include "../Library/GAS_Utils.h"
+#include "GAS_Slice/Chain.h"
 
 AKnife::AKnife()
 {
@@ -18,12 +19,16 @@ AKnife::AKnife()
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 	ProjectileMovement->UpdatedComponent = BoxCollision;
 	ProjectileMovement->bRotationFollowsVelocity = true;
-
 	ProjectileMovement->MaxSpeed = MaxSpeed;
+	
+	Chain = CreateDefaultSubobject<UChildActorComponent>(FName(TEXT("Chain")));
+	Chain->SetChildActorClass(ChainClass);
+	Chain->SetupAttachment(StaticMeshKnife_);
 }
 
 void AKnife::Throw_Implementation(FVector DirectionThrowKnife, FVector NewCameraForward)
 {
+	BP_Chain->SetSimulatePhysics(false);
 	IsAttached = false;
 	ProjectileMovement->SetUpdatedComponent(GetRootComponent());
 	ProjectileMovement->InitialSpeed = Speed;
@@ -33,6 +38,7 @@ void AKnife::Throw_Implementation(FVector DirectionThrowKnife, FVector NewCamera
 
 void AKnife::ResetKnife()
 {
+	BP_Chain->SetSimulatePhysics(false);
 	StopMove();
 	IsAttached = false;
 	BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -47,6 +53,7 @@ void AKnife::StopMove_Implementation()
 void AKnife::OnHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	FVector NormalImpulse, const FHitResult& Hit)
 {
+	BP_Chain->SetSimulatePhysics(true);
 	IsAttached = true;
 	StopMove();
 	HitRotate(Hit);
@@ -127,6 +134,12 @@ void AKnife::CheckCollisionAttack()
 void AKnife::FinishCheckCollisionAttack()
 {
 	hasAlreadyAttack = false;
+}
+
+void AKnife::BeginPlay()
+{
+	Super::BeginPlay();
+	BP_Chain = Cast<AChain>(Chain->GetChildActor());
 }
 
 void AKnife::MakeDamage(FHitResult OutHit)

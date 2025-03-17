@@ -218,8 +218,8 @@ void ACustomPlayerController::ThrowKnife_Implementation()
 
 void ACustomPlayerController::ResetKnife_Implementation()
 {
-	PlayerCharacter->ResetKnife();
 	Knife->ResetKnife();
+	PlayerCharacter->ResetKnife();
 	
 	bWasTheKnifeThrown = false;
 }

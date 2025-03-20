@@ -61,9 +61,11 @@ private:
 	FVector CameraForward;
 	bool IsAttached;
 	bool hasAlreadyAttack = false;
-
+	UStaticMeshComponent* HandStartLocation;
+	
 private:
 	UAbilitySystemComponent* PlayerAbilitySystemComponent;
+	FTimerHandle TimerHandleSetPhysicsHit;
 
 public:
 	AKnife();	
@@ -76,17 +78,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Knife")
 	void ResetKnife();
 
+	UFUNCTION(BlueprintCallable, Category = "Knife")
 	bool GetIsAttached() const {return IsAttached;}
 
 	void CheckCollisionAttack();
 	void FinishCheckCollisionAttack();
 	void SetAbilitySystemComponent(UAbilitySystemComponent* AbilitySystemComponent){PlayerAbilitySystemComponent = AbilitySystemComponent;}
+	void SetHandStartLocation(UStaticMeshComponent* ComponentHandLocation){HandStartLocation = ComponentHandLocation;}
 
 	UFUNCTION(BlueprintCallable,Category="Getter",meta = (allowPrivateAccess = "true"))
 	AChain* GetBPChain() const {return BP_Chain;}
 	
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(float DeltaSeconds) override;
 	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void StopMove();
@@ -96,6 +101,7 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
+	void SetChainPhySicsHit();
 	void OnHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
 private:

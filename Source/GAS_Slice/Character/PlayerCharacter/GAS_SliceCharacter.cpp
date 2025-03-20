@@ -29,7 +29,7 @@ AGAS_SliceCharacter::AGAS_SliceCharacter()
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
 	HandStart = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HandStart"));
-	HandStart->SetupAttachment(FirstPersonCameraComponent);	
+	HandStart->SetupAttachment(GetCapsuleComponent());	
 
 	Cable = CreateDefaultSubobject<UCableComponent>(TEXT("Cable"));
 	Cable->SetupAttachment(HandStart);
@@ -67,6 +67,7 @@ void AGAS_SliceCharacter::PostInitializeComponents()
 			KnifeStartLocation = KnifeChildActorComponent->GetRelativeLocation();
 			KnifeStartRotation = KnifeChildActorComponent->GetRelativeRotation();
 			Knife->SetAbilitySystemComponent(GetAbilitySystemComponent());
+			Knife->SetHandStartLocation(HandStart);
 		}
 	}
 }
@@ -76,6 +77,15 @@ void AGAS_SliceCharacter::BeginPlay()
 	Super::BeginPlay();
 	ResetKnife();
 	Cable->SetAttachEndToComponent(Knife->GetRootComponent());
+	Knife->GetBPChain()->SetComponentToAttachEnd(HandStart);
+	// Knife->GetBPChain()->AddDynamicMesh(false);
+}
+
+void AGAS_SliceCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+	// Knife->GetBPChain()->GetStaticMeshComponents()[Knife->GetBPChain()->GetStaticMeshComponents().Num()-1]
+	// ->SetWorldLocation(HandStart->GetComponentLocation());
 }
 
 void AGAS_SliceCharacter::ResetKnife_Implementation()

@@ -77,6 +77,9 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
 	bool bLockZRotation = true;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
+	bool StartWithPhysic = true;
+
 #pragma endregion Settings Physics
 
 #pragma region Settings PhysicsConstraint AngularLimit
@@ -212,13 +215,18 @@ private:
 	FVector LastPosition = FVector::Zero();
 	float LengthStaticMesh = 0;
 	int currentIndex = 0;
+	TArray<UStaticMeshComponent*> DynamicStaticMeshComponents;
+	UPhysicsConstraintComponent* AttachEndPhysicsConstraint;
+	USceneComponent* ComponentToAttachEndTo;
+	UStaticMeshComponent* DebugStaticMeshComponent;
+	FVector LastMeshPosition = FVector::ZeroVector;
 	
 public :
 	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
 	void SetSimulatePhysics(bool IsSimulatePhysics);
 
 	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
-	UStaticMeshComponent* AddDynamicMesh();
+	UStaticMeshComponent* AddDynamicMesh(bool SimulatePhysics);
 
 	UFUNCTION(BlueprintCallable,Category="Vector",meta=(AllowPrivateAccess=true))
 	FVector GetLastPosition() const {return LastPosition;}
@@ -226,12 +234,21 @@ public :
 	UFUNCTION(BlueprintCallable,Category="Vector",meta=(AllowPrivateAccess=true))
 	float GetLengthStaticMesh() const {return LengthStaticMesh;}
 
+	void SetComponentToAttachEnd(USceneComponent* EndComponentToAttach){ComponentToAttachEndTo = EndComponentToAttach;}
+
+	TArray<UStaticMeshComponent*> GetStaticMeshComponents() const {return StaticMeshComponents;}
+
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 	void CustomDestroyConstructedComponents();
+	virtual void Tick(float DeltaSeconds) override;
+
+	UFUNCTION(BlueprintCallable,Category="Chain",meta=(AllowPrivateAccess=true))
+	TArray<UStaticMeshComponent*> GetInstantiedDyanmicMeshes(){return DynamicStaticMeshComponents;}
 
 private:
 	UPhysicsConstraintComponent* CreatePhysicsConstraint(UPrimitiveComponent* FirstComponent, UPrimitiveComponent* SecondComponent, FVector Location, bool
 	                             IsRelativeLocation = true);
 	UStaticMeshComponent* CreateStaticMesh(bool SimulatePhysic, bool FirstMesh);
+	void AttachEndStaticMesh(USceneComponent* ComponentToAttach);
 };

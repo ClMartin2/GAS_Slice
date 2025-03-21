@@ -188,6 +188,12 @@ private:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true))
 	bool ProjectionEnabled = true;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true))
+	bool ShockPropagationEnabled = false;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true))
+	float ShockPropagationAlpha = 0.3;
 	
 #pragma endregion Settings PhysicsConstraint ConstraintBehaviour
 
@@ -214,8 +220,9 @@ private:
 
 	FVector LastPosition = FVector::Zero();
 	float LengthStaticMesh = 0;
-	int currentIndex = 0;
+	int CurrentIndex = 0;
 	TArray<UStaticMeshComponent*> DynamicStaticMeshComponents;
+	TArray<UPhysicsConstraintComponent*> DynamicPhysicsConstraintComponent;
 	UPhysicsConstraintComponent* AttachEndPhysicsConstraint;
 	USceneComponent* ComponentToAttachEndTo;
 	UStaticMeshComponent* DebugStaticMeshComponent;
@@ -228,11 +235,14 @@ public :
 	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
 	UStaticMeshComponent* AddDynamicMesh(bool SimulatePhysics);
 
+	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
+	void DestroyDynamicMesh();
+
 	UFUNCTION(BlueprintCallable,Category="Vector",meta=(AllowPrivateAccess=true))
 	FVector GetLastPosition() const {return LastPosition;}
 
 	UFUNCTION(BlueprintCallable,Category="Vector",meta=(AllowPrivateAccess=true))
-	float GetLengthStaticMesh() const {return LengthStaticMesh;}
+	float GetLengthBetweenMesh() const {return LengthStaticMesh - OffsetStaticMesh;}
 
 	void SetComponentToAttachEnd(USceneComponent* EndComponentToAttach){ComponentToAttachEndTo = EndComponentToAttach;}
 

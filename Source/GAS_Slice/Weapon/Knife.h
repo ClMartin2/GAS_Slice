@@ -37,6 +37,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	FVector OffsetBoxExtentCollisionAttack = FVector::Zero();
 
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	float DelaySetPhysicsChain = 0.3;
+
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Collision, meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* BoxCollision;
 
@@ -101,7 +104,7 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
-	void SetChainPhySicsHit();
+	void SetChainPhysicsHit();
 	void OnHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
 private:

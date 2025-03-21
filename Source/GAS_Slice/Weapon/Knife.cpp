@@ -39,6 +39,10 @@ void AKnife::Throw_Implementation(FVector DirectionThrowKnife, FVector NewCamera
 void AKnife::ResetKnife()
 {
 	BP_Chain->SetSimulatePhysics(false);
+	
+	if (IsAttached)
+		BP_Chain->DestroyDynamicMesh();
+	
 	StopMove();
 	IsAttached = false;
 	BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -50,7 +54,7 @@ void AKnife::StopMove_Implementation()
 	ProjectileMovement->InitialSpeed = 0;
 }
 
-void AKnife::SetChainPhySicsHit()
+void AKnife::SetChainPhysicsHit()
 {
 	BP_Chain->SetSimulatePhysics(true);
 }
@@ -58,7 +62,7 @@ void AKnife::SetChainPhySicsHit()
 void AKnife::OnHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                                   FVector NormalImpulse, const FHitResult& Hit)
 {
-	GetWorldTimerManager().SetTimer(TimerHandleSetPhysicsHit, this, &AKnife::SetChainPhySicsHit, 0.1f, false);
+	GetWorldTimerManager().SetTimer(TimerHandleSetPhysicsHit, this, &AKnife::SetChainPhysicsHit, DelaySetPhysicsChain, false);
 	IsAttached = true;
 	StopMove();
 	HitRotate(Hit);
@@ -164,31 +168,32 @@ void AKnife::Tick(float DeltaSeconds)
 	
 	FVector LastChainLocation = LastStaticMeshComponent->GetComponentLocation();
 	
-	float LengthLinkChain = BP_Chain->GetLengthStaticMesh() * 2;
+	HandLocation.Z = 0;
+	LastChainLocation.Z = 0;
+	
+	float LengthLinkChain = BP_Chain->GetLengthBetweenMesh();
 	float DistanceChainToHand = FVector::Distance(HandLocation,LastChainLocation);
 
-	float NbMeshToAdd = DistanceChainToHand/LengthLinkChain;
+	float NbMeshToAdd = FMath::Floor((DistanceChainToHand/LengthLinkChain) - 1);
 	
 	float CheckBehindHand = FVector::DotProduct(HandLocation - StaticMeshComponents[0]->GetComponentLocation(),
 		HandLocation - LastChainLocation);
 
-	FVector LineStart = HandStartLocation->GetComponentLocation();
+	FVector LineStart = LastChainLocation;
 	FVector LineEnd = HandLocation;
 	
 	DrawDebugDirectionalArrow(GetWorld(),LineStart,LineEnd,5,FColor::Red,true,-1,0,2);
 	
 	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red,"Check behind hand : " + FString::SanitizeFloat(CheckBehindHand));
+	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red,"Distance : " + FString::SanitizeFloat(DistanceChainToHand));
+	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red,"LengthLinkChain : " + FString::SanitizeFloat(LengthLinkChain + 1));
 	
 	if (NbMeshToAdd >= 1)
 	{
 		for (int i = 0; i < NbMeshToAdd; i++)
 		{
 			if (CheckBehindHand >= 0)
-			{
-				GEngine->AddOnScreenDebugMessage(-1,5,FColor::Blue,"Velocity" + DeltaMove.ToString());
-				// GEngine->AddOnScreenDebugMessage(-1,5,FColor::Red,"HandLocation" + HandStartLocation->GetComponentLocation().ToString());
 				BP_Chain->AddDynamicMesh(IsAttached);
-			}
 		}
 	}
 }

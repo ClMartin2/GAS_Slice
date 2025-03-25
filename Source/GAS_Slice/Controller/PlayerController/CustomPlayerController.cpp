@@ -274,7 +274,7 @@ void ACustomPlayerController::PullKnife_Implementation()
 {
 	if (!bWasTheKnifeThrown && bIsAttacking)
 		return;
-	
+
 	PushToKnife();
 	ResetKnife();
 }

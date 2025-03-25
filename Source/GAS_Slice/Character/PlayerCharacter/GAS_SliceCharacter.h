@@ -84,6 +84,5 @@ public:
 protected:
 	virtual void PostInitializeComponents() override;
 	virtual void BeginPlay() override;
-	virtual void Tick(float DeltaTime) override;
 };
 

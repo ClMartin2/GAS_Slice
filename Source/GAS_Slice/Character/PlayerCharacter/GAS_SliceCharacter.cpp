@@ -78,19 +78,10 @@ void AGAS_SliceCharacter::BeginPlay()
 	ResetKnife();
 	Cable->SetAttachEndToComponent(Knife->GetRootComponent());
 	Knife->GetBPChain()->SetComponentToAttachEnd(HandStart);
-	// Knife->GetBPChain()->AddDynamicMesh(false);
-}
-
-void AGAS_SliceCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	// Knife->GetBPChain()->GetStaticMeshComponents()[Knife->GetBPChain()->GetStaticMeshComponents().Num()-1]
-	// ->SetWorldLocation(HandStart->GetComponentLocation());
 }
 
 void AGAS_SliceCharacter::ResetKnife_Implementation()
 {
-	Knife->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
 	Knife->AttachToComponent(ParentKnife, FAttachmentTransformRules::KeepRelativeTransform);
 	Knife->SetActorRelativeTransform(FTransform(KnifeStartRotation, KnifeStartLocation));
 }

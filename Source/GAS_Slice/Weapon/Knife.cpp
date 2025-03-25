@@ -150,6 +150,7 @@ void AKnife::BeginPlay()
 void AKnife::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+	
 	FVector HandLocation = 	HandStartLocation->GetComponentLocation();
 	
 	TArray<UStaticMeshComponent*> StaticMeshComponents = BP_Chain->GetStaticMeshComponents();
@@ -162,18 +163,12 @@ void AKnife::Tick(float DeltaSeconds)
 	
 	FVector FirstChainLocation = FirstStaticMeshComponent->GetComponentLocation();
 	
-	HandLocation.Z = 0;
-	FirstChainLocation.Z = 0;
-	
 	float LengthLinkChain = BP_Chain->GetLengthBetweenMesh();
 	float DistanceChainToHand = FVector::Distance(HandLocation,FirstChainLocation);
 
 	float NbLinkOnChain = FMath::Floor((DistanceChainToHand/LengthLinkChain) - 2);
 
 	int DifferenceBetweenChain = StaticMeshComponents.Num() - NbLinkOnChain;
-
-	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red,"DifferenceBetweenChain" + FString::FromInt(DifferenceBetweenChain));
-	GEngine->AddOnScreenDebugMessage(-1,0,FColor::Red,"NBLinkOnChain" + FString::SanitizeFloat(NbLinkOnChain));
 
 	if (NbLinkOnChain >= 1)
 	{

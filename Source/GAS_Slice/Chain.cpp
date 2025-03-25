@@ -106,13 +106,6 @@ void AChain::Tick(float DeltaSeconds)
 		StaticMeshComponents[StaticMeshComponents.Num() - 1]->SetWorldLocation(
 			ComponentToAttachEndTo->GetComponentLocation());
 	}
-
-	for (UStaticMeshComponent* Component : DynamicStaticMeshComponents)
-	{
-		GEngine->AddOnScreenDebugMessage(-1,0.1,FColor::Yellow,"Previous Mesh Simulate Physic: "
-			+ LexToString(Component->IsSimulatingPhysics()));
-
-	}
 }
 
 void AChain::BeginPlay()
@@ -233,7 +226,7 @@ void AChain::SetSimulatePhysics(bool IsSimulatePhysics)
 		StaticMeshComponent->SetSimulatePhysics(IsSimulatePhysics);
 
 		if (!IsSimulatePhysics)
-			StaticMeshComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+			StaticMeshComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 	}
 }
 
@@ -250,9 +243,6 @@ UStaticMeshComponent* AChain::AddDynamicMesh(bool SimulatePhysics)
 	}
 
 	UStaticMeshComponent* StaticMeshComponent = CreateStaticMesh(!AttachEnd, false);
-
-	GEngine->AddOnScreenDebugMessage(-1,2,FColor::Yellow,"Previous Mesh Simulate Physic: " + LexToString(PreviousLastMesh->IsSimulatingPhysics()));
-	UE_LOG(LogTemp, Warning, TEXT("Previous Mesh Simulate Physic: %s"), *LexToString(PreviousLastMesh->IsSimulatingPhysics()));
 	
 	if (CurrentIndex % 2 != 0)
 		StaticMeshComponent->SetRelativeRotation(FRotator(0, 0, -90));
@@ -267,10 +257,10 @@ UStaticMeshComponent* AChain::AddDynamicMesh(bool SimulatePhysics)
 		StaticMeshComponents[CurrentIndex - 2],
 		StaticMeshComponents[CurrentIndex - 1], NewLocation, true);
 
-	DrawDebugDirectionalArrow(GetWorld(), NewLocation, NewLocation + FVector::UpVector * 100000000000000, 10,
-	                          FColor::Red,
-	                          true, -1,
-	                          0, 2);
+	// DrawDebugDirectionalArrow(GetWorld(), NewLocation, NewLocation + FVector::UpVector * 100000000000000, 10,
+	//                           FColor::Red,
+	//                           true, -1,
+	//                           0, 2);
 
 	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Blue, "Add Dynamic Mesh");
 
@@ -284,26 +274,27 @@ UStaticMeshComponent* AChain::AddDynamicMesh(bool SimulatePhysics)
 void AChain::DestroyDynamicMesh(UStaticMeshComponent* StaticMeshComponent)
 {
 	UPhysicsConstraintComponent* PhysicsConstraintComponent = DynamicMeshToPhysicsConstraint[StaticMeshComponent];
-
+	
 	StaticMeshComponents.Remove(StaticMeshComponent);
 	DynamicStaticMeshComponents.Remove(StaticMeshComponent);
 	PhysicsConstraints.Remove(PhysicsConstraintComponent);
-
+	DynamicPhysicsConstraintComponent.Remove(PhysicsConstraintComponent);
+	
 	StaticMeshComponent->DestroyComponent();
 	PhysicsConstraintComponent->DestroyComponent();
 	CurrentIndex = StaticMeshComponents.Num();
 	LastPosition = StaticMeshComponents.Num() * FVector(LengthStaticMesh + OffsetStaticMesh, 0, 0);
-
+	
 	//Correction when set new end mesh to attach this to the root and correct is rotation
 	UStaticMeshComponent* NewLastMesh = StaticMeshComponents[StaticMeshComponents.Num() - 1];
-
-	if (AttachEnd )
+	
+	if (AttachEnd)
 	{
 		AttachEndStaticMesh();
 		NewLastMesh->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 		if (CurrentIndex % 2 != 0)
 			NewLastMesh->SetRelativeRotation(FRotator(0, 0, -90));
 	}
-
+	
 	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Blue, "Remove Dynamic Mesh");
 }

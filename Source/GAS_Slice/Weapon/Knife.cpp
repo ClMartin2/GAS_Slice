@@ -39,10 +39,6 @@ void AKnife::Throw_Implementation(FVector DirectionThrowKnife, FVector NewCamera
 void AKnife::ResetKnife()
 {
 	BP_Chain->SetSimulatePhysics(false);
-	
-	if (IsAttached)
-		BP_Chain->DestroyAllDynamicMesh();
-	
 	StopMove();
 	IsAttached = false;
 	BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);

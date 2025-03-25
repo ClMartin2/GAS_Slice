@@ -73,7 +73,7 @@ void AChain::OnConstruction(const FTransform& Transform)
 		return;
 
 	if (AttachEnd)
-		AttachEndStaticMesh(ComponentToAttachEndTo);
+		AttachEndStaticMesh();
 }
 
 void AChain::CustomDestroyConstructedComponents()
@@ -103,29 +103,15 @@ void AChain::Tick(float DeltaSeconds)
 
 	if (AttachEnd && StaticMeshComponents.Num() > 0 && ComponentToAttachEndTo != nullptr)
 	{
-		StaticMeshComponents[StaticMeshComponents.Num() - 1]->SetWorldLocation(ComponentToAttachEndTo->GetComponentLocation());
-		// PhysicsConstraints[PhysicsConstraints.Num() - 1]->SetWorldLocation(ComponentToAttachEndTo->GetComponentLocation());
+		StaticMeshComponents[StaticMeshComponents.Num() - 1]->SetWorldLocation(
+			ComponentToAttachEndTo->GetComponentLocation());
 	}
 
-	//Debug
-	// for (UPhysicsConstraintComponent*  Component: PhysicsConstraints)
-	// {
-	// 	if (Component != nullptr)
-	// 	{
-	// 		FVector LineStart = Component->GetComponentLocation();
-	// 		FVector LineEnd = LineStart + FVector::UpVector * 100;
-	//
-	// 		DrawDebugDirectionalArrow(GetWorld(),LineStart,LineEnd,10,FColor::Red,false,5,0, 3);
-	// 	}
-	// }
-
-	for (UPhysicsConstraintComponent* Component : DynamicPhysicsConstraintComponent)
+	for (UStaticMeshComponent* Component : DynamicStaticMeshComponents)
 	{
-		GEngine->AddOnScreenDebugMessage(-1,GetWorld()->DeltaTimeSeconds,FColor::Yellow,"1 : " +  Component->ComponentName1.ComponentName.ToString()) ;
-		GEngine->AddOnScreenDebugMessage(-1,GetWorld()->DeltaTimeSeconds,FColor::Yellow,"2 : " + Component->ComponentName2.ComponentName.ToString()) ;
-		GEngine->AddOnScreenDebugMessage(-1,GetWorld()->DeltaTimeSeconds,FColor::Yellow,"Location PhysicsConstraint : "
-			+ Component->GetRelativeLocation().ToString()) ;
-		
+		GEngine->AddOnScreenDebugMessage(-1,0.1,FColor::Yellow,"Previous Mesh Simulate Physic: "
+			+ LexToString(Component->IsSimulatingPhysics()));
+
 	}
 }
 
@@ -135,11 +121,12 @@ void AChain::BeginPlay()
 	CurrentIndex = StaticMeshComponents.Num();
 }
 
-UStaticMeshComponent* AChain::CreateStaticMesh(bool SimulatePhysic = true,bool FirstMesh = false)
+UStaticMeshComponent* AChain::CreateStaticMesh(bool SimulatePhysic = true, bool FirstMesh = false)
 {
 	UStaticMeshComponent* StaticMeshComponent = NewObject<UStaticMeshComponent>(this);
-	StaticMeshComponent->SetWorldScale3D(Scale);
 
+	StaticMeshComponent->SetRelativeScale3D(Scale);
+	
 	if (StaticMesh != nullptr)
 		StaticMeshComponent->SetStaticMesh(StaticMesh);
 
@@ -159,42 +146,19 @@ UStaticMeshComponent* AChain::CreateStaticMesh(bool SimulatePhysic = true,bool F
 	StaticMeshComponent->BodyInstance.bLockYRotation = bLockYRotation;
 	StaticMeshComponent->BodyInstance.bLockZRotation = bLockZRotation;
 
-	StaticMeshComponent->AttachToComponent(CustomRootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	
+	StaticMeshComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 	StaticMeshComponents.Add(StaticMeshComponent);
+
 	StaticMeshComponent->RegisterComponent();
 	CurrentIndex++;
 
 	return StaticMeshComponent;
 }
 
-void AChain::AttachEndStaticMesh(USceneComponent* ComponentToAttach)
+void AChain::AttachEndStaticMesh()
 {
-	UStaticMeshComponent* EndStaticMeshComponent = StaticMeshComponents[NumberOfLinks - 1];
+	UStaticMeshComponent* EndStaticMeshComponent = StaticMeshComponents[StaticMeshComponents.Num() - 1];
 	EndStaticMeshComponent->SetSimulatePhysics(false);
-	AActor* OwingActor = GetParentActor();
-
-	// if (ComponentToAttach != nullptr)
-	// 	EndStaticMeshComponent->AttachToComponent(ComponentToAttach, FAttachmentTransformRules::KeepRelativeTransform);
-	//
-	// if (OwingActor == nullptr)
-	// 	return;
-	//
-	// TArray<UActorComponent*> Components;
-	// OwingActor->GetComponents(Components);
-	//
-	// for (UActorComponent* Component : Components)
-	// {
-	// 	if (Component->GetName() == AttachEndComponentName)
-	// 	{
-	// 		if (USceneComponent* SceneComponent = Cast<USceneComponent>(Component))
-	// 		{
-	// 			if (UPrimitiveComponent* PrimitiveComponent = Cast<UPrimitiveComponent>(Component))
-	// 			{
-	// 			}
-	// 		}
-	// 	}
-	// }
 }
 
 UPhysicsConstraintComponent* AChain::CreatePhysicsConstraint(UPrimitiveComponent* FirstComponent,
@@ -202,14 +166,14 @@ UPhysicsConstraintComponent* AChain::CreatePhysicsConstraint(UPrimitiveComponent
                                                              FVector Location, bool IsRelativeLocation)
 {
 	UPhysicsConstraintComponent* PhysicsConstraint = NewObject<UPhysicsConstraintComponent>(this);
-	PhysicsConstraint->AttachToComponent(CustomRootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+	PhysicsConstraint->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 
 	PhysicsConstraint->SetConstrainedComponents(FirstComponent, NAME_None, SecondComponent, NAME_None);
 
 	IsRelativeLocation
 		? PhysicsConstraint->SetRelativeLocation(Location)
 		: PhysicsConstraint->SetWorldLocation(Location);
-	
+
 	PhysicsConstraint->SetDisableCollision(true);
 
 	PhysicsConstraint->SetAngularTwistLimit(ConstraintTwistMotion, TwistLimitAngle);
@@ -250,7 +214,7 @@ UPhysicsConstraintComponent* AChain::CreatePhysicsConstraint(UPrimitiveComponent
 	PhysicsConstraint->SetLinearXLimit(LimitLinearConstraintMotion, LimitSize);
 	PhysicsConstraint->ConstraintInstance.SetSoftLinearLimitParams(SoftConstraint, LinearStifness, LinearDamping, 0, 0);
 
-	PhysicsConstraint->ConstraintInstance.SetShockPropagationParams(ShockPropagationEnabled,ShockPropagationAlpha);
+	PhysicsConstraint->ConstraintInstance.SetShockPropagationParams(ShockPropagationEnabled, ShockPropagationAlpha);
 
 	PhysicsConstraints.Add(PhysicsConstraint);
 	PhysicsConstraint->RegisterComponent();
@@ -269,13 +233,13 @@ void AChain::SetSimulatePhysics(bool IsSimulatePhysics)
 		StaticMeshComponent->SetSimulatePhysics(IsSimulatePhysics);
 
 		if (!IsSimulatePhysics)
-			StaticMeshComponent->AttachToComponent(CustomRootComponent, FAttachmentTransformRules::KeepWorldTransform);
+			StaticMeshComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 	}
 }
 
 UStaticMeshComponent* AChain::AddDynamicMesh(bool SimulatePhysics)
 {
-	UStaticMeshComponent* PreviousLastMesh = StaticMeshComponents[StaticMeshComponents.Num()-1];
+	UStaticMeshComponent* PreviousLastMesh = StaticMeshComponents[StaticMeshComponents.Num() - 1];
 
 	if (AttachEnd && PreviousLastMesh != nullptr)
 	{
@@ -283,11 +247,12 @@ UStaticMeshComponent* AChain::AddDynamicMesh(bool SimulatePhysics)
 		FVector NewLocation = LastPosition;
 		PreviousLastMesh->SetRelativeLocation(NewLocation);
 		PreviousLastMesh->SetSimulatePhysics(SimulatePhysics);
-
-		AttachEndStaticMesh(ComponentToAttachEndTo);
 	}
-	
-	UStaticMeshComponent* StaticMeshComponent = CreateStaticMesh(!AttachEnd,false);
+
+	UStaticMeshComponent* StaticMeshComponent = CreateStaticMesh(!AttachEnd, false);
+
+	GEngine->AddOnScreenDebugMessage(-1,2,FColor::Yellow,"Previous Mesh Simulate Physic: " + LexToString(PreviousLastMesh->IsSimulatingPhysics()));
+	UE_LOG(LogTemp, Warning, TEXT("Previous Mesh Simulate Physic: %s"), *LexToString(PreviousLastMesh->IsSimulatingPhysics()));
 	
 	if (CurrentIndex % 2 != 0)
 		StaticMeshComponent->SetRelativeRotation(FRotator(0, 0, -90));
@@ -295,68 +260,50 @@ UStaticMeshComponent* AChain::AddDynamicMesh(bool SimulatePhysics)
 	if (CurrentIndex < 2)
 		return nullptr;
 
-	FVector NewLocation = LastPosition - FVector((LengthStaticMesh + OffsetStaticMesh) - (LengthStaticMesh / 2 + OffsetPhysicConstraint) , 0, 0);
-	
-	UPhysicsConstraintComponent* PhysicsConstraintComponent = CreatePhysicsConstraint(StaticMeshComponents[CurrentIndex - 2],
-	                        StaticMeshComponents[CurrentIndex - 1],NewLocation, true);
+	FVector NewLocation = LastPosition - FVector(
+		(LengthStaticMesh + OffsetStaticMesh) - (LengthStaticMesh / 2 + OffsetPhysicConstraint), 0, 0);
 
-	DrawDebugDirectionalArrow(GetWorld(),NewLocation,NewLocation + FVector::UpVector * 100000000000000,10,FColor::Red,
-		true,-1,
-		0,2);
-	
-	GEngine->AddOnScreenDebugMessage(-1,1,FColor::Blue,"Add Dynamic Mesh");
-	
-	// DynamicStaticMeshComponents.Add(StaticMeshComponent);
-	// DynamicPhysicsConstraintComponent.Add(PhysicsConstraintComponent);
-	// DynamicMeshToPhysicsConstraint.Add(StaticMeshComponent,PhysicsConstraintComponent);
-	//
+	UPhysicsConstraintComponent* PhysicsConstraintComponent = CreatePhysicsConstraint(
+		StaticMeshComponents[CurrentIndex - 2],
+		StaticMeshComponents[CurrentIndex - 1], NewLocation, true);
+
+	DrawDebugDirectionalArrow(GetWorld(), NewLocation, NewLocation + FVector::UpVector * 100000000000000, 10,
+	                          FColor::Red,
+	                          true, -1,
+	                          0, 2);
+
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Blue, "Add Dynamic Mesh");
+
+	DynamicStaticMeshComponents.Add(StaticMeshComponent);
+	DynamicPhysicsConstraintComponent.Add(PhysicsConstraintComponent);
+	DynamicMeshToPhysicsConstraint.Add(StaticMeshComponent, PhysicsConstraintComponent);
+
 	return StaticMeshComponent;
-}
-
-void AChain::DestroyAllDynamicMesh()
-{
-	if (DynamicStaticMeshComponents.Num() <= 0)
-		return;
-	
-	for (UStaticMeshComponent* Component : DynamicStaticMeshComponents)
-	{
-		if (Component)
-		{
-			StaticMeshComponents.Remove(Component);
-			Component->DestroyComponent();
-		}
-	}
-	
-	DynamicStaticMeshComponents.Empty();
-
-	for (UPhysicsConstraintComponent* Constraint : DynamicPhysicsConstraintComponent)
-	{
-		if (Constraint)
-		{
-			PhysicsConstraints.Remove(Constraint);
-			Constraint->DestroyComponent();
-		}
-	}
-	
-	LastPosition = StaticMeshComponents.Num() * FVector(LengthStaticMesh + OffsetStaticMesh, 0, 0);
-	CurrentIndex = StaticMeshComponents.Num();
-	DynamicPhysicsConstraintComponent.Empty();
 }
 
 void AChain::DestroyDynamicMesh(UStaticMeshComponent* StaticMeshComponent)
 {
-	//Attach l'avant dernier mesh au dernier du coup 
-	
-	// UPhysicsConstraintComponent* PhysicsConstraintComponent = DynamicMeshToPhysicsConstraint[StaticMeshComponent];
-	//
-	// StaticMeshComponents.Remove(StaticMeshComponent);
-	// DynamicStaticMeshComponents.Remove(StaticMeshComponent);
-	// PhysicsConstraints.Remove(PhysicsConstraintComponent);
-	//
-	// StaticMeshComponent->DestroyComponent();
-	// PhysicsConstraintComponent->DestroyComponent();
-	// CurrentIndex = StaticMeshComponents.Num();
-	// LastPosition = StaticMeshComponents.Num() * FVector(LengthStaticMesh + OffsetStaticMesh, 0, 0);
-	//
-	// GEngine->AddOnScreenDebugMessage(-1,1,FColor::Blue,"Remove Dynamic Mesh");
+	UPhysicsConstraintComponent* PhysicsConstraintComponent = DynamicMeshToPhysicsConstraint[StaticMeshComponent];
+
+	StaticMeshComponents.Remove(StaticMeshComponent);
+	DynamicStaticMeshComponents.Remove(StaticMeshComponent);
+	PhysicsConstraints.Remove(PhysicsConstraintComponent);
+
+	StaticMeshComponent->DestroyComponent();
+	PhysicsConstraintComponent->DestroyComponent();
+	CurrentIndex = StaticMeshComponents.Num();
+	LastPosition = StaticMeshComponents.Num() * FVector(LengthStaticMesh + OffsetStaticMesh, 0, 0);
+
+	//Correction when set new end mesh to attach this to the root and correct is rotation
+	UStaticMeshComponent* NewLastMesh = StaticMeshComponents[StaticMeshComponents.Num() - 1];
+
+	if (AttachEnd )
+	{
+		AttachEndStaticMesh();
+		NewLastMesh->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+		if (CurrentIndex % 2 != 0)
+			NewLastMesh->SetRelativeRotation(FRotator(0, 0, -90));
+	}
+
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Blue, "Remove Dynamic Mesh");
 }

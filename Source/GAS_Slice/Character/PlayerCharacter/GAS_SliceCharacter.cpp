@@ -90,8 +90,8 @@ void AGAS_SliceCharacter::Tick(float DeltaTime)
 
 void AGAS_SliceCharacter::ResetKnife_Implementation()
 {
-	Knife->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-	Knife->AttachToComponent(ParentKnife, FAttachmentTransformRules::KeepWorldTransform);
+	Knife->DetachFromActor(FDetachmentTransformRules::KeepRelativeTransform);
+	Knife->AttachToComponent(ParentKnife, FAttachmentTransformRules::KeepRelativeTransform);
 	Knife->SetActorRelativeTransform(FTransform(KnifeStartRotation, KnifeStartLocation));
 }
 

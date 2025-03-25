@@ -239,9 +239,10 @@ public :
 
 	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
 	UStaticMeshComponent* AddDynamicMesh(bool SimulatePhysics);
-
-	void DestroyAllDynamicMesh();
+	
+	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
 	void DestroyDynamicMesh(UStaticMeshComponent* StaticMeshComponent);
+	
 	FVector GetLastPosition() const {return LastPosition;}
 	float GetLengthBetweenMesh() const {return LengthStaticMesh - OffsetStaticMesh;}
 
@@ -262,5 +263,5 @@ private:
 	UPhysicsConstraintComponent* CreatePhysicsConstraint(UPrimitiveComponent* FirstComponent, UPrimitiveComponent* SecondComponent, FVector Location, bool
 	                             IsRelativeLocation = true);
 	UStaticMeshComponent* CreateStaticMesh(bool SimulatePhysic, bool FirstMesh);
-	void AttachEndStaticMesh(USceneComponent* ComponentToAttach);
+	void AttachEndStaticMesh();
 };

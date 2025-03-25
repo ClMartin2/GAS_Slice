@@ -217,16 +217,21 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
 	TEnumAsByte<ELinearConstraintMotion> MiddleLimitLinearConstraintMotion = LCM_Limited;
 #pragma endregion Settings PhysicsConstraint MiddleConstraint
-
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Debug",meta=(AllowPrivateAccess=true))
 	FVector LastPosition = FVector::Zero();
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Debug",meta=(AllowPrivateAccess=true))
 	float LengthStaticMesh = 0;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Debug",meta=(AllowPrivateAccess=true))
 	int CurrentIndex = 0;
+	
 	TArray<UStaticMeshComponent*> DynamicStaticMeshComponents;
 	TArray<UPhysicsConstraintComponent*> DynamicPhysicsConstraintComponent;
 	UPhysicsConstraintComponent* AttachEndPhysicsConstraint;
 	USceneComponent* ComponentToAttachEndTo;
-	UStaticMeshComponent* DebugStaticMeshComponent;
-	FVector LastMeshPosition = FVector::ZeroVector;
+	TMap<UStaticMeshComponent*, UPhysicsConstraintComponent*> DynamicMeshToPhysicsConstraint;
 	
 public :
 	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
@@ -235,13 +240,9 @@ public :
 	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
 	UStaticMeshComponent* AddDynamicMesh(bool SimulatePhysics);
 
-	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
-	void DestroyDynamicMesh();
-
-	UFUNCTION(BlueprintCallable,Category="Vector",meta=(AllowPrivateAccess=true))
+	void DestroyAllDynamicMesh();
+	void DestroyDynamicMesh(UStaticMeshComponent* StaticMeshComponent);
 	FVector GetLastPosition() const {return LastPosition;}
-
-	UFUNCTION(BlueprintCallable,Category="Vector",meta=(AllowPrivateAccess=true))
 	float GetLengthBetweenMesh() const {return LengthStaticMesh - OffsetStaticMesh;}
 
 	void SetComponentToAttachEnd(USceneComponent* EndComponentToAttach){ComponentToAttachEndTo = EndComponentToAttach;}
@@ -252,6 +253,7 @@ protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 	void CustomDestroyConstructedComponents();
 	virtual void Tick(float DeltaSeconds) override;
+	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable,Category="Chain",meta=(AllowPrivateAccess=true))
 	TArray<UStaticMeshComponent*> GetInstantiedDyanmicMeshes(){return DynamicStaticMeshComponents;}

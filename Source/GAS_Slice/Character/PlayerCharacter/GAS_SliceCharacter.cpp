@@ -29,7 +29,7 @@ AGAS_SliceCharacter::AGAS_SliceCharacter()
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
 
 	HandStart = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HandStart"));
-	HandStart->SetupAttachment(GetCapsuleComponent());	
+	HandStart->SetupAttachment(FirstPersonCameraComponent);	
 
 	Cable = CreateDefaultSubobject<UCableComponent>(TEXT("Cable"));
 	Cable->SetupAttachment(HandStart);

@@ -31,9 +31,6 @@ AGAS_SliceCharacter::AGAS_SliceCharacter()
 	HandStart = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("HandStart"));
 	HandStart->SetupAttachment(FirstPersonCameraComponent);	
 
-	Cable = CreateDefaultSubobject<UCableComponent>(TEXT("Cable"));
-	Cable->SetupAttachment(HandStart);
-
 	DirectionAnimationKnife = CreateDefaultSubobject<UArrowComponent>(TEXT("DirectionAnimationKnife"));
 	DirectionAnimationKnife->SetupAttachment(FirstPersonCameraComponent);
 
@@ -76,7 +73,6 @@ void AGAS_SliceCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	ResetKnife();
-	Cable->SetAttachEndToComponent(Knife->GetRootComponent());
 	Knife->GetBPChain()->SetComponentToAttachEnd(HandStart);
 }
 

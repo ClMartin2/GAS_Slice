@@ -45,9 +45,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* HandStart;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Cable", meta = (AllowPrivateAccess = "true"))
-	UCableComponent* Cable;
 	
 	UPROPERTY(VisibleAnywhere,Category="Actor Component", meta=(AllowPrivateAccess = "true"))
 	UAC_LedgeGrab* LedgeGrabComponent;

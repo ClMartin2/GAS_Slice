@@ -39,6 +39,13 @@ void AKnife::Throw_Implementation(FVector DirectionThrowKnife, FVector NewCamera
 void AKnife::ResetKnife()
 {
 	BP_Chain->SetSimulatePhysics(false);
+
+	if (IsAttached)
+	{
+		CheckMeshToAdd = false;
+		BP_Chain->DestroyAllDynamicMeshes();
+	}
+	
 	AngularBreakable = false;
 	StopMove();
 	IsAttached = false;
@@ -47,6 +54,13 @@ void AKnife::ResetKnife()
 	GetWorldTimerManager().ClearTimer(TimerHandleSetAngularBreakable);
 	BP_Chain->SetAngularBreakable(false);
 
+	GetWorldTimerManager().SetTimer(TimerHandleCheckMeshToAdd, this, &AKnife::ResetCheckMeshToAdd, 1, false);
+}
+
+void AKnife::ResetCheckMeshToAdd()
+{
+	GetWorldTimerManager().ClearTimer(TimerHandleCheckMeshToAdd);
+	CheckMeshToAdd = true;
 }
 
 void AKnife::StopMove_Implementation()
@@ -163,6 +177,9 @@ void AKnife::BeginPlay()
 void AKnife::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
+	if (!CheckMeshToAdd)
+		return;
 	
 	FVector HandLocation = 	HandStartLocation->GetComponentLocation();
 	

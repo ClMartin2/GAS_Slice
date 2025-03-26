@@ -67,7 +67,7 @@ private:
 	FString AttachEndComponentName;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
-	float Mass = 1;
+	bool StaticMeshCastShadow = false;
 	
 #pragma endregion Settings
 
@@ -84,6 +84,9 @@ private:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
 	bool StartWithPhysic = true;
+	
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
+	float Mass = 1;
 
 #pragma endregion Settings Physics
 
@@ -250,16 +253,14 @@ public :
 	UStaticMeshComponent* AddDynamicMesh(bool SimulatePhysics, bool _AngularBreakable = false);
 	
 	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
-	void DestroyDynamicMesh(UStaticMeshComponent* StaticMeshComponent);
-	
+	void DestroyDynamicMesh(UStaticMeshComponent* StaticMeshComponent,bool ClearDynamicArray = true);
+
+	void DestroyAllDynamicMeshes();
 	FVector GetLastPosition() const {return LastPosition;}
 	float GetLengthMesh() const {return LengthStaticMesh;}
 	float GetOffsetBetweenMesh() const {return OffsetStaticMesh;}
-
 	void SetAngularBreakable(bool _AngularBreakable);
-
 	void SetComponentToAttachEnd(USceneComponent* EndComponentToAttach){ComponentToAttachEndTo = EndComponentToAttach;}
-	
 	TArray<UStaticMeshComponent*> GetStaticMeshComponents() const {return StaticMeshComponents;}
 
 protected:

@@ -254,7 +254,10 @@ void ACustomPlayerController::PushToKnife()
 	float CoeffActualForce = CurrentPushForce/MaxPushForce;
 	
 	if (CurrentSpeed/MaxSpeed < CoeffActualForce)
+	{
 		CurrentSpeed = FMath::Clamp(CoeffActualForce * MaxSpeed, MinSpeed, MaxSpeed);
+		GetPlayerCharacterMovement()->MaxWalkSpeed = CurrentSpeed;
+	}
 	
 	FVector LocalNewVelocity = LocalDirection * CurrentPushForce;
 	
@@ -307,6 +310,7 @@ void ACustomPlayerController::SetActualSpeed(float SpeedToAdd)
 {
 	CurrentSpeed += SpeedToAdd;
 	CurrentSpeed = FMath::Clamp(CurrentSpeed, MinSpeed, MaxSpeed);
+	GetPlayerCharacterMovement()->MaxWalkSpeed = CurrentSpeed;
 }
 
 UCharacterMovementComponent* ACustomPlayerController::GetPlayerCharacterMovement()

@@ -70,12 +70,13 @@ private:
 	bool IsAttached;
 	bool hasAlreadyAttack = false;
 	bool AngularBreakable = false;
+	bool CheckMeshToAdd = true;
 	UStaticMeshComponent* HandStartLocation;
 	UAbilitySystemComponent* PlayerAbilitySystemComponent;
 	FTimerHandle TimerHandleSetPhysicsHit;
 	FTimerHandle TimerHandleSetAngularBreakable;
+	FTimerHandle TimerHandleCheckMeshToAdd;
 	
-
 public:
 	AKnife();	
 	
@@ -121,4 +122,5 @@ private:
 	void ReplaceHitKnife(const FHitResult& Hit);
 	void MakeDamage(FHitResult OutHit);
 	void BreakChain();
+	void ResetCheckMeshToAdd();
 };

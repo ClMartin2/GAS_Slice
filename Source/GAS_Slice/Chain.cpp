@@ -136,6 +136,8 @@ UStaticMeshComponent* AChain::CreateStaticMesh(bool SimulatePhysic = true, bool 
 	StaticMeshComponent->BodyInstance.bLockYRotation = bLockYRotation;
 	StaticMeshComponent->BodyInstance.bLockZRotation = bLockZRotation;
 
+	StaticMeshComponent->CastShadow = StaticMeshCastShadow;
+	
 	StaticMeshComponent->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 	StaticMeshComponents.Add(StaticMeshComponent);
 
@@ -271,19 +273,23 @@ UStaticMeshComponent* AChain::AddDynamicMesh(bool SimulatePhysics, bool _Angular
 	return StaticMeshComponent;
 }
 
-void AChain::DestroyDynamicMesh(UStaticMeshComponent* StaticMeshComponent)
+void AChain::DestroyDynamicMesh(UStaticMeshComponent* StaticMeshComponent, bool ClearDynamicArray)
 {
 	UPhysicsConstraintComponent* PhysicsConstraintComponent = DynamicMeshToPhysicsConstraint[StaticMeshComponent];
 	
 	StaticMeshComponents.Remove(StaticMeshComponent);
-	DynamicStaticMeshComponents.Remove(StaticMeshComponent);
 	PhysicsConstraints.Remove(PhysicsConstraintComponent);
-	DynamicPhysicsConstraintComponent.Remove(PhysicsConstraintComponent);
+
+	if (ClearDynamicArray)
+	{
+		DynamicStaticMeshComponents.Remove(StaticMeshComponent);
+		DynamicPhysicsConstraintComponent.Remove(PhysicsConstraintComponent);
+	}
 	
 	StaticMeshComponent->DestroyComponent();
 	PhysicsConstraintComponent->DestroyComponent();
 	CurrentIndex = StaticMeshComponents.Num();
-	LastPosition = StaticMeshComponents.Num() * FVector(LengthStaticMesh + OffsetStaticMesh, 0, 0);
+	LastPosition = (CurrentIndex - 1) * FVector(LengthStaticMesh + OffsetStaticMesh, 0, 0);
 	
 	//Correction when set new end mesh to attach this to the root and correct is rotation
 	UStaticMeshComponent* NewLastMesh = StaticMeshComponents[StaticMeshComponents.Num() - 1];
@@ -295,6 +301,17 @@ void AChain::DestroyDynamicMesh(UStaticMeshComponent* StaticMeshComponent)
 		if (CurrentIndex % 2 != 0)
 			NewLastMesh->SetRelativeRotation(FRotator(0, 0, -90));
 	}
+}
+
+void AChain::DestroyAllDynamicMeshes()
+{
+	for (int i = 0; i < DynamicStaticMeshComponents.Num(); i++)
+	{
+		DestroyDynamicMesh(DynamicStaticMeshComponents[i], false);
+	}
+
+	DynamicStaticMeshComponents.Empty();
+	DynamicPhysicsConstraintComponent.Empty();
 }
 
 void AChain::SetAngularBreakable(bool _AngularBreakable)

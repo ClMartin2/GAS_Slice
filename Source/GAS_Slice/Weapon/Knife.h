@@ -13,6 +13,8 @@ class UBoxComponent;
 class UStaticMeshComponent;
 class UCableComponent;
 
+DECLARE_DELEGATE(FOnChainBreak);
+
 UCLASS()
 class GAS_SLICE_API AKnife : public AActor
 {
@@ -37,8 +39,11 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	FVector OffsetBoxExtentCollisionAttack = FVector::Zero();
 
-	UPROPERTY(EditAnywhere, Category = "Settings")
+	UPROPERTY(EditAnywhere, Category = "Settings|Chain")
 	float DelaySetPhysicsChain = 0.3;
+
+	UPROPERTY(EditAnywhere, Category = "Settings|Chain")
+	float DelaySetAngularBreakable = 0.1;
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = Collision, meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* BoxCollision;
@@ -64,11 +69,12 @@ private:
 	FVector CameraForward;
 	bool IsAttached;
 	bool hasAlreadyAttack = false;
+	bool AngularBreakable = false;
 	UStaticMeshComponent* HandStartLocation;
-	
-private:
 	UAbilitySystemComponent* PlayerAbilitySystemComponent;
 	FTimerHandle TimerHandleSetPhysicsHit;
+	FTimerHandle TimerHandleSetAngularBreakable;
+	
 
 public:
 	AKnife();	
@@ -91,6 +97,8 @@ public:
 
 	UFUNCTION(BlueprintCallable,Category="Getter",meta = (allowPrivateAccess = "true"))
 	AChain* GetBPChain() const {return BP_Chain;}
+
+	FOnChainBreak OnChainBreak;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -105,10 +113,12 @@ protected:
 	void OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	void SetChainPhysicsHit();
+	void SetAngularBreakable();
 	void OnHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 	
 private:
 	void HitRotate(const FHitResult& Hit);
 	void ReplaceHitKnife(const FHitResult& Hit);
 	void MakeDamage(FHitResult OutHit);
+	void BreakChain();
 };

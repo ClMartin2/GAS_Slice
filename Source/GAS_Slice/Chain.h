@@ -8,6 +8,8 @@
 
 class UPhysicsConstraintComponent;
 
+DECLARE_DELEGATE(FOnChainBreak);
+
 UCLASS()
 class GAS_SLICE_API AChain : public AActor
 {
@@ -15,6 +17,9 @@ class GAS_SLICE_API AChain : public AActor
 	
 public:	
 	AChain();
+
+public:
+	FOnChainBreak OnChainBreakDelegate;
 
 private:
 #pragma region Settings
@@ -38,7 +43,7 @@ private:
 	float OffsetStaticMesh;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
-	float OffsetPhysicConstraint;
+	FVector OffsetPhysicConstraint;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
 	FVector Scale = FVector::One();
@@ -108,6 +113,16 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
 	float AngularBreakThreshold = 0;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
+	bool SoftSwingLimit = true;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
+	float SoftSwingStifness = 50;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
+	float SoftSwingDamping = 3;
+
+
 #pragma endregion Settings PhysicsConstraint AngularLimit
 
 #pragma region Settings PhysicsConstraint LinearLimit
@@ -138,12 +153,6 @@ private:
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
 	float LinearDamping = 0;
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
-	float LimitSize = 180;
-
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
-	TEnumAsByte<ELinearConstraintMotion> LimitLinearConstraintMotion = LCM_Locked;
 
 #pragma endregion Settings PhysicsConstraint LinearLimit
 
@@ -238,16 +247,19 @@ public :
 	void SetSimulatePhysics(bool IsSimulatePhysics);
 
 	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
-	UStaticMeshComponent* AddDynamicMesh(bool SimulatePhysics);
+	UStaticMeshComponent* AddDynamicMesh(bool SimulatePhysics, bool _AngularBreakable = false);
 	
 	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
 	void DestroyDynamicMesh(UStaticMeshComponent* StaticMeshComponent);
 	
 	FVector GetLastPosition() const {return LastPosition;}
-	float GetLengthBetweenMesh() const {return LengthStaticMesh - OffsetStaticMesh;}
+	float GetLengthMesh() const {return LengthStaticMesh;}
+	float GetOffsetBetweenMesh() const {return OffsetStaticMesh;}
+
+	void SetAngularBreakable(bool _AngularBreakable);
 
 	void SetComponentToAttachEnd(USceneComponent* EndComponentToAttach){ComponentToAttachEndTo = EndComponentToAttach;}
-
+	
 	TArray<UStaticMeshComponent*> GetStaticMeshComponents() const {return StaticMeshComponents;}
 
 protected:
@@ -260,8 +272,10 @@ protected:
 	TArray<UStaticMeshComponent*> GetInstantiedDyanmicMeshes(){return DynamicStaticMeshComponents;}
 
 private:
+	UFUNCTION()
+	void OnConstraintBroken(int32 ConstraintIndex);
 	UPhysicsConstraintComponent* CreatePhysicsConstraint(UPrimitiveComponent* FirstComponent, UPrimitiveComponent* SecondComponent, FVector Location, bool
-	                             IsRelativeLocation = true);
+	                                                     IsRelativeLocation = true);
 	UStaticMeshComponent* CreateStaticMesh(bool SimulatePhysic, bool FirstMesh);
 	void AttachEndStaticMesh();
 };

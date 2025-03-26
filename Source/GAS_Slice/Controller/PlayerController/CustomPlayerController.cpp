@@ -36,6 +36,8 @@ void ACustomPlayerController::BeginPlay()
 		
 		if (Knife != nullptr)
 			KnifeChildActor = Knife->GetParentComponent();
+
+		Knife->OnChainBreak.BindUObject(this, &ACustomPlayerController::OnBreakChain);
 		
 		InputComponent->BindKey(EKeys::G,IE_Pressed,this,&ACustomPlayerController::ActivateDebugMode);
 
@@ -276,6 +278,11 @@ void ACustomPlayerController::PullKnife_Implementation()
 		return;
 
 	PushToKnife();
+	ResetKnife();
+}
+
+void ACustomPlayerController::OnBreakChain()
+{
 	ResetKnife();
 }
 

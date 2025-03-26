@@ -170,7 +170,7 @@ protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void AttackEnemy();
 	virtual void AttackEnemy_Implementation();
-	
+
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	
@@ -189,7 +189,8 @@ private:
 	void ActivateDebugMode();
 	void ChangeMappingContext(UInputMappingContext* RemoveMappingContext, UInputMappingContext* AddMappingContext, TDelegate<void()>
 							  DelegateChangeMappingContexte, EMovementMode MovementMode);
-	
+	void OnBreakChain();
+
 	UFUNCTION()
 	void PushToKnife();
 

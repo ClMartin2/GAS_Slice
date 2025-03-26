@@ -39,9 +39,14 @@ void AKnife::Throw_Implementation(FVector DirectionThrowKnife, FVector NewCamera
 void AKnife::ResetKnife()
 {
 	BP_Chain->SetSimulatePhysics(false);
+	AngularBreakable = false;
 	StopMove();
 	IsAttached = false;
 	BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	GetWorldTimerManager().ClearTimer(TimerHandleSetPhysicsHit);
+	GetWorldTimerManager().ClearTimer(TimerHandleSetAngularBreakable);
+	BP_Chain->SetAngularBreakable(false);
+
 }
 
 void AKnife::StopMove_Implementation()
@@ -53,6 +58,13 @@ void AKnife::StopMove_Implementation()
 void AKnife::SetChainPhysicsHit()
 {
 	BP_Chain->SetSimulatePhysics(true);
+	GetWorldTimerManager().SetTimer(TimerHandleSetAngularBreakable, this, &AKnife::SetAngularBreakable, DelaySetAngularBreakable, false);
+}
+
+void AKnife::SetAngularBreakable()
+{
+	BP_Chain->SetAngularBreakable(true);
+	AngularBreakable = true;
 }
 
 void AKnife::OnHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -145,6 +157,7 @@ void AKnife::BeginPlay()
 {
 	Super::BeginPlay();
 	BP_Chain = Cast<AChain>(Chain->GetChildActor());
+	BP_Chain->OnChainBreakDelegate.BindUObject(this, &AKnife::BreakChain);
 }
 
 void AKnife::Tick(float DeltaSeconds)
@@ -163,10 +176,10 @@ void AKnife::Tick(float DeltaSeconds)
 	
 	FVector FirstChainLocation = FirstStaticMeshComponent->GetComponentLocation();
 	
-	float LengthLinkChain = BP_Chain->GetLengthBetweenMesh();
+	float LengthLinkChain = (BP_Chain->GetLengthMesh() * StaticMeshKnife_->GetComponentScale()).X /*- BP_Chain->GetOffsetBetweenMesh()*/;
 	float DistanceChainToHand = FVector::Distance(HandLocation,FirstChainLocation);
 
-	float NbLinkOnChain = FMath::Floor((DistanceChainToHand/LengthLinkChain) - 2);
+	float NbLinkOnChain = FMath::Floor((DistanceChainToHand/LengthLinkChain));
 
 	int DifferenceBetweenChain = StaticMeshComponents.Num() - NbLinkOnChain;
 
@@ -176,7 +189,7 @@ void AKnife::Tick(float DeltaSeconds)
 		{
 			for (int i = 0; i < DifferenceBetweenChain * -1; i++)
 			{
-				BP_Chain->AddDynamicMesh(IsAttached);
+				BP_Chain->AddDynamicMesh(IsAttached,AngularBreakable);
 			}
 		}else
 		{
@@ -194,4 +207,9 @@ void AKnife::MakeDamage(FHitResult OutHit)
 {
 	GAS_Utils::ApplyGameplayEffectToTargetSetByCaller(this,OutHit.GetActor(),GameplayEffectClass,PlayerAbilitySystemComponent,-Damage,FName("Event.Damage"));
 	hasAlreadyAttack = true;
+}
+
+void AKnife::BreakChain()
+{
+	OnChainBreak.Execute();
 }

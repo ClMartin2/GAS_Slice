@@ -17,9 +17,7 @@ void AChain::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 	if (!Reset)
 		return;
-
-	GEngine->AddOnScreenDebugMessage(-1, 2, FColor::Red, "Construct");
-
+	
 	DestroyConstructedComponents();
 	CustomDestroyConstructedComponents();
 
@@ -39,8 +37,8 @@ void AChain::OnConstruction(const FTransform& Transform)
 		CreatePhysicsConstraint(StaticMeshComponents[i - 1], StaticMeshComponents[i],
 		                        LastPosition - FVector(
 			                        (LengthStaticMesh + OffsetStaticMesh) - (LengthStaticMesh / 2 +
-				                        OffsetPhysicConstraint)
-			                        , 0, 0), true);
+				                        OffsetPhysicConstraint.X)
+			                        , OffsetPhysicConstraint.Y, OffsetPhysicConstraint.Z), true);
 	}
 
 	if (HasMiddleConstraint)
@@ -63,7 +61,6 @@ void AChain::OnConstruction(const FTransform& Transform)
 		if (GetParentComponent() != nullptr)
 		{
 			USceneComponent* AttachSceneComponent = GetParentComponent()->GetAttachParent();
-			GEngine->AddOnScreenDebugMessage(-1, 5, FColor::Yellow, AttachSceneComponent->GetName());
 			GetRootComponent()->AttachToComponent(AttachSceneComponent,
 			                                      FAttachmentTransformRules::KeepRelativeTransform);
 		}
@@ -203,16 +200,23 @@ UPhysicsConstraintComponent* AChain::CreatePhysicsConstraint(UPrimitiveComponent
 	PhysicsConstraint->SetAngularBreakable(AngularBreakable, AngularBreakThreshold);
 
 	PhysicsConstraint->ConstraintInstance.ProfileInstance.bEnableMassConditioning = EnableMassConditioning;
-
-	PhysicsConstraint->SetLinearXLimit(LimitLinearConstraintMotion, LimitSize);
+	
 	PhysicsConstraint->ConstraintInstance.SetSoftLinearLimitParams(SoftConstraint, LinearStifness, LinearDamping, 0, 0);
+	PhysicsConstraint->ConstraintInstance.SetSoftSwingLimitParams(SoftSwingLimit, SoftSwingStifness, SoftSwingDamping, 0, 0);
 
 	PhysicsConstraint->ConstraintInstance.SetShockPropagationParams(ShockPropagationEnabled, ShockPropagationAlpha);
 
+	PhysicsConstraint->OnConstraintBroken.AddDynamic(this, &AChain::OnConstraintBroken);
+	
 	PhysicsConstraints.Add(PhysicsConstraint);
 	PhysicsConstraint->RegisterComponent();
 
 	return PhysicsConstraint;
+}
+
+void AChain::OnConstraintBroken(int32 ConstraintIndex)
+{
+	OnChainBreakDelegate.Execute();
 }
 
 void AChain::SetSimulatePhysics(bool IsSimulatePhysics)
@@ -230,7 +234,7 @@ void AChain::SetSimulatePhysics(bool IsSimulatePhysics)
 	}
 }
 
-UStaticMeshComponent* AChain::AddDynamicMesh(bool SimulatePhysics)
+UStaticMeshComponent* AChain::AddDynamicMesh(bool SimulatePhysics, bool _AngularBreakable)
 {
 	UStaticMeshComponent* PreviousLastMesh = StaticMeshComponents[StaticMeshComponents.Num() - 1];
 
@@ -251,19 +255,15 @@ UStaticMeshComponent* AChain::AddDynamicMesh(bool SimulatePhysics)
 		return nullptr;
 
 	FVector NewLocation = LastPosition - FVector(
-		(LengthStaticMesh + OffsetStaticMesh) - (LengthStaticMesh / 2 + OffsetPhysicConstraint), 0, 0);
+									(LengthStaticMesh + OffsetStaticMesh) - (LengthStaticMesh / 2 + OffsetPhysicConstraint.X)
+									, OffsetPhysicConstraint.Y, OffsetPhysicConstraint.Z);
 
 	UPhysicsConstraintComponent* PhysicsConstraintComponent = CreatePhysicsConstraint(
 		StaticMeshComponents[CurrentIndex - 2],
 		StaticMeshComponents[CurrentIndex - 1], NewLocation, true);
 
-	// DrawDebugDirectionalArrow(GetWorld(), NewLocation, NewLocation + FVector::UpVector * 100000000000000, 10,
-	//                           FColor::Red,
-	//                           true, -1,
-	//                           0, 2);
-
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Blue, "Add Dynamic Mesh");
-
+	PhysicsConstraintComponent->SetAngularBreakable(_AngularBreakable, AngularBreakThreshold);
+	
 	DynamicStaticMeshComponents.Add(StaticMeshComponent);
 	DynamicPhysicsConstraintComponent.Add(PhysicsConstraintComponent);
 	DynamicMeshToPhysicsConstraint.Add(StaticMeshComponent, PhysicsConstraintComponent);
@@ -295,6 +295,13 @@ void AChain::DestroyDynamicMesh(UStaticMeshComponent* StaticMeshComponent)
 		if (CurrentIndex % 2 != 0)
 			NewLastMesh->SetRelativeRotation(FRotator(0, 0, -90));
 	}
-	
-	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Blue, "Remove Dynamic Mesh");
 }
+
+void AChain::SetAngularBreakable(bool _AngularBreakable)
+{
+	for (UPhysicsConstraintComponent* PhysicsConstraintComponent : PhysicsConstraints)
+	{
+		PhysicsConstraintComponent->SetAngularBreakable(_AngularBreakable, AngularBreakThreshold);
+	}
+}
+

@@ -134,7 +134,9 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|ID", meta = (AllowPrivateAccess = "true"))
 	uint8 TeamId;
 	
+	UPROPERTY(BlueprintReadOnly, Category = "Speed", meta = (AllowPrivateAccess = "true"))
 	float CurrentSpeed = MinSpeed;
+	
 	float CounterTimeReduceForceWhenLanded;
 	float CurrentPushForce = MinPushForce;
 	float BaseAirControlValue = 0;

@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/GameModeBase.h"
+#include "GameFramework/GameMode.h"
 #include "GAS_SliceGameMode.generated.h"
 
 UCLASS(minimalapi)
-class AGAS_SliceGameMode : public AGameModeBase
+class AGAS_SliceGameMode : public AGameMode
 {
 	GENERATED_BODY()
 

@@ -38,8 +38,9 @@ void ACustomPlayerController::BeginPlay()
 			KnifeChildActor = Knife->GetParentComponent();
 
 		Knife->OnChainBreak.BindUObject(this, &ACustomPlayerController::OnBreakChain);
-		
-		InputComponent->BindKey(EKeys::G,IE_Pressed,this,&ACustomPlayerController::ActivateDebugMode);
+
+		//Debug
+		// InputComponent->BindKey(EKeys::G,IE_Pressed,this,&ACustomPlayerController::ActivateDebugMode);
 
 		GetPlayerCharacterMovement()->AirControl = BaseAirControlValue;
 		StartLocationKnife = Knife->GetActorLocation();

@@ -46,7 +46,6 @@ void UAC_LedgeGrab::UpdateCheckCollision()
 {
 	FCollisionQueryParams Params(FName(TEXT("CapsuleTraceSingle")), true,GetOwner());
 	Params.bReturnPhysicalMaterial = true;
-	Params.bDebugQuery = true;
 
 	FVector Start = CharacterOwner->GetPawnViewLocation();
 	FVector End = Start - FVector::UpVector * LedgeGrabHeight;
@@ -59,14 +58,6 @@ void UAC_LedgeGrab::UpdateCheckCollision()
 	
 	GetWorld()->SweepSingleByChannel(OutHit, Start, End, CapsuleRotation.Quaternion(),ECC_Visibility
 	, FCollisionShape::MakeCapsule(CapsuleRadius,CapsuleHalfHeight), Params);
-
-	if (DrawCapsule)
-	{
-		//Debug Draw Capsule
-		DrawDebugCapsuleTraceSingle(GetWorld(),Start,End,CapsuleRadius,CapsuleHalfHeight,
-		CapsuleRotation,EDrawDebugTrace::ForDuration,false,OutHit,FColor::Red,
-		FColor::Green,0.1f);
-	}
 
 	bool MoveForward = FVector::DotProduct(GetOwner()->GetActorForwardVector(),
 		CharacterOwner->GetCharacterMovement()->GetLastInputVector()) > 0;

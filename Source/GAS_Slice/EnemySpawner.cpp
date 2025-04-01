@@ -4,33 +4,8 @@
 
 AEnemySpawner::AEnemySpawner()
 {
-	PrimaryActorTick.bCanEverTick = true; // Active Tick même en mode éditeur
+	PrimaryActorTick.bCanEverTick = true; 
 }
-
-#if WITH_EDITOR
-void AEnemySpawner::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
-{
-	Super::PostEditChangeProperty(PropertyChangedEvent);
-
-	if (GetWorld() && GetWorld()->WorldType == EWorldType::Editor)
-	{
-		DrawDebugCircle(
-			GetWorld(),
-			GetActorLocation(),
-			RadiusEnemyToSpawn,
-			50,
-			FColor::Red,
-			false,
-			10,
-			0,
-			2.f,
-			FVector(1, 0, 0),
-			FVector(0, 1, 0),
-			true
-		);
-	}
-}
-#endif
 
 void AEnemySpawner::BeginPlay()
 {

@@ -94,7 +94,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
 	float MaxPushForce = 2000;
 
-	UPROPERTY(EditAnywhere, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
 	float MinPushForce = 100;
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Force", meta = (AllowPrivateAccess = "true"))
@@ -102,10 +102,10 @@ private:
 #pragma endregion ForceSettings
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Speed", meta = (AllowPrivateAccess = "true"))
-	float MinSpeed = 800;
+	float MinCharacterSpeed = 800;
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Speed", meta = (AllowPrivateAccess = "true"))
-	float MaxSpeed = 2000;
+	float MaxCharacterSpeed = 2000;
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|Jump", meta = (AllowPrivateAccess = "true"))
     float DistanceBuffedJump = 50;
@@ -135,7 +135,7 @@ private:
 	uint8 TeamId;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Speed", meta = (AllowPrivateAccess = "true"))
-	float CurrentSpeed = MinSpeed;
+	float CurrentSpeed = MinCharacterSpeed;
 	
 	float CounterTimeReduceForceWhenLanded;
 	float CurrentPushForce = MinPushForce;

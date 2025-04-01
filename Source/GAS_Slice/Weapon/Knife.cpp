@@ -54,11 +54,6 @@ void AKnife::ResetKnife()
 	GetWorldTimerManager().ClearTimer(TimerHandleSetAngularBreakable);
 	BP_Chain->SetAngularBreakable(false);
 
-	ResetCheckMeshToAdd();
-}
-
-void AKnife::ResetCheckMeshToAdd()
-{
 	GetWorldTimerManager().ClearTimer(TimerHandleCheckMeshToAdd);
 	CheckMeshToAdd = true;
 }

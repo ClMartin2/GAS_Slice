@@ -34,9 +34,6 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Settings",meta=(AllowPrivateAccess=true))
 	float DurationToLerpToLedge = 0.2;
 
-	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category="Debug",meta=(AllowPrivateAccess=true))
-	bool DrawCapsule = false;
-
 	ACharacter* CharacterOwner;
 	
 	FVector StartPositionLerpLedgeGrab;

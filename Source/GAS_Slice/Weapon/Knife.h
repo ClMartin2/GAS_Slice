@@ -122,5 +122,4 @@ private:
 	void ReplaceHitKnife(const FHitResult& Hit);
 	void MakeDamage(FHitResult OutHit);
 	void BreakChain();
-	void ResetCheckMeshToAdd();
-};
+ };

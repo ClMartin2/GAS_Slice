@@ -36,9 +36,7 @@ private:
 	float CounterToSpawnEnemy = 0;
 
 protected:
-	void PostEditTick(UWorld* World, float DeltaSeconds);
 	virtual void BeginPlay() override;
-	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 	virtual void Tick(float DeltaTime) override;
 
 private :

@@ -1,6 +1,4 @@
 #include "Chain.h"
-
-#include "LandscapeGizmoActiveActor.h"
 #include "PhysicsEngine/PhysicsConstraintComponent.h"
 
 AChain::AChain()

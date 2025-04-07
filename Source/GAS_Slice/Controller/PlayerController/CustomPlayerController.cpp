@@ -225,6 +225,7 @@ void ACustomPlayerController::ResetKnife_Implementation()
 	PlayerCharacter->ResetKnife();
 	
 	bWasTheKnifeThrown = false;
+	bChainBreak = false;
 }
 
 void ACustomPlayerController::CheckDistanceKnife_Implementation()
@@ -281,13 +282,16 @@ void ACustomPlayerController::PullKnife_Implementation()
 	if (!bWasTheKnifeThrown && bIsAttacking)
 		return;
 
-	PushToKnife();
+	if (!bChainBreak)
+		PushToKnife();
+	
 	ResetKnife();
 }
 
 void ACustomPlayerController::OnBreakChain()
 {
-	ResetKnife();
+	bChainBreak = true;
+	GetWorldTimerManager().SetTimer(ResetKnifeAfterBreakingChain, this, &ACustomPlayerController::ResetKnife, DelayResetKnifeAfterBreaking, false);
 }
 
 #pragma endregion Knife

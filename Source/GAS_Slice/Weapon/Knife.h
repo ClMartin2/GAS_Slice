@@ -70,6 +70,7 @@ private:
 	bool IsAttached;
 	bool hasAlreadyAttack = false;
 	bool AngularBreakable = false;
+	bool LinearBreakable = false;
 	bool CheckMeshToAdd = true;
 	UStaticMeshComponent* HandStartLocation;
 	UAbilitySystemComponent* PlayerAbilitySystemComponent;

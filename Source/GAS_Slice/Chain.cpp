@@ -198,6 +198,7 @@ UPhysicsConstraintComponent* AChain::CreatePhysicsConstraint(UPrimitiveComponent
 	}
 
 	PhysicsConstraint->SetAngularBreakable(AngularBreakable, AngularBreakThreshold);
+	PhysicsConstraint->SetLinearBreakable(LinearBreakable, LinearBreakableThreshold);
 
 	PhysicsConstraint->ConstraintInstance.ProfileInstance.bEnableMassConditioning = EnableMassConditioning;
 	
@@ -234,7 +235,7 @@ void AChain::SetSimulatePhysics(bool IsSimulatePhysics)
 	}
 }
 
-UStaticMeshComponent* AChain::AddDynamicMesh(bool SimulatePhysics, bool _AngularBreakable)
+UStaticMeshComponent* AChain::AddDynamicMesh(bool SimulatePhysics, bool _AngularBreakable, bool _LinearBreakable)
 {
 	UStaticMeshComponent* PreviousLastMesh = StaticMeshComponents[StaticMeshComponents.Num() - 1];
 
@@ -262,7 +263,10 @@ UStaticMeshComponent* AChain::AddDynamicMesh(bool SimulatePhysics, bool _Angular
 		StaticMeshComponents[CurrentIndex - 2],
 		StaticMeshComponents[CurrentIndex - 1], NewLocation, true);
 
-	PhysicsConstraintComponent->SetAngularBreakable(_AngularBreakable, AngularBreakThreshold);
+	PhysicsConstraintComponent->SetAngularBreakable(false, AngularBreakThreshold);
+	PhysicsConstraintComponent->SetLinearBreakable(false, LinearBreakableThreshold);
+	
+	SetAngularBreakable(_AngularBreakable,_LinearBreakable);
 	
 	DynamicStaticMeshComponents.Add(StaticMeshComponent);
 	DynamicPhysicsConstraintComponent.Add(PhysicsConstraintComponent);
@@ -312,11 +316,14 @@ void AChain::DestroyAllDynamicMeshes()
 	DynamicPhysicsConstraintComponent.Empty();
 }
 
-void AChain::SetAngularBreakable(bool _AngularBreakable)
+void AChain::SetAngularBreakable(bool _AngularBreakable, bool _LinearBreakable)
 {
-	for (UPhysicsConstraintComponent* PhysicsConstraintComponent : PhysicsConstraints)
+	for (int i = 1; i < PhysicsConstraints.Num() - 1; i++)
 	{
+		UPhysicsConstraintComponent* PhysicsConstraintComponent = PhysicsConstraints[i];
+		
 		PhysicsConstraintComponent->SetAngularBreakable(_AngularBreakable, AngularBreakThreshold);
+		PhysicsConstraintComponent->SetLinearBreakable(_LinearBreakable, LinearBreakableThreshold);
 	}
 }
 

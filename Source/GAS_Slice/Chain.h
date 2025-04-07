@@ -157,6 +157,12 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
 	float LinearDamping = 0;
 
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	bool LinearBreakable = false;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	float LinearBreakableThreshold = 0;
+
 #pragma endregion Settings PhysicsConstraint LinearLimit
 
 #pragma region Settings PhysicsConstraint AngularMotor
@@ -250,7 +256,7 @@ public :
 	void SetSimulatePhysics(bool IsSimulatePhysics);
 
 	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
-	UStaticMeshComponent* AddDynamicMesh(bool SimulatePhysics, bool _AngularBreakable = false);
+	UStaticMeshComponent* AddDynamicMesh(bool SimulatePhysics, bool _AngularBreakable = false, bool _LinearBreakable = false);
 	
 	UFUNCTION(BlueprintCallable,Category="Physics",meta=(AllowPrivateAccess=true))
 	void DestroyDynamicMesh(UStaticMeshComponent* StaticMeshComponent,bool ClearDynamicArray = true);
@@ -259,7 +265,7 @@ public :
 	FVector GetLastPosition() const {return LastPosition;}
 	float GetLengthMesh() const {return LengthStaticMesh;}
 	float GetOffsetBetweenMesh() const {return OffsetStaticMesh;}
-	void SetAngularBreakable(bool _AngularBreakable);
+	void SetAngularBreakable(bool _AngularBreakable, bool _LinearBreakable);
 	void SetComponentToAttachEnd(USceneComponent* EndComponentToAttach){ComponentToAttachEndTo = EndComponentToAttach;}
 	TArray<UStaticMeshComponent*> GetStaticMeshComponents() const {return StaticMeshComponents;}
 

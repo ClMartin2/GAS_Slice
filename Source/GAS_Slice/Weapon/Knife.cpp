@@ -47,12 +47,13 @@ void AKnife::ResetKnife()
 	}
 	
 	AngularBreakable = false;
+	LinearBreakable = false;
 	StopMove();
 	IsAttached = false;
 	BoxCollision->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	GetWorldTimerManager().ClearTimer(TimerHandleSetPhysicsHit);
 	GetWorldTimerManager().ClearTimer(TimerHandleSetAngularBreakable);
-	BP_Chain->SetAngularBreakable(false);
+	BP_Chain->SetAngularBreakable(false, false);
 
 	GetWorldTimerManager().ClearTimer(TimerHandleCheckMeshToAdd);
 	CheckMeshToAdd = true;
@@ -72,8 +73,9 @@ void AKnife::SetChainPhysicsHit()
 
 void AKnife::SetAngularBreakable()
 {
-	BP_Chain->SetAngularBreakable(true);
+	BP_Chain->SetAngularBreakable(true, true);
 	AngularBreakable = true;
+	LinearBreakable = true;
 }
 
 void AKnife::OnHit_Implementation(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -201,7 +203,7 @@ void AKnife::Tick(float DeltaSeconds)
 		{
 			for (int i = 0; i < DifferenceBetweenChain * -1; i++)
 			{
-				BP_Chain->AddDynamicMesh(IsAttached,AngularBreakable);
+				BP_Chain->AddDynamicMesh(IsAttached,AngularBreakable,LinearBreakable);
 			}
 		}else
 		{

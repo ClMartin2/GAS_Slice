@@ -133,6 +133,9 @@ private:
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|ID", meta = (AllowPrivateAccess = "true"))
 	uint8 TeamId;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = "Settings|KnifeChain", meta = (AllowPrivateAccess = "true"))
+	float DelayResetKnifeAfterBreaking = 0.1;
 	
 	UPROPERTY(BlueprintReadOnly, Category = "Speed", meta = (AllowPrivateAccess = "true"))
 	float CurrentSpeed = MinCharacterSpeed;
@@ -148,10 +151,12 @@ private:
 	bool bWasTheKnifeThrown = false;
 	bool bDebugModeActivated = false;
 	bool bIsAttacking = false;
+	bool bChainBreak = false;
 
 	FTimeline TimelineAttackAnimation;
 	FTimerHandle UpdateAttackTimerHandle;
-	
+	FTimerHandle ResetKnifeAfterBreakingChain;
+
 protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
 	void ThrowKnife();

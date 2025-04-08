@@ -24,105 +24,105 @@ public:
 private:
 #pragma region Settings
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
 	bool Reset = false;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
 	int NumberOfLinks = 10;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
 	TArray<UStaticMeshComponent*> StaticMeshComponents;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
 	TArray<UPhysicsConstraintComponent*> PhysicsConstraints;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
 	USceneComponent* CustomRootComponent;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
 	float OffsetStaticMesh;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
 	FVector OffsetPhysicConstraint;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
 	FVector Scale = FVector::One();
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
 	UStaticMesh* StaticMesh;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
 	float LinearDampling = 0.01f;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
 	float AngularDampling = 0;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
 	bool AttachStart = true;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
 	bool AttachEnd = false;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
 	FString AttachEndComponentName;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
 	bool StaticMeshCastShadow = false;
 	
 #pragma endregion Settings
 
 #pragma region Settings|Physics
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
 	bool bLockXRotation = true;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
 	bool bLockYRotation = true;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
 	bool bLockZRotation = true;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
 	bool StartWithPhysic = true;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
 	float Mass = 1;
 
 #pragma endregion Settings Physics
 
 #pragma region Settings PhysicsConstraint AngularLimit
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
 	TEnumAsByte<EAngularConstraintMotion> ConstraintTwistMotion;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
 	float TwistLimitAngle;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
 	TEnumAsByte<EAngularConstraintMotion> ConstraintSwing1Motion;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
 	float Swing1LimitAngle;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
 	TEnumAsByte<EAngularConstraintMotion> ConstraintSwing2Motion;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
 	float Swing2LimitAngle;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
 	bool AngularBreakable = false;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
 	float AngularBreakThreshold = 0;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
 	bool SoftSwingLimit = true;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
 	float SoftSwingStifness = 50;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
 	float SoftSwingDamping = 3;
 
 
@@ -130,119 +130,119 @@ private:
 
 #pragma region Settings PhysicsConstraint LinearLimit
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
 	TEnumAsByte<ELinearConstraintMotion> XLinearConstraintMotionLimit;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
 	float XLimitSize;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
 	TEnumAsByte<ELinearConstraintMotion> YLinearConstraintMotionLimit;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
 	float YLimitSize;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
 	TEnumAsByte<ELinearConstraintMotion> ZLinearConstraintMotionLimit;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
 	float ZLimitSize;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
 	bool SoftConstraint = true;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
 	float LinearStifness = 100;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
 	float LinearDamping = 0;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
 	bool LinearBreakable = false;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|LinearLimit",meta=(AllowPrivateAccess=true))
 	float LinearBreakableThreshold = 0;
 
 #pragma endregion Settings PhysicsConstraint LinearLimit
 
 #pragma region Settings PhysicsConstraint AngularMotor
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
 	TEnumAsByte<EAngularDriveMode::Type> AngularDriveMode;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
 	FVector TargetVelocity;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
 	FRotator TargetOrientation;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
 	bool EnableSwingDriveTargetVelocityAngularMotor;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
 	bool EnableTwistDriveTargetVelocityAngularMotor;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
 	bool EnableSwingDriveTargetOrientationAngularMotor;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
 	bool EnableTwistDriveTargetOrientationAngularMotor;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
 	float PositionStrength;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
 	float VelocityStrength;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
 	float MaxForce;
 
 #pragma endregion Settings PhysicsConstraint AngularMotor
 
 #pragma region Settings PhysicsConstraint ConstraintBehaviour
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true))
 	bool EnableMassConditioning = true;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true))
 	bool ProjectionEnabled = true;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true))
 	bool ShockPropagationEnabled = false;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true))
 	float ShockPropagationAlpha = 0.3;
 	
 #pragma endregion Settings PhysicsConstraint ConstraintBehaviour
 
 #pragma region Settings PhysicsConstraint MiddleConstraint
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
 	bool HasMiddleConstraint = false;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
 	bool MiddleIsSoftConstraint = true;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
 	float MiddleStifness = 100;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
 	float MiddleDamping = 0;
 
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
 	float MiddleLimitSize = 180;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Settings|PhysicsConstraint|MiddleContraint",meta=(AllowPrivateAccess=true))
 	TEnumAsByte<ELinearConstraintMotion> MiddleLimitLinearConstraintMotion = LCM_Limited;
 #pragma endregion Settings PhysicsConstraint MiddleConstraint
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Debug",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Debug",meta=(AllowPrivateAccess=true))
 	FVector LastPosition = FVector::Zero();
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Debug",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Debug",meta=(AllowPrivateAccess=true))
 	float LengthStaticMesh = 0;
 	
-	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category="Debug",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Debug",meta=(AllowPrivateAccess=true))
 	int CurrentIndex = 0;
 	
 	TArray<UStaticMeshComponent*> DynamicStaticMeshComponents;

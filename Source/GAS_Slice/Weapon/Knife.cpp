@@ -190,7 +190,7 @@ void AKnife::Tick(float DeltaSeconds)
 	
 	FVector FirstChainLocation = FirstStaticMeshComponent->GetComponentLocation();
 	
-	float LengthLinkChain = (BP_Chain->GetLengthMesh() * StaticMeshKnife_->GetComponentScale()).X /*- BP_Chain->GetOffsetBetweenMesh()*/;
+	float LengthLinkChain = (BP_Chain->GetLengthMesh() * StaticMeshKnife_->GetComponentScale()).X;
 	float DistanceChainToHand = FVector::Distance(HandLocation,FirstChainLocation);
 
 	float NbLinkOnChain = FMath::Floor((DistanceChainToHand/LengthLinkChain));
@@ -203,7 +203,7 @@ void AKnife::Tick(float DeltaSeconds)
 		{
 			for (int i = 0; i < DifferenceBetweenChain * -1; i++)
 			{
-				BP_Chain->AddDynamicMesh(IsAttached,AngularBreakable,LinearBreakable);
+				BP_Chain->AddDynamicMesh(IsAttached,false,LinearBreakable);
 			}
 		}else
 		{

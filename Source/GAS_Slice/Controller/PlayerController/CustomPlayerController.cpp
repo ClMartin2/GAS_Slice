@@ -188,7 +188,13 @@ void ACustomPlayerController::ActivateDebugMode()
 
 void ACustomPlayerController::ThrowKnife_Implementation()
 {
-	if (bWasTheKnifeThrown && bIsAttacking)
+	if (bWasTheKnifeThrown)
+	{
+		ResetKnife();
+		return;
+	}
+
+	if (bIsAttacking)
 		return;
 
 	FVector ForwardThrowKnife = PlayerCameraManager->GetCameraRotation().Vector();

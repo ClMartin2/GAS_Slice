@@ -52,12 +52,6 @@ private:
 	UStaticMesh* StaticMesh;
 
 	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
-	float LinearDampling = 0.01f;
-
-	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
-	float AngularDampling = 0;
-
-	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
 	bool AttachStart = true;
 
 	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
@@ -74,6 +68,12 @@ private:
 #pragma region Settings|Physics
 
 	UPROPERTY(EditAnywhere,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
+	float LinearDampling = 0.01f;
+
+	UPROPERTY(EditAnywhere,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
+	float AngularDampling = 0;
+	
+	UPROPERTY(EditAnywhere,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
 	bool bLockXRotation = true;
 
 	UPROPERTY(EditAnywhere,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
@@ -85,8 +85,14 @@ private:
 	UPROPERTY(EditAnywhere,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
 	bool StartWithPhysic = true;
 	
-	UPROPERTY(EditAnywhere,Category="Settings",meta=(AllowPrivateAccess=true))
+	UPROPERTY(EditAnywhere,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
 	float Mass = 1;
+
+	UPROPERTY(EditAnywhere,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
+	bool bOverrideMaxAngularVelocity = false;
+
+	UPROPERTY(EditAnywhere,Category="Settings|Physics",meta=(AllowPrivateAccess=true))
+	float MaxAngularVelocity = 100;
 
 #pragma endregion Settings Physics
 
@@ -124,6 +130,12 @@ private:
 
 	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
 	float SoftSwingDamping = 3;
+
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
+	bool AngularPlasticity = false;
+
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularLimit",meta=(AllowPrivateAccess=true))
+	float AngularPlasticityThreshold;
 
 
 #pragma endregion Settings PhysicsConstraint AngularLimit
@@ -177,7 +189,7 @@ private:
 	FRotator TargetOrientation;
 
 	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
-	bool EnableSwingDriveTargetVelocityAngularMotor;
+	bool _EnableSwingDriveTargetVelocityAngularMotor = true;
 
 	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|AngularMotor",meta=(AllowPrivateAccess=true))
 	bool EnableTwistDriveTargetVelocityAngularMotor;
@@ -207,6 +219,20 @@ private:
 	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true))
 	bool ProjectionEnabled = true;
 
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true))
+	float ProjectionLinearTolerance;
+
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true))
+	float ProjectionAngularTolerance;
+
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true,
+		ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+	float ProjectionLinearAlpha;
+	
+	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true,
+		ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+	float ProjectionAngularAlpha;
+	
 	UPROPERTY(EditAnywhere,Category="Settings|PhysicsConstraint|ConstraintBehaviour",meta=(AllowPrivateAccess=true))
 	bool ShockPropagationEnabled = false;
 
@@ -268,9 +294,10 @@ public :
 	void SetAngularBreakable(bool _AngularBreakable, bool _LinearBreakable);
 	void SetComponentToAttachEnd(USceneComponent* EndComponentToAttach){ComponentToAttachEndTo = EndComponentToAttach;}
 	TArray<UStaticMeshComponent*> GetStaticMeshComponents() const {return StaticMeshComponents;}
+	void InitializeChain();
+	void OnConstruction(const FTransform& Transform);
 
 protected:
-	virtual void OnConstruction(const FTransform& Transform) override;
 	void CustomDestroyConstructedComponents();
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;

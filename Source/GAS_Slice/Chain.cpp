@@ -10,9 +10,8 @@ AChain::AChain()
 	StaticMeshComponents.Init(nullptr, 0);
 }
 
-void AChain::OnConstruction(const FTransform& Transform)
+void AChain::InitializeChain()
 {
-	Super::OnConstruction(Transform);
 	if (!Reset)
 		return;
 	
@@ -69,6 +68,12 @@ void AChain::OnConstruction(const FTransform& Transform)
 
 	if (AttachEnd)
 		AttachEndStaticMesh();
+}
+
+void AChain::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	InitializeChain();
 }
 
 void AChain::CustomDestroyConstructedComponents()
@@ -130,9 +135,12 @@ UStaticMeshComponent* AChain::CreateStaticMesh(bool SimulatePhysic = true, bool 
 	StaticMeshComponent->SetAngularDamping(AngularDampling);
 	StaticMeshComponent->SetCollisionProfileName("KnifeCable");
 	StaticMeshComponent->SetMassOverrideInKg(NAME_None, Mass);
+	
 	StaticMeshComponent->BodyInstance.bLockXRotation = bLockXRotation;
 	StaticMeshComponent->BodyInstance.bLockYRotation = bLockYRotation;
 	StaticMeshComponent->BodyInstance.bLockZRotation = bLockZRotation;
+	StaticMeshComponent->BodyInstance.bOverrideMaxAngularVelocity = bOverrideMaxAngularVelocity;
+	StaticMeshComponent->BodyInstance.MaxAngularVelocity = MaxAngularVelocity;
 
 	StaticMeshComponent->CastShadow = StaticMeshCastShadow;
 	
@@ -178,11 +186,11 @@ UPhysicsConstraintComponent* AChain::CreatePhysicsConstraint(UPrimitiveComponent
 
 	PhysicsConstraint->SetAngularDriveMode(AngularDriveMode);
 	PhysicsConstraint->SetAngularVelocityTarget(TargetVelocity);
-	PhysicsConstraint->SetAngularVelocityDrive(EnableSwingDriveTargetVelocityAngularMotor,
+	PhysicsConstraint->SetAngularVelocityDrive(_EnableSwingDriveTargetVelocityAngularMotor,
 	                                           EnableTwistDriveTargetVelocityAngularMotor);
 	PhysicsConstraint->SetAngularDriveParams(PositionStrength, VelocityStrength, MaxForce);
 
-	PhysicsConstraint->SetAngularOrientationDrive(EnableSwingDriveTargetVelocityAngularMotor,
+	PhysicsConstraint->SetAngularOrientationDrive(_EnableSwingDriveTargetVelocityAngularMotor,
 	                                              EnableTwistDriveTargetVelocityAngularMotor);
 	PhysicsConstraint->SetAngularOrientationTarget(TargetOrientation);
 
@@ -207,7 +215,12 @@ UPhysicsConstraintComponent* AChain::CreatePhysicsConstraint(UPrimitiveComponent
 
 	PhysicsConstraint->ConstraintInstance.SetShockPropagationParams(ShockPropagationEnabled, ShockPropagationAlpha);
 
+	PhysicsConstraint->SetAngularPlasticity(AngularPlasticity, AngularPlasticityThreshold);
+
 	PhysicsConstraint->OnConstraintBroken.AddDynamic(this, &AChain::OnConstraintBroken);
+	
+	PhysicsConstraint->SetProjectionParams(ProjectionLinearAlpha, ProjectionAngularAlpha,
+		ProjectionLinearTolerance, ProjectionAngularTolerance);
 	
 	PhysicsConstraints.Add(PhysicsConstraint);
 	PhysicsConstraint->RegisterComponent();
@@ -318,7 +331,7 @@ void AChain::DestroyAllDynamicMeshes()
 
 void AChain::SetAngularBreakable(bool _AngularBreakable, bool _LinearBreakable)
 {
-	for (int i = 1; i < PhysicsConstraints.Num() - 1; i++)
+	for (int i = 3; i < PhysicsConstraints.Num() - 1; i++)
 	{
 		UPhysicsConstraintComponent* PhysicsConstraintComponent = PhysicsConstraints[i];
 		

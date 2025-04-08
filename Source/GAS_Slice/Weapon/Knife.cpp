@@ -73,7 +73,7 @@ void AKnife::SetChainPhysicsHit()
 
 void AKnife::SetAngularBreakable()
 {
-	BP_Chain->SetAngularBreakable(true, true);
+	BP_Chain->SetAngularBreakable(false, false);
 	AngularBreakable = true;
 	LinearBreakable = true;
 }
@@ -203,7 +203,7 @@ void AKnife::Tick(float DeltaSeconds)
 		{
 			for (int i = 0; i < DifferenceBetweenChain * -1; i++)
 			{
-				BP_Chain->AddDynamicMesh(IsAttached,false,LinearBreakable);
+				BP_Chain->AddDynamicMesh(IsAttached,false,false);
 			}
 		}else
 		{

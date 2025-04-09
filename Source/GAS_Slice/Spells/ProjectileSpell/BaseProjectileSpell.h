@@ -1,0 +1,40 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "AbilitySystemComponent.h"
+#include "../BaseSpell.h"
+#include "BaseProjectileSpell.generated.h"
+
+class USphereComponent;
+class UProjectileMovementComponent;
+
+UCLASS()
+class GAS_SLICE_API ABaseProjectileSpell : public ABaseSpell
+{
+	GENERATED_BODY()
+
+public:
+	ABaseProjectileSpell();
+	
+protected:
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category= "Collider", meta=(AllowPrivateAccess=true))
+	USphereComponent* SphereCollider;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category= "Projectile", meta=(AllowPrivateAccess=true))
+	UProjectileMovementComponent* ProjectileMovement;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category= "Visual", meta=(AllowPrivateAccess=true))
+	UStaticMeshComponent* Mesh;
+
+	virtual void OnOverlapActor(AActor* CollideActor);
+	
+protected:
+	UFUNCTION(BlueprintNativeEvent,Category="Collision",meta = (AllowPrivateAccess=true))
+	void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+		int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	
+	void OnSphereBeginOverlap_Implementation(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+};

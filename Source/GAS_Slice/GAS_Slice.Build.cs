@@ -8,7 +8,11 @@ public class GAS_Slice : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "CableComponent" });
-		PrivateDependencyModuleNames.AddRange(new string[] { "CableComponent", "ClothingSystemRuntimeCommon", "AIModule" });
+		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "CableComponent","PhysicsCore" });
+		PrivateDependencyModuleNames.AddRange(new string[]
+		{
+			"CableComponent", "ClothingSystemRuntimeCommon", "AIModule", "GameplayAbilities"
+			,"GameplayTags", "GameplayTasks"
+		});
 	}
 }

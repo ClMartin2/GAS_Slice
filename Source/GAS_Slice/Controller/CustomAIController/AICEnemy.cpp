@@ -8,8 +8,8 @@ AAICEnemy::AAICEnemy()
 void AAICEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+	
 }
-
 
 ETeamAttitude::Type AAICEnemy::GetTeamAttitudeTowards(const AActor& Other) const
 {
@@ -28,4 +28,3 @@ ETeamAttitude::Type AAICEnemy::GetTeamAttitudeTowards(const AActor& Other) const
 
 	return ETeamAttitude::Neutral;
 }
-

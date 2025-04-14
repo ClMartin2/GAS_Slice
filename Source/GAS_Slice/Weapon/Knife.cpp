@@ -5,7 +5,7 @@
 #include "DrawDebugHelpers.h"
 #include "Math/Quat.h"
 #include "../Library/GAS_Utils.h"
-#include "GAS_Slice/Chain.h"
+#include "GAS_Slice/Weapon/Chain/Chain.h"
 
 AKnife::AKnife()
 {
@@ -20,10 +20,10 @@ AKnife::AKnife()
 	ProjectileMovement->UpdatedComponent = BoxCollision;
 	ProjectileMovement->bRotationFollowsVelocity = true;
 	ProjectileMovement->MaxSpeed = MaxSpeed;
-	
-	Chain = CreateDefaultSubobject<UChildActorComponent>(FName(TEXT("Chain")));
-	Chain->SetChildActorClass(ChainClass);
-	Chain->SetupAttachment(StaticMeshKnife_);
+
+	DynamicChain = CreateDefaultSubobject<UChildActorComponent>(FName(TEXT("Dynamic Chain")));
+	DynamicChain->SetChildActorClass(DynamicChainClass);
+	DynamicChain->SetupAttachment(StaticMeshKnife_);
 }
 
 void AKnife::Throw_Implementation(FVector DirectionThrowKnife, FVector NewCameraForward)
@@ -167,15 +167,30 @@ void AKnife::FinishCheckCollisionAttack()
 void AKnife::BeginPlay()
 {
 	Super::BeginPlay();
-	BP_Chain = Cast<AChain>(Chain->GetChildActor());
+	BP_Chain = Cast<ADynamicChain>(DynamicChain->GetChildActor());
 	BP_Chain->OnChainBreakDelegate.BindUObject(this, &AKnife::BreakChain);
 }
 
 void AKnife::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+	AddDynamicMeshChain();
+}
 
-	if (!CheckMeshToAdd)
+void AKnife::MakeDamage(FHitResult OutHit)
+{
+	GAS_Utils::ApplyGameplayEffectToTargetSetByCaller(this,OutHit.GetActor(),GameplayEffectClass,PlayerAbilitySystemComponent,-Damage,FName("Event.Damage"));
+	hasAlreadyAttack = true;
+}
+
+void AKnife::BreakChain()
+{
+	OnChainBreak.Execute();
+}
+
+void AKnife::AddDynamicMeshChain()
+{
+	if (!CheckMeshToAdd || HandStartLocation == nullptr)
 		return;
 	
 	FVector HandLocation = 	HandStartLocation->GetComponentLocation();
@@ -187,7 +202,6 @@ void AKnife::Tick(float DeltaSeconds)
 		return;
 	
 	UStaticMeshComponent* FirstStaticMeshComponent = StaticMeshComponents[0];
-	
 	FVector FirstChainLocation = FirstStaticMeshComponent->GetComponentLocation();
 	
 	float LengthLinkChain = (BP_Chain->GetLengthMesh() * StaticMeshKnife_->GetComponentScale()).X;
@@ -215,15 +229,4 @@ void AKnife::Tick(float DeltaSeconds)
 			}
 		}
 	}
-}
-
-void AKnife::MakeDamage(FHitResult OutHit)
-{
-	GAS_Utils::ApplyGameplayEffectToTargetSetByCaller(this,OutHit.GetActor(),GameplayEffectClass,PlayerAbilitySystemComponent,-Damage,FName("Event.Damage"));
-	hasAlreadyAttack = true;
-}
-
-void AKnife::BreakChain()
-{
-	OnChainBreak.Execute();
 }

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Chain/ADynamicChain.h"
 #include "GameFramework/Actor.h"
-#include "GAS_Slice/Chain.h"
 #include "Knife.generated.h"
 
 class AChain;
@@ -55,13 +55,16 @@ private:
 	UProjectileMovementComponent* ProjectileMovement;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Settings", meta = (AllowPrivateAccess = "true"))
-	UChildActorComponent* Chain;
+	UChildActorComponent* DynamicChain;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Movement, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<AChain> ChainClass;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Settings", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<ADynamicChain> DynamicChainClass;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Actor", meta = (AllowPrivateAccess = "true"))
-	AChain* BP_Chain;
+	ADynamicChain* BP_Chain;
 
 	UPROPERTY(EditAnywhere, Category = "Settings|GAS", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UGameplayEffect> GameplayEffectClass;
@@ -123,4 +126,5 @@ private:
 	void ReplaceHitKnife(const FHitResult& Hit);
 	void MakeDamage(FHitResult OutHit);
 	void BreakChain();
+	void AddDynamicMeshChain();
  };

@@ -1,6 +1,4 @@
 #include "CustomPlayerController.h"
-#include "CableComponent.h"
-#include "CollisionDebugDrawingPublic.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "EnhancedInputComponent.h"
@@ -24,37 +22,32 @@ void ACustomPlayerController::BeginPlay()
 
 	PlayerCharacter = (AGAS_SliceCharacter*)UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 
-	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+		GetLocalPlayer()))
 	{
 		Subsystem->AddMappingContext(DefaultMappingContext, 0);
 	}
 
-	if (PlayerCharacter != nullptr) {
+	if (PlayerCharacter != nullptr)
+	{
 		SetUpPlayerInputComponent();
-		Knife = PlayerCharacter->GetKnife();
-		PlayerCharacter->LandedDelegate.AddDynamic(this, &ACustomPlayerController::LandedDelegate);
+
+		GetWorldTimerManager().SetTimer(StartDelayInitKnife, this, &ACustomPlayerController::InitKnife,
+									0.1f, false);
 		
-		if (Knife != nullptr)
-			KnifeChildActor = Knife->GetParentComponent();
-
-		Knife->OnChainBreak.BindUObject(this, &ACustomPlayerController::OnBreakChain);
-
-		//Debug
-		// InputComponent->BindKey(EKeys::G,IE_Pressed,this,&ACustomPlayerController::ActivateDebugMode);
-
+		PlayerCharacter->LandedDelegate.AddDynamic(this, &ACustomPlayerController::LandedDelegate);
 		GetPlayerCharacterMovement()->AirControl = BaseAirControlValue;
-		StartLocationKnife = Knife->GetActorLocation();
 	}
 
 	FOnTimelineFloat ProgressUpdate;
-	ProgressUpdate.BindUFunction(this,FName("AttackAnimationUpdate"));
+	ProgressUpdate.BindUFunction(this, FName("AttackAnimationUpdate"));
 
 	FOnTimelineEvent FinishedEvent;
-	FinishedEvent.BindUFunction(this,FName("AttackAnimationFinish"));
+	FinishedEvent.BindUFunction(this, FName("AttackAnimationFinish"));
 
-	TimelineAttackAnimation.AddInterpFloat(CurveTimelineAttackAnimation,ProgressUpdate);
+	TimelineAttackAnimation.AddInterpFloat(CurveTimelineAttackAnimation, ProgressUpdate);
 	TimelineAttackAnimation.SetTimelineFinishedFunc(FinishedEvent);
-	TimelineAttackAnimation.SetPlayRate(1/DurationAnimAttack);
+	TimelineAttackAnimation.SetPlayRate(1 / DurationAnimAttack);
 }
 
 void ACustomPlayerController::Tick(float DeltaTime)
@@ -64,16 +57,16 @@ void ACustomPlayerController::Tick(float DeltaTime)
 	TimelineAttackAnimation.TickTimeline(DeltaTime);
 }
 
-#pragma endregion	Unreal Functions
+#pragma endregion Unreal Functions
 
 #pragma region InputFunction
 
 void ACustomPlayerController::Move(const FInputActionValue& Value)
 {
 	FVector2D MovementVector = Value.Get<FVector2D>();
-	
+
 	PlayerCharacter->AddMovementInput(PlayerCharacter->GetActorForwardVector(), MovementVector.Y);
-	PlayerCharacter->AddMovementInput(PlayerCharacter->GetActorRightVector(), MovementVector.X);	
+	PlayerCharacter->AddMovementInput(PlayerCharacter->GetActorRightVector(), MovementVector.X);
 }
 
 void ACustomPlayerController::Look(const FInputActionValue& Value)
@@ -87,13 +80,14 @@ void ACustomPlayerController::Look(const FInputActionValue& Value)
 void ACustomPlayerController::GoUp(const FInputActionValue& Value)
 {
 	float LocalDirection = Value.Get<float>();
- 	PlayerCharacter->AddMovementInput(FVector::UpVector,LocalDirection,false);
+	PlayerCharacter->AddMovementInput(FVector::UpVector, LocalDirection, false);
 }
 
-void ACustomPlayerController::Jump() {
+void ACustomPlayerController::Jump()
+{
 	if (JumpCount >= PlayerCharacter->JumpMaxCount)
 		return;
-	
+
 	FCollisionQueryParams RV_TraceParams =
 		FCollisionQueryParams(FName(TEXT("RV_Trace")), true, PlayerCharacter);
 	RV_TraceParams.bTraceComplex = true;
@@ -104,20 +98,23 @@ void ACustomPlayerController::Jump() {
 	FVector Start = PlayerCharacter->GetActorLocation() -
 		PlayerCharacter->GetActorUpVector() * PlayerCharacter->GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	FVector End = Start - PlayerCharacter->GetActorUpVector() * DistanceBuffedJump;
-	
+
 	if (RV_Hit.bBlockingHit)
 	{
 		GetPlayerCharacterMovement()->SetMovementMode(MOVE_Walking);
 	}
 
-	if (PlayerCharacter != nullptr) {
+	if (PlayerCharacter != nullptr)
+	{
 		PlayerCharacter->Jump();
 		JumpCount++;
 	}
 }
 
-void ACustomPlayerController::StopJumping() {
-	if (PlayerCharacter != nullptr) {
+void ACustomPlayerController::StopJumping()
+{
+	if (PlayerCharacter != nullptr)
+	{
 		PlayerCharacter->StopJumping();
 	}
 }
@@ -129,30 +126,37 @@ void ACustomPlayerController::StopJumping() {
 void ACustomPlayerController::SetUpPlayerInputComponent()
 {
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
-	
+
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACustomPlayerController::Jump);
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACustomPlayerController::StopJumping);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this,
+	                                   &ACustomPlayerController::StopJumping);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Look);
-	EnhancedInputComponent->BindAction(ThrowKnifeAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::ThrowKnife);
-	EnhancedInputComponent->BindAction(ResetKnifeAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::PullKnife);
-	EnhancedInputComponent->BindAction(AttackEnemyAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::AttackEnemy);
+	EnhancedInputComponent->BindAction(ThrowKnifeAction, ETriggerEvent::Triggered, this,
+	                                   &ACustomPlayerController::ThrowKnife);
+	EnhancedInputComponent->BindAction(ResetKnifeAction, ETriggerEvent::Triggered, this,
+	                                   &ACustomPlayerController::PullKnife);
+	EnhancedInputComponent->BindAction(AttackEnemyAction, ETriggerEvent::Triggered, this,
+	                                   &ACustomPlayerController::AttackEnemy);
 }
 
 void ACustomPlayerController::SetupDebugModeInputComponent()
 {
 	UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
-	
+
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::Look);
 	EnhancedInputComponent->BindAction(GoUpAction, ETriggerEvent::Triggered, this, &ACustomPlayerController::GoUp);
 }
 
 void ACustomPlayerController::ChangeMappingContext(UInputMappingContext* RemoveMappingContext, UInputMappingContext*
-	AddMappingContext,FDelegateCallBackChangeMappingContext DelegateChangeMappingContexte,EMovementMode MovementMode)
+                                                   AddMappingContext,
+                                                   FDelegateCallBackChangeMappingContext DelegateChangeMappingContexte,
+                                                   EMovementMode MovementMode)
 {
-	UEnhancedInputLocalPlayerSubsystem* LocalSubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
-	
+	UEnhancedInputLocalPlayerSubsystem* LocalSubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+		GetLocalPlayer());
+
 	LocalSubSystem->RemoveMappingContext(RemoveMappingContext);
 	LocalSubSystem->AddMappingContext(AddMappingContext, 0);
 	DelegateChangeMappingContexte.Execute();
@@ -162,29 +166,64 @@ void ACustomPlayerController::ChangeMappingContext(UInputMappingContext* RemoveM
 
 void ACustomPlayerController::ActivateDebugMode()
 {
-	UEnhancedInputLocalPlayerSubsystem* LocalSubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer());
+	UEnhancedInputLocalPlayerSubsystem* LocalSubSystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(
+		GetLocalPlayer());
 
 	if (!bDebugModeActivated)
 	{
 		FDelegateCallBackChangeMappingContext DelegateSetDebugModeInput;
-		DelegateSetDebugModeInput.BindUObject(this,&ACustomPlayerController::SetupDebugModeInputComponent);
-		
-		ChangeMappingContext(DefaultMappingContext,DebugModeMappingContext,
-			DelegateSetDebugModeInput,MOVE_Flying);
+		DelegateSetDebugModeInput.BindUObject(this, &ACustomPlayerController::SetupDebugModeInputComponent);
+
+		ChangeMappingContext(DefaultMappingContext, DebugModeMappingContext,
+		                     DelegateSetDebugModeInput, MOVE_Flying);
 	}
 	else
 	{
 		FDelegateCallBackChangeMappingContext DelegateSetUpPlayerInput;
-		DelegateSetUpPlayerInput.BindUObject(this,&ACustomPlayerController::SetUpPlayerInputComponent);
-		
-		ChangeMappingContext(DebugModeMappingContext,DefaultMappingContext,
-			DelegateSetUpPlayerInput,MOVE_Falling);
+		DelegateSetUpPlayerInput.BindUObject(this, &ACustomPlayerController::SetUpPlayerInputComponent);
+
+		ChangeMappingContext(DebugModeMappingContext, DefaultMappingContext,
+		                     DelegateSetUpPlayerInput, MOVE_Falling);
 	}
 
 	bDebugModeActivated = !bDebugModeActivated;
 }
 
 #pragma region Knife
+
+void ACustomPlayerController::InitKnife()
+{
+	TArray<AActor*> ChildActors;
+	PlayerCharacter->GetAllChildActors(ChildActors, true);
+
+	for (AActor* Actor : ChildActors)
+	{
+		if (Actor->IsA(AKnife::StaticClass()))
+		{
+			Knife = Cast<AKnife>(Actor);
+		}
+	}
+
+	if (Knife != nullptr)
+	{
+		KnifeChildActor = Knife->GetParentComponent();
+		ParentKnife = KnifeChildActor->GetAttachParent();
+			
+		KnifeStartLocation = KnifeChildActor->GetRelativeLocation();
+		KnifeStartRotation = KnifeChildActor->GetRelativeRotation();
+
+		UStaticMeshComponent* HandStart = PlayerCharacter->GetHandStart();
+		
+		Knife->SetAbilitySystemComponent(PlayerCharacter->_GetAbilitySystemComponent());
+		Knife->SetHandStartLocation(HandStart);
+		
+		Knife->OnChainBreak.BindUObject(this, &ACustomPlayerController::OnBreakChain);
+			
+		ResetKnife();
+		StartLocationKnife = Knife->GetActorLocation();
+		Knife->GetBPChain()->SetComponentToAttachEnd(HandStart);
+	}
+}
 
 void ACustomPlayerController::ThrowKnife_Implementation()
 {
@@ -198,7 +237,7 @@ void ACustomPlayerController::ThrowKnife_Implementation()
 		return;
 
 	FVector ForwardThrowKnife = PlayerCameraManager->GetCameraRotation().Vector();
-	
+
 	FHitResult HitResult(ForceInit);
 	FVector CameraLocation = PlayerCameraManager->GetCameraLocation();
 	FVector KnifeLocation = Knife->GetActorLocation();
@@ -207,9 +246,10 @@ void ACustomPlayerController::ThrowKnife_Implementation()
 	RV_TraceParams.bTraceComplex = true;
 	RV_TraceParams.bReturnPhysicalMaterial = false;
 
-	GetWorld()->LineTraceSingleByChannel(HitResult, CameraLocation, CameraLocation + ForwardThrowKnife * 99999999999999999,
-		ECollisionChannel::ECC_Visibility, RV_TraceParams);
-	
+	GetWorld()->LineTraceSingleByChannel(HitResult, CameraLocation,
+	                                     CameraLocation + ForwardThrowKnife * 99999999999999999,
+	                                     ECollisionChannel::ECC_Visibility, RV_TraceParams);
+
 	FVector DirectionKnife = FVector::ZeroVector;
 
 	if (HitResult.GetActor() != nullptr)
@@ -218,25 +258,29 @@ void ACustomPlayerController::ThrowKnife_Implementation()
 		DirectionKnife = (CameraLocation + ForwardThrowKnife * 10000) - KnifeLocation;
 
 	DirectionKnife = DirectionKnife.GetSafeNormal();
-	
-	PlayerCharacter->ThrowKnife();
-	Knife->Throw(DirectionKnife,ForwardThrowKnife);
-	
+
+	Knife->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+
+	Knife->Throw(DirectionKnife, ForwardThrowKnife);
+
 	bWasTheKnifeThrown = true;
-} 
+}
 
 void ACustomPlayerController::ResetKnife_Implementation()
 {
 	Knife->ResetKnife();
-	PlayerCharacter->ResetKnife();
+	
+	Knife->AttachToComponent(ParentKnife, FAttachmentTransformRules::KeepRelativeTransform);
+	Knife->SetActorRelativeTransform(FTransform(KnifeStartRotation, KnifeStartLocation));
 	
 	bWasTheKnifeThrown = false;
 	bChainBreak = false;
 }
 
-void ACustomPlayerController::CheckDistanceKnife_Implementation()
+void ACustomPlayerController::CheckDistanceKnife()
 {
-	float Distance = FVector::Distance(PlayerCharacter->GetHandStart()->GetComponentLocation(),Knife->GetActorLocation());
+	float Distance = FVector::Distance(PlayerCharacter->GetHandStart()->GetComponentLocation(),
+	                                   Knife->GetActorLocation());
 
 	if (Distance > MaxDistance)
 	{
@@ -248,33 +292,33 @@ void ACustomPlayerController::PushToKnife()
 {
 	if (!Knife->GetIsAttached())
 		return;
-	
+
 	FVector LocalDirection = (Knife->GetActorLocation() - PlayerCameraManager->GetCameraLocation());
 	float LengthVectorDirection = LocalDirection.Length();
 	LocalDirection = LocalDirection.GetSafeNormal();
-	
+
 	float Angle = FMath::RadiansToDegrees(FMath::Acos(
 		FVector::DotProduct(LocalDirection, PlayerCharacter->GetActorForwardVector())));
 	float CoeffAngle = FVector::DotProduct(LocalDirection, -PlayerCharacter->GetActorUpVector());
 	bool AddBaseZVelocity = -CoeffAngle >= 0.0f;
 	// float LocalCoeffZpushForce = 1 - Angle/MaxAngle;
 	SetActualPushForce(LengthVectorDirection * FMath::Abs(CoeffForceToAdd));
-	float CoeffActualForce = CurrentPushForce/MaxPushForce;
-	
-	if (CurrentSpeed/MaxCharacterSpeed < CoeffActualForce)
+	float CoeffActualForce = CurrentPushForce / MaxPushForce;
+
+	if (CurrentSpeed / MaxCharacterSpeed < CoeffActualForce)
 	{
 		CurrentSpeed = FMath::Clamp(CoeffActualForce * MaxCharacterSpeed, MinCharacterSpeed, MaxCharacterSpeed);
 		GetPlayerCharacterMovement()->MaxWalkSpeed = CurrentSpeed;
 	}
-	
+
 	FVector LocalNewVelocity = LocalDirection * CurrentPushForce;
-	
+
 	LocalNewVelocity.Z = FMathf::Clamp(MinZPushForce * AddBaseZVelocity + LocalNewVelocity.Z
-		,MinZPushForce,MaxZPushForce);
+	                                   , MinZPushForce, MaxZPushForce);
 
 	GetPlayerCharacterMovement()->Velocity = FVector::ZeroVector;
 	GetPlayerCharacterMovement()->AddImpulse(LocalNewVelocity, true);
-	GetPlayerCharacterMovement()->AirControl = AirControlPushToKnife; 
+	GetPlayerCharacterMovement()->AirControl = AirControlPushToKnife;
 }
 
 void ACustomPlayerController::SetActualPushForce(float ForceToAdd)
@@ -290,14 +334,15 @@ void ACustomPlayerController::PullKnife_Implementation()
 
 	if (!bChainBreak)
 		PushToKnife();
-	
+
 	ResetKnife();
 }
 
 void ACustomPlayerController::OnBreakChain()
 {
 	bChainBreak = true;
-	GetWorldTimerManager().SetTimer(ResetKnifeAfterBreakingChain, this, &ACustomPlayerController::ResetKnife, DelayResetKnifeAfterBreaking, false);
+	GetWorldTimerManager().SetTimer(ResetKnifeAfterBreakingChain, this, &ACustomPlayerController::ResetKnife,
+	                                DelayResetKnifeAfterBreaking, false);
 }
 
 #pragma endregion Knife
@@ -313,7 +358,6 @@ void ACustomPlayerController::LandedDelegate(const FHitResult& Hit)
 
 void ACustomPlayerController::OnLandedCharacter_Implementation()
 {
-	
 }
 #pragma endregion Landed
 
@@ -334,7 +378,7 @@ UCharacterMovementComponent* ACustomPlayerController::GetPlayerCharacterMovement
 
 FGenericTeamId ACustomPlayerController::GetGenericTeamId() const
 {
-	return 	FGenericTeamId(TeamId);
+	return FGenericTeamId(TeamId);
 }
 
 #pragma region Attack
@@ -343,19 +387,19 @@ void ACustomPlayerController::AttackEnemy_Implementation()
 {
 	if (bIsAttacking && bWasTheKnifeThrown)
 		return;
-	
+
 	FVector StartLocation = PlayerCharacter->GetDirectionAnimationKnife()->GetRelativeLocation();
 	FRotator StartRotation = RotationAnimAttack;
-	
-	Knife->SetActorLocation(StartLocation,false,nullptr,ETeleportType::ResetPhysics);
-	Knife->SetActorRelativeRotation(StartRotation,false,nullptr,ETeleportType::ResetPhysics);
+
+	Knife->SetActorLocation(StartLocation, false, nullptr, ETeleportType::ResetPhysics);
+	Knife->SetActorRelativeRotation(StartRotation, false, nullptr, ETeleportType::ResetPhysics);
 
 	StartLocationKnifeAttackAnim = StartLocation;
 	StartRotationKnifeAttackAnim = StartRotation;
-	
+
 	TimelineAttackAnimation.PlayFromStart();
 	GetWorldTimerManager().SetTimer(UpdateAttackTimerHandle, this, &ACustomPlayerController::CheckCollisionAttack,
-		0.01f, true);
+	                                0.01f, true);
 	bIsAttacking = true;
 }
 
@@ -363,19 +407,20 @@ void ACustomPlayerController::AttackEnemy_Implementation()
 void ACustomPlayerController::AttackAnimationUpdate(float Ratio) const
 {
 	FVector StartLocation = StartLocationKnifeAttackAnim;
-	FVector LocalForwardArrowVector = UKismetMathLibrary::InverseTransformDirection(PlayerCharacter->GetFirstPersonCameraComponent()->GetComponentTransform()
-		,PlayerCharacter->GetDirectionAnimationKnife()->GetForwardVector());
+	FVector LocalForwardArrowVector = UKismetMathLibrary::InverseTransformDirection(
+		PlayerCharacter->GetFirstPersonCameraComponent()->GetComponentTransform()
+		, PlayerCharacter->GetDirectionAnimationKnife()->GetForwardVector());
 	FVector EndLocation = StartLocation + LocalForwardArrowVector * DistanceAttackAnim;
 
 	FRotator StartRotation = StartRotationKnifeAttackAnim;
 	FRotator EndRotation = StartRotation + EndRotationAnimAttack;
 
-	FRotator LerpRotation = FMath::Lerp(StartRotation,EndRotation,Ratio);
-	FVector LerpLocation = FMath::Lerp(StartLocation,EndLocation,Ratio);
-	
-	FTransform NewTransform = FTransform(LerpRotation,LerpLocation,Knife->GetActorScale());
-	
-	Knife->SetActorRelativeTransform(NewTransform,false,nullptr,ETeleportType::ResetPhysics);
+	FRotator LerpRotation = FMath::Lerp(StartRotation, EndRotation, Ratio);
+	FVector LerpLocation = FMath::Lerp(StartLocation, EndLocation, Ratio);
+
+	FTransform NewTransform = FTransform(LerpRotation, LerpLocation, Knife->GetActorScale());
+
+	Knife->SetActorRelativeTransform(NewTransform, false, nullptr, ETeleportType::ResetPhysics);
 }
 
 void ACustomPlayerController::AttackAnimationFinish()

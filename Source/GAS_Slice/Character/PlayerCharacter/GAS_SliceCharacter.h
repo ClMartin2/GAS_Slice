@@ -58,28 +58,14 @@ private:
 	UChildActorComponent* KnifeChildActorComponent;
 	
 public:
+	AGAS_SliceCharacter();
+	
 	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 	AKnife* GetKnife() const { return Knife; }
 	UStaticMeshComponent* GetHandStart() const {return HandStart;}
 	UAC_LedgeGrab* GetLedgeGrab() const {return LedgeGrabComponent;}
 	UArrowComponent* GetDirectionAnimationKnife() const {return DirectionAnimationKnife;}
-
-public:
-	AGAS_SliceCharacter();
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
-	void ThrowKnife();
-
-	virtual void ThrowKnife_Implementation();
-
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
-	void ResetKnife();
-
-	virtual void ResetKnife_Implementation();
-	
-protected:
-	virtual void PostInitializeComponents() override;
-	virtual void BeginPlay() override;
+	UAbilitySystemComponent* _GetAbilitySystemComponent() const {return GetAbilitySystemComponent();}
 };
 

@@ -76,6 +76,9 @@ private:
 
 	AKnife* Knife;
 	USceneComponent* KnifeChildActor;
+	USceneComponent* ParentKnife;
+	FVector KnifeStartLocation;
+	FRotator KnifeStartRotation;
 	
 	UPROPERTY(EditAnywhere, Category = "Settings|Knife", meta = (AllowPrivateAccess = "true"))
 	float MaxDistance;
@@ -156,6 +159,7 @@ private:
 	FTimeline TimelineAttackAnimation;
 	FTimerHandle UpdateAttackTimerHandle;
 	FTimerHandle ResetKnifeAfterBreakingChain;
+	FTimerHandle StartDelayInitKnife;
 
 protected:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
@@ -181,9 +185,8 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Knife")
+	UFUNCTION(BlueprintCallable, Category = "Knife")
 	void CheckDistanceKnife();
-	virtual void CheckDistanceKnife_Implementation();
 
 private:
 	void Move(const FInputActionValue& Value);
@@ -221,5 +224,6 @@ private:
 
 	virtual FGenericTeamId GetGenericTeamId() const override;
 	void CheckCollisionAttack() const;
+	void InitKnife();
 };
 
